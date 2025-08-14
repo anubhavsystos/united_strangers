@@ -26,7 +26,7 @@
             </div>
             <input type="text" name="category" id="category" value="" class="d-none" >
             <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-6">
                     <div class="mb-3">
                         <label for="visibility" class="form-label ol-form-label"> {{get_phrase('Visibility')}} *</label>
                         <select name="visibility" id="visibility" class="form-control ol-form-control ol-select22 ol-select2" required>
@@ -36,6 +36,12 @@
                         </select>
                     </div>
                 </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="tables" class="form-label ol-form-label"> {{get_phrase('Tables')}} *</label>
+                        <input type="number" name="tables" id="tables" class="form-control ol-form-control" placeholder="{{get_phrase('Enter Number of Table')}}" >
+                    </div>
+                </div>            
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label for="is_popular" class="form-label ol-form-label"> {{get_phrase('Type')}} *</label>
@@ -53,6 +59,7 @@
                     </div>
                 </div>
             </div>
+           
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">

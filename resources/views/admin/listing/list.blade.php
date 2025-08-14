@@ -77,12 +77,7 @@
                          @endif 
                     </td>
                     <td> {{$category}} </td>
-                    @if ($type == 'car')
-                    <td> {{$brand}} </td>
-                    <td> {{$model}} </td>
-                    <td> {{currency($listing->price)}} </td>
-                    @elseif($type == 'beauty')
-                    @elseif($type == 'work' || $type == 'sleep')
+                    @if($type == 'work' || $type == 'sleep')
                     <td> {{currency($listing->price)}} </td>
                     @endif
                     <td> {{ucwords($listing->visibility)}} </td>
@@ -92,14 +87,11 @@
                                 <span class="fi-rr-menu-dots-vertical"></span>
                             </button>
                             <ul class="dropdown-menu">
-
                              <li><a class="dropdown-item fs-14px" href="{{route('listing.details',['id'=>$listing->id,'type'=>$listing->type, 'slug'=>slugify($listing->title)])}}" target="_blank"> {{get_phrase('View frontend')}} </a></li>
-
                               <li><a class="dropdown-item fs-14px" href="{{route('admin.listing.status',['type'=>$type, 'id'=>$listing->id, 'status'=>$listing->visibility])}}"> {{get_phrase('Change visibility')}} </a></li>
-
                               <li><a class="dropdown-item fs-14px" href="{{route('admin.listing.edit',['type'=>$type, 'id'=>$listing->id, 'tab'=>0])}}"> {{get_phrase('Edit')}} </a></li>
+                              <li><a class="dropdown-item fs-14px" onclick="delete_modal('{{route('admin.listing.delete',['type'=>$type, 'id'=>$listing->id])}}')" href="javascript:void(0);"> {{get_phrase('Delete')}} </a></li>
 
-                              <li><a class="dropdown-item fs-14px" onclick="delete_modal('{{route('admin.listing.delete',['type'=>$type, 'id'=>$listing->id])}}')" href="javascript:void(0);"> {{get_phrase('Delete')}} </a></a></li>
                             </ul>
                         </div>
                     </td>

@@ -368,7 +368,7 @@
                                 <div class="ol-card mt-3">
                                     <div class="ol-card mt-3">
                                         <div class="ol-card-body p-3">
-                                            @if(count($bookings_data))
+                                            @if(count($bookings))
                                             <table id="datatable" class=" table nowrap w-100">
                                                 <thead>
                                                     <tr>
@@ -385,7 +385,7 @@
                                                 </thead>
                                                 <tbody>
                                                     @php $num = 1 @endphp
-                                                    @foreach ($bookings_data as $listing)
+                                                    @foreach ($bookings as $listing)
                                                     @php
                                                     
                                                         $category = App\Models\Category::where('id', $listing->category)->first()->name;
@@ -456,7 +456,23 @@
                         <div class="row">                            
                              <!-- start -->
                             <div class="col-sm-12">
-                                
+                                <div class="d-flex flex-wrap" id="image-container">
+                                    <!-- Image previews will be dynamically added here -->
+                                    @foreach (json_decode($listing->image) as $key => $image)
+                                        <div class="possition_relative" id="image-icon{{ $key }}">
+                                            <img class="object-fit" src="{{ get_all_image('listing-images/' . $image) }}" class="rounded" height="50" width="50">
+                                            <a href="javascript:void(0);" onclick="listing_image_delete('{{ route('admin.listing.image.delete', ['type' => $type, 'id' => $listing->id, 'image' => $image]) }}', '{{ $key }}')"> <i data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" class="fas fa-trash-alt"></i> </a>
+                                        </div>
+                                    @endforeach
+                                </div>
+                                <div class="form-group">
+                                    <label for="listing-icon-image" class="file-upload-label">
+                                        <div class="label-bg">
+                                            <span>{{ get_phrase('Click to upload SVG, PNG, JPG, or GIF') }} ({{ get_phrase('max 500 x 700px') }})</span>
+                                        </div>
+                                    </label>
+                                    <input type="file" id="listing-icon-image" name="listing_image[]" class="form-control d-none" multiple>
+                                </div>
                             </div>
                             <!-- end -->
                         </div>

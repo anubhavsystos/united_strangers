@@ -44,7 +44,7 @@ return [
             'url' => env('DB_URL'),
             'host' => '127.0.0.1',
             'port' => env('DB_PORT', '3306'),
-            'database' => 'united_to_strangers',
+            'database' => 'united_strangers',
             'username' => 'root',
             'password' => '',
             'unix_socket' => env('DB_SOCKET', ''),

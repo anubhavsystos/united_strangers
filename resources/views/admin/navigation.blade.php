@@ -3,12 +3,12 @@
 <div class="sidebar-logo-area">
     <a href="" class="sidebar-logos">
         @if(get_frontend_settings('light_logo'))
-        <img class="sidebar-logo-lg" height="50px" src="{{ asset('uploads/logo/' . get_frontend_settings('light_logo')) }}" alt="">
+        <img class="sidebar-logo-lg" height="50px" src="{{ asset('uploads/logo/logo.png') }}" alt="">
         @else
           <img class="sidebar-logo-lg" height="50px" src="{{ asset('assets/backend/images/logo-light-bg.svg') }}" alt="">
         @endif
         @if(get_frontend_settings('favicon_logo'))
-        <img class="sidebar-logo-sm" height="40px" src="{{ asset('uploads/logo/' . get_frontend_settings('favicon_logo')) }}" alt="">
+        <img class="sidebar-logo-sm" height="40px" src="{{  asset('uploads/logo/logo.png') }}" alt="">
         @else
             <img class="sidebar-logo-sm" height="40px" src="{{ asset('assets/backend/images/favicon.svg') }}" alt="">
         @endif 

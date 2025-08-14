@@ -3,8 +3,6 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use App\Models\BeautyListing;
-use App\Models\CarListing;
 use App\Models\Category;
 use App\Models\Listing_Feature;
 use App\Models\Listing_Specification;
@@ -15,6 +13,7 @@ use App\Models\Room;
 use App\Models\Menu;
 use App\Models\ClaimedListing;
 use App\Models\ReportedListing;
+use App\Models\Booking;
 use Brian2694\Toastr\Facades\Toastr;
 use App\Models\NearByLocation;
 use Carbon\Carbon;
@@ -24,7 +23,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ListingController extends Controller
 {
-    public function __construct(Category $category,SleepListing $sleepListing,Listing_Feature $listingFeature,Listing_Specification $listingSpecification,WorkListing $workListing,PlayListing $playListing,Room $room,Menu $menu,ClaimedListing $claimedListing,ReportedListing $reportedListing,NearByLocation $nearByLocation) {
+    public function __construct(Category $category,SleepListing $sleepListing,Listing_Feature $listingFeature,Listing_Specification $listingSpecification,WorkListing $workListing,PlayListing $playListing,Room $room,Menu $menu,ClaimedListing $claimedListing,ReportedListing $reportedListing,NearByLocation $nearByLocation, Booking $booking) {
     
     $this->category = $category;
     $this->sleepListing = $sleepListing;
@@ -37,6 +36,7 @@ class ListingController extends Controller
     $this->claimedListing = $claimedListing;
     $this->reportedListing = $reportedListing;
     $this->nearByLocation = $nearByLocation;
+    $this->booking = $booking;
 }
 
 
@@ -127,6 +127,7 @@ class ListingController extends Controller
             $data['near_by']='{"0":"school","1":"hospital","2":"shopping_center"}';
              $this->workListing->insert($data);
         }elseif($type == 'play'){
+            $data['tables'] = sanitizenumber($request->tables);            
             $data['is_popular'] = $request->is_popular ?? 0;
             $this->playListing->insert($data);
         }
@@ -153,6 +154,11 @@ class ListingController extends Controller
             $page_data['listing'] = $this->sleepListing->where('id', $id)->first();
         }elseif($type == 'play'){
             $page_data['listing'] = $this->playListing->where('id', $id)->first();
+            $page_data['bookings'] = $this->playListing->where('id', $id)->get();
+            $startDate = Carbon::now()->startOfMonth();
+            $endDate = Carbon::now()->addMonths(6)->endOfMonth();
+
+            $bookings = $this->booking::whereBetween('booking_date', [$startDate, $endDate])->get();
         }
         $page_data['categories'] = $this->category->where('type', $type)->get();
         $page_data['tab'] = $tab;
@@ -197,96 +203,7 @@ class ListingController extends Controller
 
       
 
-        if($type == 'car'){
-            $data['sub_title'] = sanitize($request->sub_title);
-            $data['brand'] = sanitize($request->brand);
-            $data['model'] = sanitize($request->model);
-            $data['year'] = sanitize($request->year);
-            $data['car_type'] = sanitize($request->car_type);
-            $data['transmission'] = sanitize($request->transmission);
-            $data['fuel_type'] = sanitize($request->fuel_type);
-            $data['engine_size'] = sanitize($request->engine_size);
-            $data['cylinder'] = sanitize($request->cylinder);
-            $data['interior_color'] = sanitize($request->interior_color);
-            $data['exterior_color'] = sanitize($request->exterior_color);
-            $data['drive_train'] = sanitize($request->drive_train);
-            $data['trim'] = sanitize($request->trim);
-            $data['mileage'] = sanitize($request->mileage);
-            $data['vin'] = sanitize($request->vin);
-            $data['price'] = sanitize($request->price);
-            $data['discount_price'] = $request->discount_price;
-            $data['feature'] = sanitize($request->feature);
-            $data['specification'] = sanitize($request->specification);
-            $data['is_popular'] = $request->is_popular ?? 0;
-            $data['status'] = sanitize($request->status);
-            $data['stock'] =sanitize($request->stock);
-
-            $listing_image = json_decode(CarListing::where('id', $id)->pluck('image')->toArray()[0])??[];
-
-            if ($request->hasFile('listing_image')) {
-                foreach ($request->file('listing_image') as $key => $image) {
-                    $imageName = $key.'-'.time() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('uploads/listing-images'), $imageName);
-                    array_push($listing_image, $imageName);
-                }
-                $data['image'] = json_encode($listing_image);
-            }else{
-                $data['image'] = $listing_image;
-            }
-            
-            CarListing::where('id', $id)->update($data);
-            Session::flash('success', get_phrase('Listing Update successfully!'));
-            if(isset($request->is_agent) && $request->is_agent == 1){
-                return redirect('agent/my-listings');
-            }else{
-                return redirect('admin/listings/car');
-            }
-        }elseif($type == 'beauty'){
-
-            $opening_times = [
-                'saturday' => ['open' => sanitize($request->saturday_open), 'close' => sanitize($request->saturday_close)],
-                'sunday' => ['open' =>sanitize( $request->sunday_open), 'close' => sanitize($request->sunday_close)],
-                'monday' => ['open' => sanitize($request->monday_open), 'close' => sanitize($request->monday_close)],
-                'tuesday' => ['open' => sanitize($request->tuesday_open), 'close' => sanitize($request->tuesday_close)],
-                'wednesday' => ['open' => sanitize($request->wednesday_open), 'close' => sanitize($request->wednesday_close)],
-                'thursday' => ['open' => sanitize($request->thursday_open), 'close' => sanitize($request->thursday_close)],
-                'friday' => ['open' => sanitize($request->friday_open), 'close' => sanitize($request->friday_close)],
-            ];
-            
-            // Encode the array into JSON format
-            $data['opening_time'] = json_encode($opening_times);
-
-            $data['video'] = sanitize($request->video);
-
-            $data['is_popular'] = $request->is_popular ?? 0;
-            
-            $data['team'] = json_encode($request->team)??[];
-            
-            $data['service'] = json_encode($request->service)??[];
-
-
-            $listing_image = json_decode(BeautyListing::where('id', $id)->pluck('image')->toArray()[0])??[];
-
-            if ($request->hasFile('listing_image')) {
-                foreach ($request->file('listing_image') as $key => $image) {
-                    $imageName = $key.'-'.time() . '.' . $image->getClientOriginalExtension();
-                    $image->move(public_path('uploads/listing-images'), $imageName);
-                    array_push($listing_image, $imageName);
-                }
-                $data['image'] = json_encode($listing_image);
-            }else{
-                $data['image'] = $listing_image;
-            }
-            Session::flash('success', get_phrase('Listing Update successfully!'));
-            BeautyListing::where('id', $id)->update($data);
-
-            if(isset($request->is_agent) && $request->is_agent == 1){
-                return redirect('agent/my-listings');
-            }else{
-                return redirect('admin/listings/beauty');
-            }
-            
-        }elseif($type == 'sleep'){
+      if($type == 'sleep'){
             $data['price'] = sanitize($request->price);
             $data['bed'] = sanitize($request->bed);
             $data['bath'] = sanitize($request->bath);
@@ -295,10 +212,7 @@ class ListingController extends Controller
             $data['feature'] = json_encode($request->feature)??[];
             $data['room'] = json_encode($request->room)??[];
             $data['is_popular'] = $request->is_popular ?? 0;
-          
-            
             $listing_image = json_decode($this->sleepListing->where('id', $id)->pluck('image')->toArray()[0])??[];
-
             if ($request->hasFile('listing_image')) {
                 foreach ($request->file('listing_image') as $key => $image) {
                     $imageName = $key.'-'.time() . '.' . $image->getClientOriginalExtension();
@@ -331,10 +245,7 @@ class ListingController extends Controller
             $data['sub_dimension'] = sanitize($request->sub_dimension);
             $data['feature'] = json_encode($request->feature)??[];
             $data['status'] = sanitize($request->status);
-
-
             $listing_image = json_decode( $this->workListing->where('id', $id)->pluck('image')->toArray()[0])??[];
-
             if ($request->hasFile('listing_image')) {
                 foreach ($request->file('listing_image') as $key => $image) {
                     $imageName = $key.'-'.time() . '.' . $image->getClientOriginalExtension();
@@ -345,8 +256,6 @@ class ListingController extends Controller
             }else{
                 $data['image'] = json_encode($listing_image);
             }
-
-            // Model
             if ($request->model) {
                 $random_name = rand();
                 $attachment = $random_name . '.' . $request->model->getClientOriginalExtension();
@@ -364,7 +273,6 @@ class ListingController extends Controller
             if ($request->hasFile('listing_floor_plan')) {
                 foreach ($request->file('listing_floor_plan') as $key => $image) {
                     $floorImage = $key.'-'.time() . '.' . $image->getClientOriginalExtension();
-                    // $image->storeAs('public/floor-plan', $floorImage);
                     $image->move(public_path('uploads/floor-plan'), $floorImage);
                     array_push($listing_listing_floor_plan, $floorImage);
                 }
@@ -381,6 +289,7 @@ class ListingController extends Controller
                 return redirect('admin/listings/work');
             }
         }elseif($type == 'play'){
+            $data['tables'] = sanitizenumber($request->tables);
             $data['is_popular'] = $request->is_popular;
             $opening_times = [
                 'saturday' => ['open' => sanitize($request->saturday_open), 'close' => sanitize($request->saturday_close)],
@@ -391,8 +300,6 @@ class ListingController extends Controller
                 'thursday' => ['open' => sanitize($request->thursday_open), 'close' => sanitize($request->thursday_close)],
                 'friday' => ['open' => sanitize($request->friday_open), 'close' => sanitize($request->friday_close)],
             ];
-            
-            // Encode the array into JSON format
             $data['opening_time'] = json_encode($opening_times);
             $data['amenities'] = json_encode($request->feature)??[];
             $listing_image = json_decode($this->playListing->where('id', $id)->pluck('image')->toArray()[0])??[];
@@ -420,11 +327,7 @@ class ListingController extends Controller
 
 
     public function listing_image_delete($type, $id, $image){
-        if($type == 'car'){
-            $listing = CarListing::where('id', $id);
-        }elseif($type == 'beauty'){
-            $listing = BeautyListing::where('id', $id);
-        }elseif($type == 'sleep'){
+        if($type == 'sleep'){
             $listing = $this->sleepListing->where('id', $id);
         }elseif($type == 'work'){
             $listing =  $this->workListing->where('id', $id);
@@ -446,11 +349,7 @@ class ListingController extends Controller
         return 1;
     }
     public function listing_floor_image_delete($type, $id, $image){
-        if($type == 'car'){
-            $listing = CarListing::where('id', $id);
-        }elseif($type == 'beauty'){
-            $listing = BeautyListing::where('id', $id);
-        }elseif($type == 'sleep'){
+        if($type == 'sleep'){
             $listing = $this->sleepListing->where('id', $id);
         }elseif($type == 'work'){
             $listing =  $this->workListing->where('id', $id);
@@ -475,11 +374,7 @@ class ListingController extends Controller
     public function listing_status($type, $id, $status){
         $status = $status == 'visible'?'hidden':'visible';
        
-        if($type == 'car'){
-            $listing = CarListing::where('id', $id);
-        }elseif($type == 'beauty'){
-            $listing = BeautyListing::where('id', $id);
-        }elseif($type == 'sleep'){
+        if($type == 'sleep'){
             $listing = $this->sleepListing->where('id', $id);
         }elseif($type == 'work'){
             $listing =  $this->workListing->where('id', $id);
@@ -492,11 +387,7 @@ class ListingController extends Controller
     }
 
     public function listing_delete($type, $id){
-        if($type == 'car'){
-            $listing = CarListing::where('id', $id);
-        }elseif($type == 'beauty'){
-            $listing = BeautyListing::where('id', $id);
-        }elseif($type == 'sleep'){
+        if($type == 'sleep'){
             $listing = $this->sleepListing->where('id', $id);
         }elseif($type == 'work'){
             $listing =  $this->workListing->where('id', $id);
@@ -1041,11 +932,7 @@ class ListingController extends Controller
     
     // Report To Listing Delete
     public function report_global_listings_delete($type, $listing_id){
-        if($type == 'car'){
-            $listing = CarListing::where('id', $listing_id);
-        }elseif($type == 'beauty'){
-            $listing = BeautyListing::where('id', $listing_id);
-        }elseif($type == 'sleep'){
+        if($type == 'sleep'){
             $listing = $this->sleepListing->where('id', $listing_id);
         }elseif($type == 'work'){
             $listing =  $this->workListing->where('id', $listing_id);

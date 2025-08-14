@@ -24,7 +24,7 @@
             @foreach ($countries as $country)
                 <div class="col-md-6 col-lg-4 col-xl-3">
                     <div class="ol-card category-card radious-10px h-100">
-                        <img src="{{ get_all_image('country-thumbnails/'.$country->thumbnail) }}" class="card-img-top" alt="...">
+                        <img src="{{ get_all_image('state_thumbnails/'.$country->thumbnail) }}" class="card-img-top" alt="...">
                         <h6 class="title fs-14px mb-12px px-3 pt-3 d-flex align-baseline">
                             {{ $country->name }} <span class="text-muted d-inline-block ms-auto">({{ $country->country_to_city->count() }})</span>
                         </h6>

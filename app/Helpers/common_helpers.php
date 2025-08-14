@@ -48,7 +48,6 @@ if (!function_exists('get_image')) {
 if (!function_exists('get_all_image')) {
     function get_all_image($url)
     {
-        return asset('uploads/' . $url);
         $path = public_path('uploads/' . $url);
         if (is_file($path) && file_exists($path) && $url != '') {
             return asset('uploads/' . $url);
@@ -153,7 +152,8 @@ if (!function_exists('currency')) {
     {
         $currency_position = DB::table('system_settings')->where('key', 'currency_position')->value('value');
         $code = DB::table('system_settings')->where('key', 'system_currency')->value('value');
-        $symbol = DB::table('currencies')->where('id', $code)->value('symbol');
+        // $symbol = DB::table('countries')->where('id', $code)->value('symbol');
+        $symbol = "₹";
 
         if($currency_position == 'left'){
             return $symbol.''.$price;
@@ -311,6 +311,26 @@ if (!function_exists('sanitize')) {
         $text = removeScripts($text);
         $text = strip_tags($text);
         return str_replace('&amp;', '&', $text);
+    }
+}
+
+// if (!function_exists('sanitizetime')) {
+//     function sanitizetime($time)
+//     {
+//         $time = strip_tags(trim($time));
+//         if (preg_match('/^(2[0-3]|[01]?[0-9]):([0-5]?[0-9])(:([0-5]?[0-9]))?$/', $time)) {
+//             return $time;
+//         }
+//         return null; 
+//     }
+// }
+
+if (!function_exists('sanitizenumber')) {
+    function sanitizenumber($number)
+    {
+        $number = strip_tags(trim($number));
+        $number = preg_replace('/[^0-9.]/', '', $number);
+        return $number === '' ? 0 : $number;
     }
 }
 
