@@ -860,7 +860,7 @@ i:not(.fas, .fa, .fab) {
 .select2-container--default .select2-results__option--highlighted.select2-results__option--selectable,
 .select2-container--default .select2-results__option--selected {
     background-color: #ebf4ff !important;
-    color: #FF736A !important;
+    color: #212529 !important;
 }
 
 .select2-dropdown {
@@ -1021,12 +1021,12 @@ i:not(.fas, .fa, .fab) {
 .sidebar-first-li.active>a,
 .sidebar-first-li:hover>a {
     background: #dfedff;
-    color: #FF736A;
+    color: #212529;
 }
 
 .sidebar-first-li.active>a .icon,
 .sidebar-first-li:hover>a .icon {
-    color: #FF736A;
+    color: #212529;
 }
 
 .first-li-have-sub>a::after {
@@ -1159,7 +1159,7 @@ input.daterangepicker {
 
 .daterangepicker td.active,
 .daterangepicker td.active:hover {
-    background-color: #FF736A;
+    background-color: #212529;
 }
 
 .daterangepicker td.in-range:not(.active),
@@ -1170,8 +1170,8 @@ input.daterangepicker {
 
 .drp-buttons .applyBtn.btn-primary, .active>.page-link, .page-link.active
 {
-    border-color: #FF736A;
-    background-color: #FF736A;
+    border-color: #212529;
+    background-color: #212529;
 }
 .drp-buttons .applyBtn.btn-primary:hover{
     border-color: #cad1db;
@@ -1191,7 +1191,7 @@ input.daterangepicker {
 
 
 .select2-container--default .select2-selection--multiple .select2-selection__choice__display {
-    color: #FF736A;
+    color: #212529;
     font-size: 13px;
 }
 
@@ -1213,7 +1213,7 @@ input.daterangepicker {
 }
 
 .select2-container--default.select2-container--focus .select2-selection--multiple {
-    border: solid #FF736A 1px;
+    border: solid #212529 1px;
 }
 
 .select2-container--default .select2-selection--multiple .select2-selection__choice {
@@ -1296,8 +1296,8 @@ input.daterangepicker {
 /* Print content ENDED*/
 
 .form-check-input:checked{
-    background-color: #FF736A !important;
-    border-color: #FF736A !important;
+    background-color: #212529 !important;
+    border-color: #212529 !important;
 }
 
 .badge.bg-success{
@@ -1330,41 +1330,41 @@ input.daterangepicker {
     font-weight: 600;
 }
 .badge.bg-primary{
-    background-color: #FF736A2e !important;
+    background-color: #2125292e !important;
     border-radius: 5px;
-    color: #FF736A !important;
-    border: 1px solid #FF736A2e !important;
+    color: #212529 !important;
+    border: 1px solid #2125292e !important;
     font-weight: 600;
 }
 .form-switch .form-check-input{
     background-color: #ecf2ff;
 }
 .edit-badge{
-    border: 1px solid #FF736A;
+    border: 1px solid #212529;
     background-color: #fff;
     border-radius: 5px;
     padding: 5px 10px;
-    color: #FF736A !important;
+    color: #212529 !important;
     font-size: 15px;
 }
 .add-section-block{
     background-color: #f8fbff;
     padding: 35px 70px;
     border-radius: 10px;
-    color: #FF736A;
+    color: #212529;
     text-align: center;
-    border: 1px solid #FF736A;
+    border: 1px solid #212529;
     border-style: dashed;
     width: 100%;
 }
 .add-section-block:hover{
-    box-shadow: 0px 5px 20px #FF736A29;
+    box-shadow: 0px 5px 20px #21252929;
 }
 .add-section-block .sub-title{
     font-size: 25px;
 }
 .add-section-block .title, .add-section-block .sub-title{
-    color: #FF736A;
+    color: #212529;
 }
 .note-btn{
     border-radius: 8px;
@@ -1375,7 +1375,7 @@ input.daterangepicker {
 }
 .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:hover, .select2-container--default .select2-selection--multiple .select2-selection__choice__remove:focus{
     background-color: #e6f1ff;
-    color: #FF736A;
+    color: #212529;
 }
 
 
@@ -1575,7 +1575,7 @@ input.daterangepicker {
 	object-fit: cover;
 }
 .sidebar-first-li:hover .icon svg path{
-    fill: #FF736A;
+    fill: #212529;
 }
 
 
@@ -1661,10 +1661,10 @@ input.daterangepicker {
     object-fit: contain;
 }
 .sidebar-first-li.active span svg path{
-    fill: #FF736A;
+    fill: #212529;
 } 
 .sidebar-first-li:hover span svg path{
-    fill: #FF736A;
+    fill: #212529;
 }
 
 .img-text-select .eSvgs {

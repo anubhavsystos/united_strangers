@@ -18,7 +18,8 @@
             <div class="row row-28 align-items-center mb-4">
                 <div class="col-xl-8 col-lg-7">
                     <div class="sleepdetails-rent-area d-flex align-items-center justify-content-between flex-wrap">
-                        <p class="title capitalize">{{ $listing->is_popular }}</p>
+                           <h1 class="title">{{$listing->title}}</h1>
+                        <p class="title capitalize">{{-- $listing->is_popular --}}</p>
                         <div class="sleeprent-price-area d-flex align-items-center flex-wrap">
                             <p class="price">{{ get_phrase('Total Price : ') }}<span>{{ currency($listing->price) }}</span></p>
                         </div>
@@ -189,74 +190,7 @@
                     @endforeach
                     <!-- Gallery for Room 2 -->
 
-               
-                    @php
-                        $ownReview = null;
-                        if (auth()->check()) {
-                            $ownReview = App\Models\Review::where('listing_id', $listing->id)
-                                ->where('type', 'sleep')->where('user_id', auth()->user()->id)->whereNull('reply_id')->first();
-                                     
-                        }
-                    @endphp
-                    @if (auth()->check() && auth()->user()->id !== $listing->user_id)
-                        @if (!$user_review_count)
-                            <!-- Add Review -->
-                            <div class="atndetails-edit-reviews" id="add_review">
-                                <h2 class="title mb-20">{{ get_phrase('Add Your Review') }}</h2>
-                                <form action="{{ route('listing.review', ['id' => $listing->id]) }}" method="post">
-                                    @csrf
-                                    <div class="realdetails-review-form">
-                                        <div class="mb-16">
-                                            <input type="hidden" name="agent_id" value="{{ $listing->user_id }}">
-                                            <input type="hidden" name="listing_type" value="{{ $listing->type }}">
-                                            <label class="form-label smform-label2 mb-16">{{ get_phrase('Rating') }}</label>
-                                            <select class="mNiceSelect review-select mform-control" name="rating" required>
-                                                <option selected>{{ get_phrase('Select Rating') }}</option>
-                                                <option value="1">{{ get_phrase('1') }}</option>
-                                                <option value="2">{{ get_phrase('2') }}</option>
-                                                <option value="3">{{ get_phrase('3') }}</option>
-                                                <option value="4">{{ get_phrase('4') }}</option>
-                                                <option value="5">{{ get_phrase('5') }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-20">
-                                            <label for="textarea1" class="form-label smform-label2 mb-16">{{ get_phrase('Review') }}</label>
-                                            <textarea class="form-control mform-control review-textarea" name="review" id="textarea1" required></textarea>
-                                        </div>
-                                        <button class="theme-btn1" type="submit">{{ get_phrase('Submit') }}</button>
-                                    </div>
-                                </form>
-                            </div>
-                        @elseif(auth()->check() && $ownReview && auth()->user()->id == $ownReview->user_id)
-                            <!-- Edit Review -->
-                            <div class="atndetails-edit-reviews" id="update_review">
-                                <h2 class="title mb-20">{{ get_phrase('Update Your Review') }}</h2>
-                                <form action="{{ route('listing.review.update', ['id' => $listing->id]) }}" method="post">
-                                    @csrf
-                                    <div class="realdetails-review-form">
-                                        <div class="mb-16">
-                                            <input type="hidden" name="agent_id" value="{{ $listing->user_id }}">
-                                            <input type="hidden" name="listing_type" value="{{ $listing->type }}">
-                                            <label class="form-label smform-label2 mb-16">{{ get_phrase('Rating') }}</label>
-                                            <select class="mNiceSelect review-select mform-control" name="rating" required>
-                                                <option value="1" {{ isset($user_review_count) && $user_review_count->rating == 1 ? 'selected' : '' }}>{{ get_phrase('1') }}</option>
-                                                <option value="2" {{ isset($user_review_count) && $user_review_count->rating == 2 ? 'selected' : '' }}>{{ get_phrase('2') }}</option>
-                                                <option value="3" {{ isset($user_review_count) && $user_review_count->rating == 3 ? 'selected' : '' }}>{{ get_phrase('3') }}</option>
-                                                <option value="4" {{ isset($user_review_count) && $user_review_count->rating == 4 ? 'selected' : '' }}>{{ get_phrase('4') }}</option>
-                                                <option value="5" {{ isset($user_review_count) && $user_review_count->rating == 5 ? 'selected' : '' }}>{{ get_phrase('5') }}</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-20">
-                                            <label for="textarea1" class="form-label smform-label2 mb-16">{{ get_phrase('Review') }}</label>
-                                            <textarea class="form-control mform-control review-textarea" name="review" id="textarea1" required>{{ $user_review_count->review }}</textarea>
-                                        </div>
-                                        <button class="theme-btn1" type="submit">{{ get_phrase('Update') }}</button>
-                                    </div>
-                                </form>
-                            </div>
-                        @else
-                        @endif
-                    @endif
+                   
 
                 </div>
                 <!-- Right Sidebar -->

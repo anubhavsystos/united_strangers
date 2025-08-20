@@ -7,8 +7,12 @@
 @endpush
 @include('admin.listing.listing_style')
 @php
-    $tab = isset($tab)?$tab:0;
+    $tab = isset($tab) ? $tab : 0;
+    $prefix = request()->route('prefix');
+    $segment_type  = "sleep";
+    $segment_id = $listing->id;
 @endphp
+    
 <div class="ol-card">
     <div class="ol-card-body p-3 d-flex align-items-center justify-content-between">
         <h3 class="title fs-16px d-flex align-items-center"> <i class="fi-rr-settings-sliders me-2"></i> {{ucwords($type).' '.get_phrase('Listing Update')}} </h3>
@@ -28,12 +32,18 @@
             <li class="nav-item" role="presentation">
               <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab" aria-controls="address" aria-selected="false"> {{get_phrase('Address')}} </button>
             </li>
-            <!-- <li class="nav-item" role="presentation">
+            <li class="nav-item" role="presentation">
               <button class="nav-link {{($tab == 'feature')?'active':''}}" id="feature-tab" data-bs-toggle="tab" data-bs-target="#feature" type="button" role="tab" aria-controls="feature" aria-selected="false"> {{get_phrase('Features')}} </button>
-            </li> -->
-            <!-- <li class="nav-item" role="presentation">
+            </li>
+            <li class="nav-item" role="presentation">
               <button class="nav-link {{($tab == 'room')?'active':''}}" id="room-tab" data-bs-toggle="tab" data-bs-target="#room" type="button" role="tab" aria-controls="room" aria-selected="false"> {{get_phrase('Rooms')}} </button>
-            </li> -->
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false"> {{ get_phrase('appointments') }} </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calander') }} </button>
+            </li>
             <li class="nav-item" role="presentation">
               <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false"> {{get_phrase('Seo')}} </button>
             </li>
@@ -293,6 +303,104 @@
                         @endforeach
                     </div>
                 </div>
+
+                <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+                    <div class="row">                          
+                        <div class="col-sm-12">
+                            <div class="ol-card mt-3">
+                                <div class="ol-card mt-3">
+                                    <div class="ol-card-body p-3">
+                                        <div class="ol-card mt-3">
+                                            <div class="ol-card-body p-3">
+                                                @if(count($appointments))
+                                                <table id="datatable" class=" table nowrap w-100">
+                                                        <thead class="ca-thead">
+                                                        <tr class="ca-tr">
+                                                            <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Id')}}</th>                                                                
+                                                            <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Customer')}}</th>
+                                                            <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Details')}}</th>
+                                                            <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Listing')}}</th>                                                                
+                                                            <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>                                                                
+                                                        </tr>
+                                                        </thead>
+                                                    <tbody>
+                                                        @php $num = 1 @endphp
+                                                        @foreach ($appointments as $key => $appointment)    
+                                                            <tr class="ca-tr">
+                                                                <td ><p class="ca-subtitle-14px ca-text-dark mb-2"> {{++$key}}.</p></td>                                                                    
+                                                                <td class="min-w-140px">                                                                                                                                            
+                                                                    <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">
+                                                                        <img src="{{isset($appointment['image']) ? $appointment['image'] : ''}}" class="rounded" height="50px" width="50px" alt="">                                                                            
+                                                                    </p>             
+                                                                </td>
+                                                                <td class="min-w-140px">                                                                        
+                                                                    <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">                                                                            
+                                                                        {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}
+                                                                    </p>
+                                                                    <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">                                                                            
+                                                                        {{isset($appointment['customer_email']) ? $appointment['customer_email'] : ''}}
+                                                                    </p>
+                                                                    <div class="d-flex align-items-center gap-2">
+                                                                        <p class="badge-dark">{{isset($appointment['customer_phone']) ? $appointment['customer_phone'] : ''}} </p>
+                                                                    </div>
+                                                                </td>
+                                                                <td class="min-w-110px">
+                                                                    <p class="ca-subtitle-14px ca-text-dark mb-2">
+                                                                        {{isset($appointment['date']) ? date('d M y', strtotime($appointment['date'])) : ''}}
+                                                                    </p>
+                                                                    <div class="d-flex gap-1 align-items-center">
+                                                                        <img src="{{ asset('assets/frontend/images/icons/clock-gray-12.svg') }}" alt="icon">
+                                                                        <p class="in-subtitle-14px">{{!empty($appointment['time']) ? date('h:i A', strtotime($appointment['time'])) : ''}}</p>
+                                                                    </div>
+                                                                    
+                                                                    <div class="eMessage">
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-6px mb-2">
+                                                                            <span class="short-text d-inline">
+                                                                                {{ \Illuminate\Support\Str::words($appointment['message'], 30, '...') }}
+                                                                            </span>
+                                                                            <span class="full-text d-none">
+                                                                                {{ $appointment['message'] }}
+                                                                            </span>                                                                                
+                                                                        </p>
+                                                                        @if(str_word_count($appointment['message']) > 30)
+                                                                            <a href="javascript:void(0)" class="read-more">{{ get_phrase('Read More') }}</a>
+                                                                        @endif
+                                                                    </div>                                                                        
+                                                                </td>                                                                        
+
+                                                                <td>
+                                                                    @if ($appointment['status'] == 1)
+                                                                        <p class="badge-success-light">{{get_phrase('Successfully Ended')}}</p>
+                                                                    @else
+                                                                        <p class="badge-danger-light">{{get_phrase('Not start yet')}}</p>
+                                                                    @endif
+                                                                </td>
+                                                
+                                                            </tr>
+                                                            @endforeach
+                                                    </tbody>
+                                                </table>
+                                                @else
+                                                    @include('layouts.no_data_found')
+                                                @endif
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="tab-pane fade" id="calander" role="tabpanel" aria-labelledby="calander-tab">
+                    <div class="row">  
+                        <div class="col-sm-12">
+                            <div class="container mt-4">
+                                <h2>Appointment Calendar</h2>
+                                <div id="calendar"></div>
+                            </div>                               
+                        </div>
+                    </div>
+                </div>   
                 <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
                     <div class="mb-3">
                         <label for="meta_title" class="form-label ol-form-label"> {{get_phrase('Meta Title')}}</label>

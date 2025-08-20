@@ -512,7 +512,6 @@ class FrontendController extends Controller
         $appointment = new Appointment();
         $appointment->date = sanitize($appointment_date_time->format('Y-m-d')); 
         $appointment->time = sanitize($appointment_date_time->format('H:i:s')); 
-        $appointment->type = $data['type'];
         $appointment->listing_type = sanitize($data['listing_type']);
         $appointment->listing_id = sanitize($data['listing_id']);
         $appointment->agent_id = sanitize($data['agent_id']);

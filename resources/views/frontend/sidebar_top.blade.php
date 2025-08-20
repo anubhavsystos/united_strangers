@@ -12,7 +12,7 @@
         font-size: 16px;
     }
     .noUi-connect {
-        background: #F77214;
+        background: #212529;
     }
     .noUi-horizontal {
         height: 8px;

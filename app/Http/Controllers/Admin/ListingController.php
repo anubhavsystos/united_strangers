@@ -13,7 +13,7 @@ use App\Models\Room;
 use App\Models\Menu;
 use App\Models\ClaimedListing;
 use App\Models\ReportedListing;
-use App\Models\Booking;
+use App\Models\appointment;
 use Brian2694\Toastr\Facades\Toastr;
 use App\Models\NearByLocation;
 use Carbon\Carbon;
@@ -23,7 +23,7 @@ use Illuminate\Support\Facades\Validator;
 
 class ListingController extends Controller
 {
-    public function __construct(Category $category,SleepListing $sleepListing,Listing_Feature $listingFeature,Listing_Specification $listingSpecification,WorkListing $workListing,PlayListing $playListing,Room $room,Menu $menu,ClaimedListing $claimedListing,ReportedListing $reportedListing,NearByLocation $nearByLocation, Booking $booking) {
+    public function __construct(Category $category,SleepListing $sleepListing,Listing_Feature $listingFeature,Listing_Specification $listingSpecification,WorkListing $workListing,PlayListing $playListing,Room $room,Menu $menu,ClaimedListing $claimedListing,ReportedListing $reportedListing,NearByLocation $nearByLocation, appointment $appointment) {
     
     $this->category = $category;
     $this->sleepListing = $sleepListing;
@@ -36,7 +36,7 @@ class ListingController extends Controller
     $this->claimedListing = $claimedListing;
     $this->reportedListing = $reportedListing;
     $this->nearByLocation = $nearByLocation;
-    $this->booking = $booking;
+    $this->appointment = $appointment;
 }
 
 
@@ -152,14 +152,13 @@ class ListingController extends Controller
             $page_data['listing'] =  $this->workListing->where('id', $id)->first();
         }elseif($type == 'sleep'){
             $page_data['listing'] = $this->sleepListing->where('id', $id)->first();
-        }elseif($type == 'play'){
+        }elseif($type == 'play'){            
             $page_data['listing'] = $this->playListing->where('id', $id)->first();
-            $page_data['bookings'] = $this->playListing->where('id', $id)->get();
-            $startDate = Carbon::now()->startOfMonth();
-            $endDate = Carbon::now()->addMonths(6)->endOfMonth();
-
-            $bookings = $this->booking::whereBetween('booking_date', [$startDate, $endDate])->get();
+            $page_data['menus'] = $this->menu->where('listing_id', $id)->get();
         }
+        $page_data['appointments'] =   $this->appointment->where("listing_type", $type)->where("listing_id", $id) ->get()->map(function ($item) use ($type) {
+                return $item->appointmentFormatted($type);
+            });    
         $page_data['categories'] = $this->category->where('type', $type)->get();
         $page_data['tab'] = $tab;
         $page_data['type'] = $type;

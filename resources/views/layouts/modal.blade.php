@@ -66,6 +66,40 @@
       </div>
     </div>
 </div>
+<div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <form id="appointmentForm_data" action="{{ route('appointments.store') }}" method="POST">
+                @csrf
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">New Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Appointment Date</label>
+                        <input type="date" class="form-control" id="appointmentDate" name="date" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>                    
+                    <input type="hidden" name="listing_type" id="segment_type" value="{{!empty($segment_type) ? $segment_type : '' }}">
+                    <input type="hidden" name="listing_id" id="segment_id"  value="{{!empty($segment_id) ? $segment_id : '' }}">
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="message" id="message" cols="30" rows="3" placeholder="{{ get_phrase('Write your description') }}" class="form-control"></textarea>
+                        
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary">Save appointment</button>
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
 {{-- @push('js') --}}
 <script>
     "use script"

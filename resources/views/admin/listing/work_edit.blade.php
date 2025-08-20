@@ -8,6 +8,9 @@
     @include('admin.listing.listing_style')
     @php
         $tab = isset($tab) ? $tab : 0;
+        $prefix = request()->route('prefix');
+        $segment_type  = "work";
+        $segment_id = $listing->id;
     @endphp
     <div class="ol-card">
         <div class="ol-card-body p-3 d-flex align-items-center justify-content-between">
@@ -32,20 +35,20 @@
                     <button class="nav-link {{ $tab == 'feature' ? 'active' : '' }}" id="feature-tab" data-bs-toggle="tab" data-bs-target="#feature" type="button" role="tab" aria-controls="feature" aria-selected="false"> {{ get_phrase('Features') }} </button>
                 </li> -->
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false"> {{ get_phrase('appointments') }} </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calander') }} </button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false"> {{ get_phrase('Seo') }} </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#media" type="button" role="tab" aria-controls="media" aria-selected="false"> {{ get_phrase('Media') }} </button>
                 </li>
                 <!-- <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="Nearby-tab" data-bs-toggle="tab" data-bs-target="#Nearby" type="button" role="tab" aria-controls="Nearby" aria-selected="false"> {{ get_phrase('Nearby') }} </button>
-                </li> -->
-                <!-- <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="model-tab" data-bs-toggle="tab" data-bs-target="#model" type="button" role="tab" aria-controls="model" aria-selected="false"> {{ get_phrase('3D Model') }} </button>
-                </li> -->
-                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="claim-tab" data-bs-toggle="tab" data-bs-target="#claim" type="button" role="tab" aria-controls="claim" aria-selected="false"> {{ get_phrase('Claim') }} </button>
-                </li>
+                </li> -->
                 
                  {{-- Shop addon --}}
                  @if (addon_status('shop') == 1)
@@ -272,6 +275,104 @@
                             @endforeach
                         </div>
                     </div> -->
+
+                    <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
+                        <div class="row">                          
+                            <div class="col-sm-12">
+                                <div class="ol-card mt-3">
+                                    <div class="ol-card mt-3">
+                                        <div class="ol-card-body p-3">
+                                            <div class="ol-card mt-3">
+                                                <div class="ol-card-body p-3">
+                                                    @if(count($appointments))
+                                                    <table id="datatable" class=" table nowrap w-100">
+                                                         <thead class="ca-thead">
+                                                            <tr class="ca-tr">
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Id')}}</th>                                                                
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Customer')}}</th>
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Details')}}</th>
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Listing')}}</th>                                                                
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>                                                                
+                                                            </tr>
+                                                            </thead>
+                                                        <tbody>
+                                                            @php $num = 1 @endphp
+                                                            @foreach ($appointments as $key => $appointment)    
+                                                                <tr class="ca-tr">
+                                                                    <td ><p class="ca-subtitle-14px ca-text-dark mb-2"> {{++$key}}.</p></td>                                                                    
+                                                                    <td class="min-w-140px">                                                                                                                                            
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">
+                                                                            <img src="{{isset($appointment['image']) ? $appointment['image'] : ''}}" class="rounded" height="50px" width="50px" alt="">                                                                            
+                                                                        </p>             
+                                                                    </td>
+                                                                    <td class="min-w-140px">                                                                        
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">                                                                            
+                                                                            {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}
+                                                                        </p>
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">                                                                            
+                                                                            {{isset($appointment['customer_email']) ? $appointment['customer_email'] : ''}}
+                                                                        </p>
+                                                                        <div class="d-flex align-items-center gap-2">
+                                                                            <p class="badge-dark">{{isset($appointment['customer_phone']) ? $appointment['customer_phone'] : ''}} </p>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="min-w-110px">
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2">
+                                                                           {{isset($appointment['date']) ? date('d M y', strtotime($appointment['date'])) : ''}}
+                                                                        </p>
+                                                                        <div class="d-flex gap-1 align-items-center">
+                                                                            <img src="{{ asset('assets/frontend/images/icons/clock-gray-12.svg') }}" alt="icon">
+                                                                            <p class="in-subtitle-14px">{{!empty($appointment['time']) ? date('h:i A', strtotime($appointment['time'])) : ''}}</p>
+                                                                        </div>
+                                                                       
+                                                                        <div class="eMessage">
+                                                                            <p class="ca-subtitle-14px ca-text-dark mb-6px mb-2">
+                                                                                <span class="short-text d-inline">
+                                                                                    {{ \Illuminate\Support\Str::words($appointment['message'], 30, '...') }}
+                                                                                </span>
+                                                                                <span class="full-text d-none">
+                                                                                    {{ $appointment['message'] }}
+                                                                                </span>                                                                                
+                                                                            </p>
+                                                                            @if(str_word_count($appointment['message']) > 30)
+                                                                                <a href="javascript:void(0)" class="read-more">{{ get_phrase('Read More') }}</a>
+                                                                            @endif
+                                                                        </div>                                                                        
+                                                                    </td>                                                                        
+
+                                                                    <td>
+                                                                        @if ($appointment['status'] == 1)
+                                                                            <p class="badge-success-light">{{get_phrase('Successfully Ended')}}</p>
+                                                                        @else
+                                                                            <p class="badge-danger-light">{{get_phrase('Not start yet')}}</p>
+                                                                        @endif
+                                                                    </td>
+                                                   
+                                                                </tr>
+                                                                @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                    @else
+                                                        @include('layouts.no_data_found')
+                                                    @endif
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" id="calander" role="tabpanel" aria-labelledby="calander-tab">
+                        <div class="row">  
+                            <div class="col-sm-12">
+                                <div class="container mt-4">
+                                    <h2>Appointment Calendar</h2>
+                                    <div id="calendar"></div>
+                                </div>                               
+                            </div>
+                        </div>
+                    </div>  
                     <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
                         <div class="mb-3">
                             <label for="meta_title" class="form-label ol-form-label"> {{ get_phrase('Meta Title') }}</label>
@@ -370,204 +471,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <!-- <div class="tab-pane fade" id="Nearby" role="tabpanel" aria-labelledby="Nearby-tab">
-                        <div class="row mb-3">
-                            <div class="d-flex justify-content-between align-items-center flex-wrap g-12 bd-b-1 pb-30">
-                                <div class="tableTitle-3">
-                                    <h4 class="fz-18-m-black">{{ get_phrase('Nearby Location') }}</h4>
-                                </div>
-                                <a href="javascript:;" onclick="modal('modal-lg', '{{ route('add-listing-nearBy', ['prefix' => 'admin', 'id' => $listing->id]) }}', '{{ get_phrase('Add NearBy Location') }}')" class="btn ol-btn-primary ">{{ get_phrase('Add Nearby Location') }}</a>
-                            </div>
-                        </div>
-                        <ul class="nav nav-tabs eNav-Tabs-custom nearby-tab" id="myTab" role="tablist">
-                            
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link active" id="cSchool-tab" data-bs-toggle="tab" data-bs-target="#cSchool" type="button" role="tab" aria-controls="cSchool" aria-selected="true">
-                                    {{ get_phrase('School') }}
-                                    <span></span>
-                                </button>
-                            </li>
-                            
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="cHospital-tab" data-bs-toggle="tab" data-bs-target="#cHospital" type="button" role="tab" aria-controls="cHospital" aria-selected="false">
-                                    {{ get_phrase('Hospital') }}
-                                    <span></span>
-                                </button>
-                            </li>
-                            
-                            <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="cShoppingCenter-tab" data-bs-toggle="tab" data-bs-target="#cShoppingCenter" type="button" role="tab" aria-controls="cShoppingCenter" aria-selected="false">
-                                    {{ get_phrase('Shopping Center') }}
-                                    <span></span>
-                                </button>
-                            </li>
-                        </ul>
-                        @php
-                            $nearBYLocation = App\Models\NearByLocation::where('listing_id', $listing->id)->where('listing_type', 'work')->get();
-                        @endphp
-                        <div class="tab-content eNav-Tabs-content" id="myTabContent">
-                            
-                            <div class="tab-pane fade show active" id="cSchool" role="tabpanel" aria-labelledby="cSchool-tab">
-                                
-                                <div class="table-responsive">
-                                    <table class="table eTable eTable-2 table-icon table-p0 mt-2">
-                                        <tbody>
-                                            @foreach ($nearBYLocation as $nearby)
-                                                @if ($nearby->nearby_id == 0)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="dl_property_type d-flex flex-column g-8">
-                                                                <p class="form-label cap-form-label">
-                                                                    {{ $nearby->name }}
-                                                                </p>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="nearBtn  justify-content-end d-flex gap-3">
-                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
-                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endif
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="tab-pane fade" id="cHospital" role="tabpanel" aria-labelledby="cHospital-tab">
-                            
-                                <div class="table-responsive">
-                                    <table class="table eTable eTable-2 table-icon table-p0 mt-2">
-                                        <tbody>
-                                            @foreach ($nearBYLocation as $nearby)
-                                                @if ($nearby->nearby_id == 1)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="dl_property_type d-flex flex-column g-8">
-                                                                <p class="form-label cap-form-label">
-                                                                    {{ $nearby->name }}
-                                                                </p>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-
-                                                            <div class="nearBtn d-flex justify-content-end gap-3">
-                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
-
-                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endif
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            
-                            <div class="tab-pane fade" id="cShoppingCenter" role="tabpanel" aria-labelledby="cShoppingCenter-tab">
-                            
-                                <div class="table-responsive">
-                                    <table class="table eTable eTable-2 table-icon table-p0 mt-2">
-                                        <tbody>
-                                            @foreach ($nearBYLocation as $nearby)
-                                                @if ($nearby->nearby_id == 2)
-                                                    <tr>
-                                                        <td>
-                                                            <div class="dl_property_type d-flex flex-column g-8">
-                                                                <p class="form-label cap-form-label">
-                                                                    {{ $nearby->name }}
-                                                                </p>
-                                                            </div>
-                                                        </td>
-                                                        <td>
-                                                            <div class="nearBtn d-flex justify-content-end gap-3 ">
-                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
-                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                @endif
-                                            @endforeach
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    <!-- <div class="tab-pane fade" id="model" role="tabpanel" aria-labelledby="model-tab">
-
-                        <div class="row mb-3">
-                            <div class="col-sm-3">
-                                <label class="form-label cap-form-label"> {{ get_phrase('Upload 3D Model') }} :</label>
-                            </div>
-                            <div class="col-sm-9">
-                                <script type="module" src="{{ asset('assets/backend/js/model-viewer.min.js') }}"></script>
-                                <div class="3d_view">
-                                    <model-viewer class="model-viewer" alt="" src="{{ asset('uploads/3d/' . $listing->model) }}" shadow-intensity="1" ar camera-controls touch-action="pan-y"></model-viewer>
-                                </div>
-                                <div class="dl-photoUploaders mt-3">
-                                    <input type="file" class="eForm-laebl d-none " name="model" id="3model">
-                                    <input type="hidden" class="eForm-laebl" name="old_model" value="{{ $listing->model }}">
-                                    <label for="3model" class="new_label float-end">{{ get_phrase('Upload A 3D Model') }}</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                    
-                    
-                    <div class="tab-pane fade" id="claim" role="tabpanel" aria-labelledby="claim-tab">
-
-                        <div class="card pt-5 pb-5 claimCard">
-                            @php 
-                            $claimed = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type','work')->first();
-                        @endphp
-                        
-                        @if($claimed && $claimed->status == 1)
-                            <div class="card-body approveClaim">
-                                <img src="{{asset('assets/frontend/images/verified.svg')}}" alt="">
-                                <p class="text-center mb-2">{{$claimed->user_name}}</p>
-                                <p class="text-center mb-2">{{$claimed->user_phone}}</p>
-                                <p class="text-center mb-3">{{$claimed->additional_info}}</p>
-                                <a href="javascript:;" onclick="delete_modal('{{route('admin.claim-listing.delete',[ 'id'=>$claimed->id])}}')" class="btn ol-btn-outline-secondary d-flex m-auto ">{{get_phrase('Remove verification Status')}}</a>
-                            </div>
-                        @elseif($claimed && $claimed->status == 0) 
-                         <div class="card-body approveClaim">
-                            <p class="text-center mb-2">{{$claimed->user_name}}</p>
-                            <p class="text-center mb-2">{{$claimed->user_phone}}</p>
-                            <p class="text-center mb-3">{{$claimed->additional_info}}</p>
-                             <div class="text-center">
-                                <a href="javascript:;" onclick="confirm_modal('{{route('admin.claim-listing.approve',['type' => 'work', 'listing_id'=>$claimed->id])}}')" class="btn ol-btn-outline-secondary  m-auto ">{{get_phrase('Approve')}}</a>
-                                <a href="javascript:;" onclick="delete_modal('{{route('admin.claim-listing.delete',[ 'id'=>$claimed->id])}}')" class="btn ol-btn-outline-secondary  m-auto ">{{get_phrase('Delete')}}</a>
-                             </div>
-                        </div>
-                        @else
-                            <div class="card-body">
-                                <h5 class="text-center mb-4">{{get_phrase('This directory is not yet verified !')}}</h5>
-                                <a href="javascript:;" onclick="edit_modal('modal-md','{{route('admin.claimed_listing.form',['type' =>$listing->type, 'id'=>$listing->id])}}','{{get_phrase('Provide Validity')}}')" class="btn ol-btn-outline-secondary d-flex m-auto ">{{get_phrase('Provide Validity')}}</a>
-                            </div>
-                        @endif
-                              
-                        </div>
-                    </div>
-                    {{-- Claim  --}}
-                      {{-- Shop   --}}
-                      @if (addon_status('shop') == 1)
-                      <div class="tab-pane fade" id="shop" role="tabpanel" aria-labelledby="shop-tab">
-                          <div class="d-flex align-items-center justify-content-between mb-3">
-                              <h5 class="fs-16px title mb-3 capitalize"> {{ get_phrase('Your  Shop Inventory') }} </h5>
-                              <div>
-                                  <a href="javascript:void(0);" onclick="modal('modal-md', '{{ route('admin.inventory.create', ['prefix' => 'admin', 'type' => 'work','listing_id' => $listing->id]) }}', '{{ get_phrase('Add Product') }}')" class="btn ol-btn-primary fs-14px"> {{ get_phrase('Add New Product') }} </a>
-                                  <a href="javascript:void(0);" onclick="modal('modal-md', '{{ route('admin.inventory.category.create', ['prefix' => 'admin', 'type' => 'work', 'listing_id' => $listing->id]) }}', '{{ get_phrase('Add Category') }}')" class="btn ol-btn-primary fs-14px"> {{ get_phrase('Add Product Category') }} </a>
-                              </div>
-                          </div>
-                          @include('admin.shop.inventory_list')
-                      </div>
-                      @endif
-                  {{-- Shop  --}}
+                    </div>                 
                 </div>
             </form>
         </div>

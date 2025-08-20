@@ -80,7 +80,7 @@
     right: 5px;
 }
 .team-checkbox .team-body .checked i {
-    background-color: #FF736A;
+    background-color: #212529;
     padding: 7px 5px;
     border-radius: 50px;
     color: #fff;

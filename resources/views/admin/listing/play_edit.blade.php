@@ -1,16 +1,18 @@
 @extends('layouts.admin')
 @section('title', get_phrase('Update Listing'))
-@push('css')
-<link rel="stylesheet" href="{{ asset('assets/frontend/css/mapbox-gl.css') }}">
-<script src="{{ asset('assets/frontend/js/mapbox-gl.js') }}"></script>
-@endpush
+@push('css') 
+<!-- <link rel="stylesheet" href="{{ asset('assets/frontend/css/mapbox-gl.css') }}"> -->
+<!-- <script src="{{ asset('assets/frontend/js/mapbox-gl.js') }}"></script> -->
+
 @section('admin_layout')
     @include('admin.listing.listing_style')
-
     @php
         $tab = isset($tab) ? $tab : 0;
+        $prefix = request()->route('prefix');
+        $segment_type  = "play";
+        $segment_id = $listing->id;
     @endphp
-
+    
     <div class="ol-card mt-3">
         <div class="ol-card-body p-3">
             <ul class="nav nav-tabs" id="myTab" role="tablist">
@@ -30,27 +32,18 @@
                     <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab" aria-controls="address" aria-selected="false"> {{ get_phrase('Address') }} </button>
                 </li>
                 <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false"> {{ get_phrase('appointments') }} </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calander') }} </button>
+                </li>
+                <li class="nav-item" role="presentation">
                     <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false"> {{ get_phrase('Seo') }} </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="media-tab" data-bs-toggle="tab" data-bs-target="#media" type="button" role="tab" aria-controls="media" aria-selected="false"> {{ get_phrase('Media') }} </button>
                 </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings" type="button" role="tab" aria-controls="bookings" aria-selected="false"> {{ get_phrase('Bookings') }} </button>
-                </li>
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calander') }} </button>
-                </li>
-                <!-- <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="claim-tab" data-bs-toggle="tab" data-bs-target="#claim" type="button" role="tab" aria-controls="claim" aria-selected="false"> {{ get_phrase('Claim') }} </button>
-                </li> -->
-                 {{-- Shop addon --}}
-                   @if (addon_status('shop') == 1)
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="shop-tab" data-bs-toggle="tab" data-bs-target="#shop" type="button" role="tab" aria-controls="shop" aria-selected="false"> {{ get_phrase('Shop') }} </button>
-                    </li>
-                    @endif
-                 {{-- Shop Addon --}}
+               
             </ul>
             <form action="{{ route('admin.listing.update', ['type' => 'play', 'id' => $listing->id]) }}" id="form-action" method="post" enctype="multipart/form-data" class="position-relative">
                 @csrf
@@ -190,14 +183,10 @@
                         <div class="d-flex align-items-center justify-content-between mb-2">
                             <h5 class="fs-16px title mb-3"> {{ get_phrase('Add some menu for play') }} </h5>
                             <a href="javascript:void(0)" onclick="modal('modal-md', '{{ route('admin.add.listing.menu', ['prefix' => 'admin', 'id' => $listing->id]) }}', '{{ get_phrase('Add New Menu') }}')" class="btn ol-btn-primary "> {{ get_phrase('Add menu') }} </a>
-                        </div>
-                        @php
-                            $menus = App\Models\Menu::where('listing_id', $listing->id)->get();
-                        @endphp
+                        </div>                        
                         <div class="row">
                             @foreach ($menus as $key => $menu)
                                 <div class="col-sm-4">
-
                                     <input class="form-check-input d-none" name="menu[]" type="checkbox" value="{{ $menu->id }}" id="flexCheckDefault{{ $key }}" @if ($listing->menu && $listing->menu != 'null' && in_array($menu->id, json_decode($listing->menu))) checked @endif>
                                     <label class="form-check-label w-100" onclick="menu_select('{{ $key }}')" for="flexCheckDefault{{ $key }}">
                                         <div class="card mb-3 team-checkbox">
@@ -269,7 +258,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <div class="mb-3">
-                                    <label for="engine_size" class="form-label ol-form-label"> {{ get_phrase('Country') }} *</label>
+                                    <label for="engine_size" class="form-label ol-form-label"> {{ get_phrase('State') }} *</label>
                                     <select name="country" id="country" class="form-control ol-form-control ol-select2">
                                         <option value=""> {{ get_phrase('Select listing country') }} </option>
                                         @foreach (App\Models\Country::get() as $country)
@@ -362,90 +351,87 @@
                             </div>
                         </div>
                     </div>
-                    <div class="tab-pane fade" id="bookings" role="tabpanel" aria-labelledby="bookings-tab">
+                    <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
                         <div class="row">                          
                             <div class="col-sm-12">
                                 <div class="ol-card mt-3">
                                     <div class="ol-card mt-3">
                                         <div class="ol-card-body p-3">
-                                            @if(count($bookings_data))
-                                            <table id="datatable" class=" table nowrap w-100">
-                                                <thead>
-                                                    <tr>
-                                                        <th> {{get_phrase('ID')}} </th>
-                                                        <th> {{get_phrase('Image')}} </th>
-                                                        <th> {{get_phrase('Title')}} </th>
-                                                        <th> {{get_phrase('Category')}} </th>
-                                                        @if($type == 'work' || $type == 'sleep')
-                                                        <th> {{get_phrase('Price')}} </th>
-                                                        @endif
-                                                        <th> {{get_phrase('Visibility')}} </th>
-                                                        <th> {{get_phrase('Action')}} </th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    @php $num = 1 @endphp
-                                                    @foreach ($bookings_data as $listing)
-                                                    @php
-                                                    
-                                                        $category = App\Models\Category::where('id', $listing->category)->first()->name;
-                                                        $image = json_decode($listing->image)[0]??0;
-                                                        if($type == 'car'){
-                                                            $brand = App\Models\Amenities::where('id', $listing->brand)->first()->name;
-                                                            $model = App\Models\Amenities::where('id', $listing->model)->first()->name;
-                                                        }
+                                            <div class="ol-card mt-3">
+                                                <div class="ol-card-body p-3">
+                                                    @if(count($appointments))
+                                                    <table id="datatable" class=" table nowrap w-100">
+                                                         <thead class="ca-thead">
+                                                            <tr class="ca-tr">
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Id')}}</th>                                                                
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Customer')}}</th>
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Details')}}</th>
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Listing')}}</th>                                                                
+                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>                                                                
+                                                            </tr>
+                                                            </thead>
+                                                        <tbody>
+                                                            @php $num = 1 @endphp
+                                                            @foreach ($appointments as $key => $appointment)    
+                                                                <tr class="ca-tr">
+                                                                    <td ><p class="ca-subtitle-14px ca-text-dark mb-2"> {{++$key}}.</p></td>                                                                    
+                                                                    <td class="min-w-140px">                                                                                                                                            
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">
+                                                                            <img src="{{isset($appointment['image']) ? $appointment['image'] : ''}}" class="rounded" height="50px" width="50px" alt="">                                                                            
+                                                                        </p>             
+                                                                    </td>
+                                                                    <td class="min-w-140px">                                                                        
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">                                                                            
+                                                                            {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}
+                                                                        </p>
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">                                                                            
+                                                                            {{isset($appointment['customer_email']) ? $appointment['customer_email'] : ''}}
+                                                                        </p>
+                                                                        <div class="d-flex align-items-center gap-2">
+                                                                            <p class="badge-dark">{{isset($appointment['customer_phone']) ? $appointment['customer_phone'] : ''}} </p>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td class="min-w-110px">
+                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2">
+                                                                           {{isset($appointment['date']) ? date('d M y', strtotime($appointment['date'])) : ''}}
+                                                                        </p>
+                                                                        <div class="d-flex gap-1 align-items-center">
+                                                                            <img src="{{ asset('assets/frontend/images/icons/clock-gray-12.svg') }}" alt="icon">
+                                                                            <p class="in-subtitle-14px">{{!empty($appointment['time']) ? date('h:i A', strtotime($appointment['time'])) : ''}}</p>
+                                                                        </div>
+                                                                       
+                                                                        <div class="eMessage">
+                                                                            <p class="ca-subtitle-14px ca-text-dark mb-6px mb-2">
+                                                                                <span class="short-text d-inline">
+                                                                                    {{ \Illuminate\Support\Str::words($appointment['message'], 30, '...') }}
+                                                                                </span>
+                                                                                <span class="full-text d-none">
+                                                                                    {{ $appointment['message'] }}
+                                                                                </span>                                                                                
+                                                                            </p>
+                                                                            @if(str_word_count($appointment['message']) > 30)
+                                                                                <a href="javascript:void(0)" class="read-more">{{ get_phrase('Read More') }}</a>
+                                                                            @endif
+                                                                        </div>                                                                        
+                                                                    </td>                                                                        
 
-                                                        // Claimed
-                                                        if($listing->type == 'beauty'){
-                                                            $claimStatus = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type', 'beauty')->first();
-                                                        } elseif($listing->type == 'sleep'){
-                                                            $claimStatus = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type', 'sleep')->first();
-                                                        } elseif($listing->type == 'car'){
-                                                            $claimStatus = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type', 'car')->first();
-                                                        } elseif($listing->type == 'play'){
-                                                            $claimStatus = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type', 'play')->first();
-                                                        }elseif($listing->type == 'work'){
-                                                            $claimStatus = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type', 'work')->first();
-                                                        }
-
-                                                    @endphp    
-                                                    <tr>
-                                                        <td> {{$num++}} </td>
-                                                        <td>
-                                                            <img src="{{get_all_image('listing-images/'.$image)}}" width="50" height="50" class="rounded" alt="">
-                                                        </td>
-                                                        <td> {{$listing->title}} 
-                                                            @if(isset($claimStatus) && $claimStatus->status == 1) 
-                                                            <svg data-bs-toggle="tooltip" 
-                                                            data-bs-title=" {{ get_phrase('This listing is verified') }}" fill="none" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="paint0_linear_16_1334" gradientUnits="userSpaceOnUse" x1="12" x2="12" y1="-1.2" y2="25.2"><stop offset="0" stop-color="#ce9ffc"/><stop offset=".979167" stop-color="#7367f0"/></linearGradient><path d="m3.783 2.826 8.217-1.826 8.217 1.826c.2221.04936.4207.17297.563.3504.1424.17744.22.39812.22.6256v9.987c-.0001.9877-.244 1.9602-.7101 2.831s-1.14 1.6131-1.9619 2.161l-6.328 4.219-6.328-4.219c-.82173-.5478-1.49554-1.2899-1.96165-2.1605-.46611-.8707-.71011-1.8429-.71035-2.8305v-9.988c.00004-.22748.07764-.44816.21999-.6256.14235-.17743.34095-.30104.56301-.3504zm8.217 10.674 2.939 1.545-.561-3.272 2.377-2.318-3.286-.478-1.469-2.977-1.47 2.977-3.285.478 2.377 2.318-.56 3.272z" fill="url(#paint0_linear_16_1334)"/></svg>
-                                                            @endif 
-                                                        </td>
-                                                        <td> {{$category}} </td>
-                                                        @if($type == 'work' || $type == 'sleep')
-                                                        <td> {{currency($listing->price)}} </td>
-                                                        @endif
-                                                        <td> {{ucwords($listing->visibility)}} </td>
-                                                        <td> 
-                                                            <div class="dropdown ol-icon-dropdown">
-                                                                <button class="px-2" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                                    <span class="fi-rr-menu-dots-vertical"></span>
-                                                                </button>
-                                                                <ul class="dropdown-menu">
-                                                                <li><a class="dropdown-item fs-14px" href="{{route('listing.details',['id'=>$listing->id,'type'=>$listing->type, 'slug'=>slugify($listing->title)])}}" target="_blank"> {{get_phrase('View frontend')}} </a></li>
-                                                                <li><a class="dropdown-item fs-14px" href="{{route('admin.listing.status',['type'=>$type, 'id'=>$listing->id, 'status'=>$listing->visibility])}}"> {{get_phrase('Change visibility')}} </a></li>
-                                                                <li><a class="dropdown-item fs-14px" href="{{route('admin.listing.edit',['type'=>$type, 'id'=>$listing->id, 'tab'=>0])}}"> {{get_phrase('Edit')}} </a></li>
-                                                                <li><a class="dropdown-item fs-14px" onclick="delete_modal('{{route('admin.listing.delete',['type'=>$type, 'id'=>$listing->id])}}')" href="javascript:void(0);"> {{get_phrase('Delete')}} </a></li>
-
-                                                                </ul>
-                                                            </div>
-                                                        </td>
-                                                    </tr>
-                                                    @endforeach
-                                                </tbody>
-                                            </table>
-                                            @else
-                                                @include('layouts.no_data_found')
-                                            @endif
+                                                                    <td>
+                                                                        @if ($appointment['status'] == 1)
+                                                                            <p class="badge-success-light">{{get_phrase('Successfully Ended')}}</p>
+                                                                        @else
+                                                                            <p class="badge-danger-light">{{get_phrase('Not start yet')}}</p>
+                                                                        @endif
+                                                                    </td>
+                                                   
+                                                                </tr>
+                                                                @endforeach
+                                                        </tbody>
+                                                    </table>
+                                                    @else
+                                                        @include('layouts.no_data_found')
+                                                    @endif
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -453,70 +439,20 @@
                         </div>
                     </div>
                     <div class="tab-pane fade" id="calander" role="tabpanel" aria-labelledby="calander-tab">
-                        <div class="row">                            
-                             <!-- start -->
+                        <div class="row">  
                             <div class="col-sm-12">
-                                
+                                <div class="container mt-4">
+                                    <h2>Appointment Calendar</h2>
+                                    <div id="calendar"></div>
+                                </div>                               
                             </div>
-                            <!-- end -->
                         </div>
-                    </div>
-                     {{-- Claim  --}}
-                    
-                     <div class="tab-pane fade" id="claim" role="tabpanel" aria-labelledby="claim-tab">
-
-                        <div class="card pt-5 pb-5 claimCard">
-                            @php 
-                            $claimed = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type','play')->first();
-                        @endphp
-                        
-                        @if($claimed && $claimed->status == 1)
-                            <div class="card-body approveClaim">
-                                <img src="{{asset('assets/frontend/images/verified.svg')}}" alt="">
-                                <p class="text-center mb-2">{{$claimed->user_name}}</p>
-                                <p class="text-center mb-2">{{$claimed->user_phone}}</p>
-                                <p class="text-center mb-3">{{$claimed->additional_info}}</p>
-                                <a href="javascript:;" onclick="delete_modal('{{route('admin.claim-listing.delete',[ 'id'=>$claimed->id])}}')" class="btn ol-btn-outline-secondary d-flex m-auto ">{{get_phrase('Remove verification Status')}}</a>
-                            </div>
-                        @elseif($claimed && $claimed->status == 0) 
-                         <div class="card-body approveClaim">
-                            <p class="text-center mb-2">{{$claimed->user_name}}</p>
-                            <p class="text-center mb-2">{{$claimed->user_phone}}</p>
-                            <p class="text-center mb-3">{{$claimed->additional_info}}</p>
-                             <div class="text-center">
-                                <a href="javascript:;" onclick="confirm_modal('{{route('admin.claim-listing.approve',['type' => 'play', 'listing_id'=>$claimed->id])}}')" class="btn ol-btn-outline-secondary  m-auto ">{{get_phrase('Approve')}}</a>
-                                <a href="javascript:;" onclick="delete_modal('{{route('admin.claim-listing.delete',[ 'id'=>$claimed->id])}}')" class="btn ol-btn-outline-secondary  m-auto ">{{get_phrase('Delete')}}</a>
-                             </div>
-                        </div>
-                        @else
-                            <div class="card-body">
-                                <h5 class="text-center mb-4">{{get_phrase('This directory is not yet verified !')}}</h5>
-                                <a href="javascript:;" onclick="edit_modal('modal-md','{{route('admin.claimed_listing.form',['type' =>$listing->type, 'id'=>$listing->id])}}','{{get_phrase('Provide Validity')}}')" class="btn ol-btn-outline-secondary d-flex m-auto ">{{get_phrase('Provide Validity')}}</a>
-                            </div>
-                        @endif
-                              
-                        </div>
-                    </div>
-                    {{-- Claim  --}}
-                    {{-- Shop   --}}
-                    @if (addon_status('shop') == 1)
-                        <div class="tab-pane fade" id="shop" role="tabpanel" aria-labelledby="shop-tab">
-                            <div class="d-flex align-items-center justify-content-between mb-3">
-                                <h5 class="fs-16px title mb-3 capitalize"> {{ get_phrase('Your  Shop Inventory') }} </h5>
-                                <div>
-                                    <a href="javascript:void(0);" onclick="modal('modal-md', '{{ route('admin.inventory.create', ['prefix' => 'admin', 'type' => 'play','listing_id' => $listing->id]) }}', '{{ get_phrase('Add Product') }}')" class="btn ol-btn-primary fs-14px"> {{ get_phrase('Add New Product') }} </a>
-                                    <a href="javascript:void(0);" onclick="modal('modal-md', '{{ route('admin.inventory.category.create', ['prefix' => 'admin', 'type' => 'play', 'listing_id' => $listing->id]) }}', '{{ get_phrase('Add Category') }}')" class="btn ol-btn-primary fs-14px"> {{ get_phrase('Add Product Category') }} </a>
-                                </div>
-                            </div>
-                            @include('admin.shop.inventory_list')
-                        </div>
-                        @endif 
-                        {{-- Shop  --}}
+                    </div>                    
                 </div>
             </form>
         </div>
     </div>
-
+    
     @include('admin.listing.listing_script')
     <script>
         "use strict";
@@ -532,7 +468,7 @@
             }
             var listing_country = $("#country").val();
             if (!listing_country) {
-                warning('Listing country is required');
+                warning('Listing State is required');
             }
             var listing_city = $("#city").val();
             if (!listing_city) {
@@ -589,7 +525,7 @@
     </script>
 
     <script>
-         document.getElementById('listing-icon-image').addEventListener('change', function(event) {
+        document.getElementById('listing-icon-image').addEventListener('change', function(event) {
         const imageContainer = document.getElementById('image-container');
         const files = event.target.files;
 
@@ -618,5 +554,7 @@
             reader.readAsDataURL(file);
         }
     }); 
-    </script>
+    </script>    
+
+
 @endsection

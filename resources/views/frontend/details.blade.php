@@ -328,7 +328,7 @@
                                         </div>                                       
                                         <button type="submit" class="btn at-btn-purple">
                                             <img src="{{ asset('assets/frontend/images/icons/search-white-20.svg') }}" alt="">
-                                            <span>{{ get_phrase('Search 123') }}</span>
+                                            <span>{{ get_phrase('Search') }}</span>
                                         </button>
                                     </div>
                                 </form>

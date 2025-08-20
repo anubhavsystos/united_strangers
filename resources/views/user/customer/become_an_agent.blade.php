@@ -11,7 +11,7 @@
         font-size: 14px;
     }
     .icon-color {
-        color: #F77214;
+        color: #212529;
     }
     .fs-30px {
         font-size: 30px;

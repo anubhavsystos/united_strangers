@@ -8,7 +8,7 @@
     font-size: 14px;
 }
 .icon-color {
-    color: #F77214;
+    color: #212529;
 }
 .at-shadow-card.active {
     background-color: var(--themeColor);
@@ -59,7 +59,7 @@
 }
 .beauty-details-body  .filter-tab-switch .grid-list.active path,
 .beauty-details-body  .filter-tab-switch .grid-list:hover path {
-	fill: #FF736A;
+	fill: #212529;
 }
 .beauty-details-body .switch-button .knobs span {
 	background-image: url(../images/icons/location-purple_beauty.svg);
@@ -69,12 +69,12 @@
 	background-color: #ff746a2e;
 }
 .beauty-details-body .noUi-connect {
-	background: #FF736A;
+	background: #212529;
 }
 
 .activeColor svg path,
 .beautyColor path{
-    fill: #FF736A !important;
+    fill: #212529 !important;
 }
 
 /* Agent message */
@@ -181,16 +181,16 @@
 
 .car-details-body .numbers svg path,
 .car-details-body .location svg path{
-    fill: #F77214 !important;
+    fill: #212529 !important;
 }
 .car-details-body .bt-home-navbar-nav .at-home-nav-link.active,
 .car-details-body .bt-home-navbar-nav .at-home-nav-link:hover {
-	color: #F77214;
+	color: #212529;
 }
 .car-details-body .grid-list-bookmark.gray-bookmark2.ca-bookmark-hover.active path, 
 .car-details-body .grid-list-bookmark.gray-bookmark2.ca-bookmark-hover:hover path {
-	fill: #F77214;
-	stroke: #F77214;
+	fill: #212529;
+	stroke: #212529;
 }
 .car-details-body .grid-list-bookmark.gray-bookmark2,
 .car-details-body .grid-list-bookmark.white-bookmark {
@@ -198,7 +198,7 @@
 }
 .car-details-body .grid-list-bookmark.gray-bookmark2 path,
 .car-details-body .grid-list-bookmark.gray-bookmark2 path {
-	stroke: #F77214;
+	stroke: #212529;
 }
 .h-220{
     height: 200px !important;
@@ -861,7 +861,7 @@
     border-color: var(--themeColor) !important;
 }
 .play-details-body .switch-button .switch-checkbox:checked ~ .layer {
-	background-color: #F772142E;
+	background-color: #2125292E;
 }
 .car-details-body .switch-button .switch-checkbox:checked ~ .layer {
 	background-color: #15131321;
@@ -870,7 +870,7 @@
 	background-color: #44A1ED6B;
 }
 .sleep-details-body .switch-button .switch-checkbox:checked ~ .layer {
-	background-color: #F7721457;
+	background-color: #21252957;
 }
 .ca-home-menu-btn path {
 	fill: var(--themeColor);

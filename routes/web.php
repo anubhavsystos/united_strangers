@@ -151,8 +151,10 @@ Route::prefix('{prefix}')->middleware(['auth', 'anyAuth'])->group(function () {
     Route::get('listing/nearby/location/edit/{id}/{page}', [ListingController::class, 'edit_listing_nearBY'])->name('editNearByLocation');
     Route::post('listing/nearby/location/update/{id}', [ListingController::class, 'updateNearByLocation'])->name('updateNearByLocation');
     Route::get('listing/nearby/location/delete/{id}', [ListingController::class, 'deleteNearByLocation'])->name('deleteNearByLocation');
-
+    
+    
 });
+
 Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
 
 
@@ -273,6 +275,11 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/listing-floor-image-delete/{type}/{id}/{image}', [ListingController::class, 'listing_floor_image_delete'])->name('admin.listing.floor.image.delete');
    
     
+    // AppointmentController
+    Route::get('appointments', [AppointmentController::class, 'fetchappointments'])->name('appointments.fetch');
+    Route::post('appointments', [AppointmentController::class, 'appointment_store'])->name('appointments.store');
+
+
     // amenities
     Route::get('/amenities/{type}', [AmenitiesController::class, 'amenities_list'])->name('admin.amenities.list');
     Route::get('/amenities-item/{type}/{item}', [AmenitiesController::class, 'amenities_item'])->name('admin.amenities.item');

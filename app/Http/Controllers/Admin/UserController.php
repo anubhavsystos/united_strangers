@@ -22,6 +22,7 @@ class UserController extends Controller
     }
  
     public function user_create(Request $request, $type){
+        
         $validated = $request->validate([
             'name' => 'required|max:255',
             'email' => 'required|max:255',
@@ -37,22 +38,24 @@ class UserController extends Controller
         $address['city'] = sanitize($request->city);
 
         if ($request->hasFile('image')) {
-            // $image = $request->file('image');
-            // $imageName = time() . '.' . $image->getClientOriginalExtension();
-            // $image->move(public_path('uploads/users'), $imageName);
-            // $data['image'] = $imageName;
-            $data['image'] = file_upload($request->file('image'));
+            $image = $request->file('image');
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
+            $image->move(public_path('uploads/users'), $imageName);
+            $data['image'] = $imageName;
+            
         }       
-
         $data['type'] = $type;
-        $data['role'] = 1;
-        $data['status'] = 1;        
+        $data['role'] = 2;
+        $data['status'] = 1;
+        $data['name'] = sanitize($request->name);
+        $data['email'] = sanitize($request->email);
+        $data['phone'] = sanitize($request->phone);
+        $data['gender'] = sanitize($request->gender);
         $data['address'] = json_encode($address);
         $data['password'] = Hash::make($request->password);
         $data['facebook'] = sanitize($request->facebook);
         $data['twitter'] = sanitize($request->twitter);
         $data['linkedin'] = sanitize($request->linkedin);
-
         User::insert($data);
         Session::flash('success', get_phrase('User Created successfully!'));
         return redirect(route('admin.user',['type'=>$type,'action'=>'all']));
@@ -98,7 +101,6 @@ class UserController extends Controller
         $address['city'] = sanitize($request->city);
 
         if ($request->hasFile('image')) {
-            $data['image'] = file_upload($request->file('image'));
             
             $image = $request->file('image');
             $imageName = time() . '.' . $image->getClientOriginalExtension();

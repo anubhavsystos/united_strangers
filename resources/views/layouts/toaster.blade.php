@@ -56,3 +56,110 @@
         error("{!! $message !!}");
     </script>
 @endif
+<script>
+      document.addEventListener('DOMContentLoaded', function () {
+    let calendar;                          
+    const calTabBtn   = document.getElementById('calander-tab');   
+    const calTabPane  = document.getElementById('calander');   
+    const calendarEl  = document.getElementById('calendar');
+    const modalEl     = document.getElementById('appointmentModal');
+
+    function initCalendarOnce() {
+        if (calendar) return; 
+
+        const segment_type = document.getElementById('segment_type').value;
+        const segment_id   = document.getElementById('segment_id').value;
+
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            events: "{{ route('appointments.fetch') }}" 
+                     + "?segment_id=" + segment_id 
+                     + "&segment_type=" + segment_type,
+            dateClick: function(info) {
+                document.getElementById('appointmentDate').value = info.dateStr;
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+        });
+
+        calendar.render();
+        window.calendar = calendar;
+    }
+
+    if (calTabBtn) {
+        calTabBtn.addEventListener('shown.bs.tab', function () {
+            initCalendarOnce();
+            setTimeout(() => calendar.updateSize(), 50);
+        });
+    }
+
+    if (calTabPane && calTabPane.classList.contains('active')) {
+        initCalendarOnce();
+    }
+});
+</script>
+<script>
+        document.addEventListener('DOMContentLoaded', function () {
+        let calendar;                          
+        const calTabBtn = document.getElementById('calander-tab');   
+        const calTabPane = document.getElementById('calander');   
+        const calendarEl = document.getElementById('calendar');
+        const modalEl = document.getElementById('appointmentModal');
+
+        function initCalendarOnce() {
+            if (calendar) return; 
+
+            calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            dateClick: function(info) {
+                document.getElementById('appointmentDate').value = info.dateStr;
+                const modal = new bootstrap.Modal(modalEl);
+                modal.show();
+            }
+            });
+
+            calendar.render();
+        }
+        if (calTabBtn) {
+            calTabBtn.addEventListener('shown.bs.tab', function () {
+            initCalendarOnce();
+            setTimeout(() => calendar.updateSize(), 50);
+            });
+        }
+
+        if (calTabPane && calTabPane.classList.contains('active')) {
+            initCalendarOnce();
+        }
+        });
+</script>
+<script>
+function appointmentForm_data(e) {
+    e.preventDefault();
+    const type = document.getElementById("type");
+    const listing_id = document.getElementById("listing_id");
+    const form = document.getElementById("appointmentForm_data");
+    const formData = new FormData(form);
+    fetch(form.action, {
+        method: "POST",
+        headers: {
+            "X-CSRF-TOKEN": form.querySelector('input[name="_token"]').value
+        },
+        body: formData
+    })
+    .then(res => res.json())
+    .then(data => {
+        console.log("appointment Saved:", data);
+        form.reset();
+        bootstrap.Modal.getInstance(document.getElementById("appointmentModal")).hide();
+        if (window.calendar) {
+            window.calendar.refetchEvents();
+        }
+    })
+    .catch(err => console.error(err));
+}
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById("appointmentForm_data").addEventListener("submit", appointmentForm_data);
+});
+</script>

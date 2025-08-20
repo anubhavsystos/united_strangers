@@ -134,9 +134,9 @@
         {{ $workPercentage }}
     ];
     const barColors = [
-        "#FF736A",
-        "#F77214",
-        "#F77214",
+        "#212529",
+        "#212529",
+        "#212529",
     ];
 
     new Chart("myChart", {

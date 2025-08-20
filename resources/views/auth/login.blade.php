@@ -63,7 +63,7 @@
                         @csrf
                         <div class="mb-4">
                             <label for="email" class="form-label ua-form-label mb-3">{{ get_phrase('Email') }}</label>
-                            <input type="email" class="form-control ua-form-control @error('email') is-invalid @enderror" id="email" name="email" placeholder="username@gmail.com" autocomplete="email" autofocus>
+                            <input type="email" class="form-control ua-form-control @error('email') is-invalid @enderror" id="email" value="anubhavjain.systos@gmail.com" name="email" placeholder="username@gmail.com" autocomplete="email" autofocus>
                             @error('email')
                                 <span class="invalid-feedback"><strong>{{ $message }}</strong></span>
                             @enderror
@@ -73,7 +73,7 @@
                                 <label for="password" class="form-label ua-form-label">{{ get_phrase('Password') }}<span>*</span></label>
                                 <a href="{{ route('password.request') }}" class="ua-link">{{ get_phrase('Forget your password') }} ?</a>
                             </div>
-                            <input type="password" class="form-control ua-form-control @error('password') is-invalid @enderror" id="password" name="password" required placeholder="Enter password">
+                            <input type="password" class="form-control ua-form-control @error('password') is-invalid @enderror" id="password" value="systos!@#5" name="password" required placeholder="Enter password">
                             @error('password')
                                 <span class="invalid-feedback"><strong>{{ $message }}</strong></span>
                             @enderror

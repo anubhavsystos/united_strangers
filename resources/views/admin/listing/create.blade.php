@@ -21,9 +21,9 @@
                 <div class="mb-3">
                     <label for="type" class="form-label ol-form-label"> {{get_phrase('Listing Type')}} </label>
                     <select name="type" id="listing-type" class="form-control ol-select2 ol-form-control" data-minimum-results-for-search="Infinity">
-                        <option value=""> {{get_phrase('Select listing type')}} </option>
-                        <option value="work"> {{get_phrase('Work Listing')}} </option>
+                        <option value=""> {{get_phrase('Select listing type')}} </option>                       
                         <option value="sleep"> {{get_phrase('Sleep Listing')}} </option>
+                        <option value="work"> {{get_phrase('Work Listing')}} </option>
                         <option value="play"> {{get_phrase('Play Listing')}} </option>
                     </select>
                 </div>

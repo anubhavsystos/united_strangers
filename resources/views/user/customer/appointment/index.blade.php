@@ -57,7 +57,7 @@
                                 {{-- <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Customer')}}</th> --}}
                                 <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Listing')}}</th>
                                 <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Details')}}</th>
-                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('St56atus')}}</th>
+                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>
                                 <th scope="col" class="ca-title-14px ca-text-dark text-center">{{get_phrase('Action')}}</th>
                               </tr>
                             </thead>

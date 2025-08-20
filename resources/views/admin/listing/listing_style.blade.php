@@ -13,10 +13,10 @@
     }
     .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
         border: 0;
-        color: #FF736A;
+        color: #212529;
     }
     .nav-tabs .nav-link.active {
-        border-bottom: 1px solid #FF736A !important;
+        border-bottom: 1px solid #212529 !important;
     }
     .nav-link {
         color: #000;
@@ -57,10 +57,10 @@
     }
     .nav-tabs .nav-item.show .nav-link, .nav-tabs .nav-link.active {
         border: 0;
-        color: #FF736A;
+        color: #212529;
     }
     .nav-tabs .nav-link.active {
-        border-bottom: 1px solid #FF736A !important;
+        border-bottom: 1px solid #212529 !important;
     }
     .nav-link {
         color: #000;
@@ -141,7 +141,7 @@
         right: 5px;
     }
     .team-checkbox .team-body .checked i {
-        background-color: #FF736A;
+        background-color: #212529;
         padding: 7px 5px;
         border-radius: 50px;
         color: #fff;

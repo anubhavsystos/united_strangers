@@ -31,6 +31,10 @@
     <link rel="stylesheet" href="{{ asset('assets/backend/css/responsive.css') }}">
     <link rel="stylesheet" href="{{ asset('assets/backend/css/custom.css') }}">
     <script src="{{ asset('assets/backend/js/jquery-3.7.1.min.js') }}"></script>
+
+    <!-- Calander -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.15/index.global.min.js"></script>
     @stack('css')
 
 </head>
@@ -64,11 +68,7 @@
             </div>
         </div>
     </main>
-
     @include('layouts.modal')
-
-   
-
     <!-- Admin Main Top Area End -->
     <script src="{{ asset('assets/backend/vendors/apexcharts/apexcharts.min.js') }}"></script>
     <script src="{{ asset('assets/backend/vendors/chart-js/chart.js') }}"></script>
