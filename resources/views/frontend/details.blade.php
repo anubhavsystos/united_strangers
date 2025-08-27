@@ -238,44 +238,7 @@
                                             </div>
                                         </div>
 
-<script>
-    const guestState = {
-        adults: 1,
-        children: 0,
-        infants: 0
-    };
-
-    function toggleGuestDropdown(e) {
-        e.stopPropagation();
-        const dropdown = document.getElementById("guestDropdown");
-        dropdown.style.display = dropdown.style.display === "block" ? "none" : "block";
-    }
-
-    function updateGuest(e, type, change) {
-        e.stopPropagation();
-        const newVal = guestState[type] + change;
-        if (type === 'adults' && newVal < 1) return;
-        if (newVal < 0) return;
-
-        guestState[type] = newVal;
-        document.getElementById(`${type}Count`).innerText = newVal;
-
-        const total = guestState.adults + guestState.children;
-        const guestCountText = total + (guestState.infants > 0 ? ` + ${guestState.infants} infant` : '');
-
-        document.getElementById('guestCount').innerText = guestCountText;
-        document.getElementById('guest_count_input').value = guestCountText; 
-    }
-
-    function closeGuestDropdown() {
-        document.getElementById("guestDropdown").style.display = "none";
-    }
-
-    // Click outside to close
-    document.addEventListener("click", function () {
-        document.getElementById("guestDropdown").style.display = "none";
-    });
-</script>
+        
 
                                       
                                         <button type="submit" class="btn at-btn-purple">
@@ -448,7 +411,7 @@
                  <span class="d-flex flex-wrap gap-0 justify-content-between mb-30px" id="show_detals_product"></span>
             </div>
             <span id="show_more_product"></span>
-            <div id="view_more_button" class="row mb-5 mix hotel mt-5">
+            <div id="view_more_button" class="row mb-5 mix sleep mt-5">
                 <div class="col-12">
                     <div class="d-flex justify-content-center">
                         <a id="view_more_link" href="" class="btn at-btn-outline-dark">{{ get_phrase('View More') }}</a>
@@ -492,55 +455,58 @@
                 const products = response.products || [];
                 if(segment == 'sleep'){
                     products.forEach(item => {
-                        html += `<div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 mix ${response.type}">
+                        html += `<div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 mix ${segment}">
                             <div class="single-grid-card">
+                                <!-- Banner Slider -->
                                 <div class="grid-slider-area">
                                     <a class="w-100 h-100" href="${item.details_url}">
-                                        <img class="card-item-image" src="${item.image_url}" alt="">
+                                        <img class="card-item-image" src="${item.image_url}" alt="${item.title}">
                                     </a>
-                                    <p class="card-light-text black-light capitalize">${item.status}</p>
-                                    <a href="javascript:void(0);" data-bs-toggle="tooltip" data-bs-title="${item.is_in_wishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}"
-                                        onclick="updateWishlist(this, '${item.id}')"
-                                        class="grid-list-bookmark white-bookmark ${item.is_in_wishlist ? 'active' : ''}">
+                                    <p class="card-light-text theme-light capitalize">${item.is_popular ?? ''}</p>
+                                    <a href="javascript:void(0);" 
+                                    data-bs-toggle="tooltip" 
+                                    data-bs-title="${item.is_in_wishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}" 
+                                    onclick="updateWishlistsleep(this, '${item.id}')" 
+                                    class="grid-list-bookmark white-bookmark ${item.is_in_wishlist ? 'active' : ''}">
                                         <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M13.4361 3C12.7326 3.01162 12.0445 3.22023 11.4411 3.60475C10.8378 3.98927 10.3407 4.53609 10 5.18999C9.65929 4.53609 9.16217 3.98927 8.55886 3.60475C7.95554 3.22023 7.26738 3.01162 6.56389 3C5.44243 3.05176 4.38583 3.57288 3.62494 4.44953C2.86404 5.32617 2.4607 6.48707 2.50302 7.67861C2.50302 10.6961 5.49307 13.9917 8.00081 16.2262C8.56072 16.726 9.26864 17 10 17C10.7314 17 11.4393 16.726 11.9992 16.2262C14.5069 13.9917 17.497 10.6961 17.497 7.67861C17.5393 6.48707 17.136 5.32617 16.3751 4.44953C15.6142 3.57288 14.5576 3.05176 13.4361 3Z" fill="#000000"/>
+                                            <path d="M13.4361 3C12.7326 3.01162 12.0445 3.22023 11.4411 3.60475C10.8378 3.98927 10.3407 4.53609 10 5.18999C9.65929 4.53609 9.16217 3.98927 8.55886 3.60475C7.95554 3.22023 7.26738 3.01162 6.56389 3C5.44243 3.05176 4.38583 3.57288 3.62494 4.44953C2.86404 5.32617 2.4607 6.48707 2.50302 7.67861C2.50302 10.6961 5.49307 13.9917 8.00081 16.2262C8.56072 16.726 9.26864 17 10 17C10.7314 17 11.4393 16.726 11.9992 16.2262C14.5069 13.9917 17.497 10.6961 17.497 7.67861C17.5393 6.48707 17.136 5.32617 16.3751 4.44953C15.6142 3.57288 14.5576 3.05176 13.4361 3Z" fill="#6C1CFF"/>
                                         </svg>
                                     </a>
                                 </div>
-                                <div class="reals-grid-details position-relative">
-                                    <div class="location d-flex">
-                                        <img src="/assets/frontend/images/icons/location-purple-16.svg" alt="">
-                                        <p class="info">${item.city}, ${item.country}</p>
-                                    </div>
-                                    <div class="reals-grid-title mb-16">
-                                        <a href="/listing/details/${response.type}/${item.id}/${item.slug}" class="title">
-                                            ${item.is_verified ? '<span title="Verified">✔️</span>' : ''} ${item.title}
-                                        </a>
-                                        <p class="info">${item.description}</p>
-                                    </div>
-                                    <div class="reals-bed-bath-sqft d-flex align-items-center flex-wrap">
-                                        <div class="item d-flex align-items-center">
-                                            <img src="/assets/frontend/images/icons/bed-gray-16.svg" alt="">
-                                            <p class="total">${item.bed} Bed</p>
+
+                                <div class="sleep-grid-details position-relative">
+                                    <a href="${item.details_url}" class="title stretched-link">
+                                        ${item.is_verified ? `
+                                        <span data-bs-toggle="tooltip" data-bs-title="This listing is verified">
+                                            <svg fill="none" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg">
+                                                <linearGradient id="paint0_linear_16_1334" gradientUnits="userSpaceOnUse" x1="12" x2="12" y1="-1.2" y2="25.2">
+                                                    <stop offset="0" stop-color="#ce9ffc"/><stop offset=".979167" stop-color="#7367f0"/>
+                                                </linearGradient>
+                                                <path d="m3.783 2.826 8.217-1.826 8.217 1.826c.2221.04936.4207.17297.563.3504.1424.17744.22.39812.22.6256v9.987c-.0001.9877-.244 1.9602-.7101 2.831s-1.14 1.6131-1.9619 2.161l-6.328 4.219-6.328-4.219c-.82173-.5478-1.49554-1.2899-1.96165-2.1605-.46611-.8707-.71011-1.8429-.71035-2.8305v-9.988c.00004-.22748.07764-.44816.21999-.6256.14235-.17743.34095-.30104.56301-.3504zm8.217 10.674 2.939 1.545-.561-3.272 2.377-2.318-3.286-.478-1.469-2.977-1.47 2.977-3.285.478 2.377 2.318-.56 3.272z" fill="url(#paint0_linear_16_1334)"/>
+                                            </svg>
+                                        </span>` : ''}
+                                        ${item.title}
+                                    </a>
+
+                                    <div class="sleepgrid-location-rating d-flex align-items-center justify-content-between flex-wrap">
+                                        <div class="location d-flex">
+                                            <img src="/assets/frontend/images/icons/location-purple-16.svg" alt="">
+                                            <p class="name">${item.city}, ${item.country}</p>
                                         </div>
-                                        <div class="item d-flex align-items-center">
-                                            <img src="/assets/frontend/images/icons/bath-gray-16.svg" alt="">
-                                            <p class="total">${item.bath} Bath</p>
-                                        </div>
-                                        <div class="item d-flex align-items-center">
-                                            <img src="/assets/frontend/images/icons/resize-arrows-gray-16.svg" alt="">
-                                            <p class="total">${item.size} sqft</p>
-                                        </div>
+                                    
                                     </div>
-                                    <div class="reals-grid-price-see d-flex align-items-center justify-content-between">
+
+                                    <ul class="sleepgrid-list-items d-flex align-items-center flex-wrap">
+                                        ${item.features.slice(0, 2).map(f => `<li>${f}</li>`).join('')}
+                                        ${item.features.length > 4 ? `<li class="more">+${item.features.length - 4} More</li>` : ''}
+                                    </ul>
+
+                                    <div class="sleepgrid-see-price d-flex align-items-center justify-content-between">
+                                        <a href="${item.details_url}" class="see-details-btn1">See Details</a>
                                         <div class="prices d-flex">
-                                            ${item.discount
-                                                ? `<p class="new-price">${item.discount}</p><p class="old-price">${item.price}</p>`
-                                                : `<p class="new-price">${item.price}</p>`}
+                                            <p class="price">${item.price}</p>
+                                            <p class="time">/night</p>
                                         </div>
-                                        <a href="/listing/details/${response.type}/${item.id}/${item.slug}" class="reals-grid-view stretched-link">
-                                            <img src="/image/12.svg" alt="">
-                                        </a>
                                     </div>
                                 </div>
                             </div>
@@ -549,7 +515,7 @@
                 }
                 if(segment == 'work'){
                     products.forEach(item => {
-                            html += `<div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 mix work">
+                        html += `<div class="col-sm-6 col-md-6 col-lg-4 col-xl-3 mix work">
                                     <div class="single-grid-card">
                                         <div class="grid-slider-area">
                                             <a class="w-100 h-100" href="${item.details_url}">
@@ -595,7 +561,7 @@
                                                         ? `<p class="new-price">${item.discount}</p><p class="old-price">${item.price}</p>`
                                                         : `<p class="new-price">${item.price}</p>`}
                                                 </div>
-                                                <a href="/listing/details/work/${item.id}/${item.slug}" class="reals-grid-view stretched-link">
+                                                <a href="${item.details_url}" class="reals-grid-view stretched-link">
                                                     <img src="/image/12.svg" alt="">
                                                 </a>
                                             </div>
@@ -666,8 +632,8 @@
         });
 
         }
-
 </script>
+
 
 
 

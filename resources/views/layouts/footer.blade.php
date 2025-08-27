@@ -54,9 +54,9 @@
                                         <ul>
                                             <li><a href="{{route('play.home')}}">{{get_phrase('Play')}}</a></li>
                                             <li><a href="{{route('sleep.home')}}">{{get_phrase('Sleep')}}</a></li>
-                                            <li><a href="{{route('beauty.home')}}">{{get_phrase('Beauty')}}</a></li>
+                                        
                                             <li><a href="{{route('work.home')}}">{{get_phrase('Work')}}</a></li>
-                                            <li><a href="{{route('car.home')}}">{{get_phrase('Car')}}</a></li>
+                                        
                                         </ul>
                                     </div>
                                </div>

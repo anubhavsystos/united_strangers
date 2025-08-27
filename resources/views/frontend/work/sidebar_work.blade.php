@@ -1,9 +1,9 @@
 @include('frontend.sidebar_top')
 @php 
-$min_price =  App\Models\RealEstateListing::min('price') ?? 0;
-$max_price =  App\Models\RealEstateListing::max('price') ?? 0;
-$cities = App\Models\RealEstateListing::select('city')->groupBy('city')->get();
-$countries = App\Models\RealEstateListing::select('country')->groupBy('country')->get();
+$min_price =  App\Models\WorkListing::min('price') ?? 0;
+$max_price =  App\Models\WorkListing::max('price') ?? 0;
+$cities = App\Models\WorkListing::select('city')->groupBy('city')->get();
+$countries = App\Models\WorkListing::select('country')->groupBy('country')->get();
 isset($searched_bedroom) ? '' : ($searched_bedroom = []);
 isset($searched_bathroom) ? '' : ($searched_bathroom = []);
 isset($searched_garage) ? '' : ($searched_garage = []);
@@ -27,7 +27,7 @@ $numbers = ['1', '2', '3', '4', '5'];
             <ul class="sidebar-accordion-menu nBlock" id="categoryList" >
                 @foreach ($categories as $index => $category)
                     @php
-                        $categoryCount = App\Models\RealEstateListing::where('category', $category->id)->count();
+                        $categoryCount = App\Models\WorkListing::where('category', $category->id)->count();
                     @endphp
                     <li class="{{ $index >= 6 ? 'hidden' : '' }}">
                         <a href="{{ route('ListingsFilter') }}?type=real-estate&view={{ $view }}&category={{ $category->id }}" class="filter {{ (isset($category_type) && $category->id == $category_type) ? 'active' : '' }}" for="category{{ $category->id }}" >
@@ -179,7 +179,7 @@ $numbers = ['1', '2', '3', '4', '5'];
                 @foreach ($countries as $index => $countryName)    
                     @php
                         $country = App\Models\Country::where('id', $countryName->country)->first();
-                        $countryCount = App\Models\RealEstateListing::where('country', $country->id)->count();
+                        $countryCount = App\Models\WorkListing::where('country', $country->id)->count();
                     @endphp
                     <li class="{{ $index >= 6 ? 'hidden' : '' }}">
                         <a href="{{ route('ListingsFilter') }}?type=real-estate&view={{ $view }}&country={{ $country->id }}" class="filter {{ (isset($country_type) && $country->id == $country_type) ? 'active' : '' }}" for="country{{ $country->id }}" >
@@ -205,7 +205,7 @@ $numbers = ['1', '2', '3', '4', '5'];
                 @foreach ($cities as $index => $item)    
                     @php
                         $city = App\Models\City::where('id', $item->city)->first();
-                        $cityCount = App\Models\RealEstateListing::where('city', $city->id)->count();
+                        $cityCount = App\Models\WorkListing::where('city', $city->id)->count();
                     @endphp
                     <li class="{{ $index >= 6 ? 'hidden' : '' }}">
                         <a href="{{ route('ListingsFilter') }}?type=real-estate&view={{ $view }}&city={{ $city->id }}" class="filter {{ (isset($city_type) && $city->id == $city_type) ? 'active' : '' }}" for="city{{ $city->id }}" >

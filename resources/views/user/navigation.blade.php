@@ -18,22 +18,7 @@
             <div class="mb-3">
                 <h3 class="in-title-14px mb-2 cap-sidebar-title">{{ get_phrase('My Customer Panel') }}</h3>
                 <nav>
-                    <ul>
-                        <li class="sidebar-nav-item"><a href="{{ route('customer.wishlist') }}" class="sidebar-nav-link {{ $active == 'wishlist' ? 'active' : '' }}">
-                                <span class="d-flex align-items-start mt-1px gap-6px">
-                                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M9.465 15.6075C9.21 15.6975 8.79 15.6975 8.535 15.6075C6.36 14.865 1.5 11.7675 1.5 6.51745C1.5 4.19995 3.3675 2.32495 5.67 2.32495C7.035 2.32495 8.2425 2.98495 9 4.00495C9.7575 2.98495 10.9725 2.32495 12.33 2.32495C14.6325 2.32495 16.5 4.19995 16.5 6.51745C16.5 11.7675 11.64 14.865 9.465 15.6075Z" stroke="#99A1B7" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
-                                    </svg>
-                                    <span class="mt-1px">{{ get_phrase('Wishlist') }}</span>
-                                </span>
-                                <span class="badge-secondary mt-1px">
-                                    @php
-                                        $wis = App\Models\Wishlist::where('user_id', user('id'))->get();
-                                    @endphp
-                                    {{ count($wis) }}
-                                </span>
-                            </a></li>
-                          
+                    <ul>                       
                             <li class="sidebar-nav-item">
                                 <a href="{{ route('customer.appointment') }}" class="sidebar-nav-link {{ $active == 'userAppointment' ? 'active' : '' }}">
                                     <span class="d-flex align-items-start mt-1px gap-6px">

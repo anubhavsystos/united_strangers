@@ -26,23 +26,19 @@ use App\Models\Newsletter_subscriber;
 use App\Models\ClaimedListing;
 use App\Models\ReportedListing;
 use App\Models\Contact;
+use App\Models\Offer;
+use App\Models\Event;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Brian2694\Toastr\Facades\Toastr;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
-use DB;
-
-
-
 class FrontendController extends Controller
 {
-
-     protected $blog;
+    protected $blog;
     protected $blog_category;
 
-   public function __construct(BeautyListing $beautyListing,CarListing $carListing,SleepListing $sleepListing,WorkListing $workListing,PlayListing $playListing,User $user,Message_thread $messageThread,Message $message,Review $review,Wishlist $wishlist,City $city,Country $country,Menu $menu,Appointment $appointment,Amenities $amenities,Newsletter $newsletter,Newsletter_subscriber $newsletterSubscriber,ClaimedListing $claimedListing,ReportedListing $reportedListing,Contact $contact,Pricing $pricing,Category $category) {       
-       
+   public function __construct(BeautyListing $beautyListing,CarListing $carListing,SleepListing $sleepListing,WorkListing $workListing,PlayListing $playListing,User $user,Message_thread $messageThread,Message $message,Review $review,Wishlist $wishlist,City $city,Country $country,Menu $menu,Appointment $appointment,Amenities $amenities,Newsletter $newsletter,Newsletter_subscriber $newsletterSubscriber,ClaimedListing $claimedListing,ReportedListing $reportedListing,Contact $contact,Pricing $pricing,Category $category,Offer $offer, Event $event, Blog $blog) {       
         $this->sleepListing = $sleepListing;
         $this->workListing = $workListing;
         $this->playListing = $playListing;
@@ -59,37 +55,61 @@ class FrontendController extends Controller
         $this->contact = $contact;
         $this->pricing = $pricing;
         $this->category = $category;
+        $this->offer = $offer;
+        $this->event = $event;
+        $this->blog = $blog;
     }
 
 
-    public function index(){   
-        return view('frontend.index');
+    public function index(){
+        $sleeplistings = $this->sleepListing->where('visibility', 'visible')->orderBy('created_at', 'desc')->limit(15)->get()->map(function ($item) {
+            return $item->productFormattedArray();
+        });
+
+        $worklistings = $this->workListing->where('visibility', 'visible')->orderBy('created_at', 'desc')->limit(15)->get()->map(function ($item) {
+            return $item->productFormattedArray();
+        });
+
+        $playlistings = $this->playListing->where('visibility', 'visible')->orderBy('created_at', 'desc')->limit(15)->get()->map(function ($item) {
+            return $item->productFormattedArray();
+        });
+
+        $today = now()->toDateString();
+
+        $offers = $this->offer->whereDate('to_date', '<=', $today)->whereDate('from_date', '>=', $today)->get()->map(function ($item) {
+            return $item->offerformatted();
+        });
+
+        $events = $this->event->whereDate('to_date', '<=', $today)->whereDate('from_date', '>=', $today)->get()->map(function ($item) {
+            return $item->eventformatted();
+        });
+
+        $blogs = $this->blog->orderBy('created_at', 'desc')->limit(15)->get()->map(function ($item) {
+            return $item->blogformatted();
+        });
+
+        return view('frontend.index', compact('sleeplistings','worklistings','playlistings','offers','events','blogs'));
     }
+
    
 
-    public function details(){ 
-        
+    public function details(){
         $sleepListing_data = [];
         $workListing_data = [];
         $playListing_data = [];
-        // playListing
-        $playListing = $this->playListing->where('visibility', 'visible')->with(['countryDetail', 'cityDetail', 'categoryDetail'])->get();
-
-        $playcountries = $playListing->map(function ($item) {
+        $sleepListing = $this->sleepListing->where('visibility', 'visible')->with(['countryDetail', 'cityDetail', 'categoryDetail'])->get();
+        $sleepcountries = $sleepListing->map(function ($item) {
             return $item->countryDetail ? [ 'id' => $item->countryDetail->id, 'name' => $item->countryDetail->name ] : null;
         })->filter()->unique('id')->values();
-        $playcitys = $playListing->map(function ($item) {
+        $sleepcitys = $sleepListing->map(function ($item) {
             return $item->cityDetail ? ['id' => $item->cityDetail->id,'name' => $item->cityDetail->name ] : null;
         })->filter()->unique('id')->values();
-        $playcategorys = $playListing->map(function ($item) {
+        $sleepcategorys = $sleepListing->map(function ($item) {
             return $item->categoryDetail ? ['id' => $item->categoryDetail->id,'name' => $item->categoryDetail->name ] : null;
         })->filter()->unique('id')->values();
-        $playListing_data['playcountries'] = $playcountries;
-        $playListing_data['playcitys'] = $playcitys;
-        $playListing_data['playcategorys'] = $playcategorys;
-        // playListing end
-
-        // workListing 
+        $sleepListing_data['sleepcountries'] = $sleepcountries;
+        $sleepListing_data['sleepcitys'] = $sleepcitys;
+        $sleepListing_data['sleepcategorys'] = $sleepcategorys;
         $workListing = $this->workListing->where('visibility', 'visible')->with(['countryDetail', 'cityDetail', 'categoryDetail'])->get();
         $workcountries = $workListing->map(function ($item) {
             return $item->countryDetail ? [ 'id' => $item->countryDetail->id, 'name' => $item->countryDetail->name ] : null;
@@ -118,22 +138,22 @@ class FrontendController extends Controller
         $workListing_data['workpricerange'] = collect($ranges);
         // workListing end
 
-        // sleepListing
-        $sleepListing = $this->sleepListing->where('visibility', 'visible')->with(['countryDetail', 'cityDetail', 'categoryDetail'])->get();
+         // playListing
+        $playListing = $this->playListing->where('visibility', 'visible')->with(['countryDetail', 'cityDetail', 'categoryDetail'])->get();
 
-        $sleepcountries = $sleepListing->map(function ($item) {
+        $playcountries = $playListing->map(function ($item) {
             return $item->countryDetail ? [ 'id' => $item->countryDetail->id, 'name' => $item->countryDetail->name ] : null;
         })->filter()->unique('id')->values();
-        $sleepcitys = $sleepListing->map(function ($item) {
+        $playcitys = $playListing->map(function ($item) {
             return $item->cityDetail ? ['id' => $item->cityDetail->id,'name' => $item->cityDetail->name ] : null;
         })->filter()->unique('id')->values();
-        $sleepcategorys = $sleepListing->map(function ($item) {
+        $playcategorys = $playListing->map(function ($item) {
             return $item->categoryDetail ? ['id' => $item->categoryDetail->id,'name' => $item->categoryDetail->name ] : null;
         })->filter()->unique('id')->values();
-        $sleepListing_data['sleepcountries'] = $sleepcountries;
-        $sleepListing_data['sleepcitys'] = $sleepcitys;
-        $sleepListing_data['sleepcategorys'] = $sleepcategorys;
-        // sleepListing end
+        $playListing_data['playcountries'] = $playcountries;
+        $playListing_data['playcitys'] = $playcitys;
+        $playListing_data['playcategorys'] = $playcategorys;
+        // playListing end
 
         // return $sleepListing_data ;
         return view('frontend.details', compact('sleepListing_data','workListing_data','playListing_data'));
@@ -293,16 +313,16 @@ class FrontendController extends Controller
     }
 
     public function blogs(){
-        $page_data['blogs'] = Blog::where('status', 1)->paginate(10);
+        $page_data['blogs'] = $this->blog->where('status', 1)->paginate(10);
         return view('frontend.blogs', $page_data);
     }
 
     public function blog_details($id, $slug){
-        $page_data['blog'] = Blog::where('id', $id)->first();
+        $page_data['blog'] = $this->blog->where('id', $id)->first();
         return view('frontend.blog_details', $page_data);
     }
     public function blog_category($category, $slug){
-        $page_data['blogs'] = Blog::where('category', $category)->where('status', 1)->paginate(10);
+        $page_data['blogs'] = $this->blog->where('category', $category)->where('status', 1)->paginate(10);
         return view('frontend.blogs', $page_data);
     }
     public function blog_search(Request $request){
@@ -310,7 +330,7 @@ class FrontendController extends Controller
             'search' => 'required|string|max:255',
         ]);
     
-        $page_data['blogs'] = Blog::where('title', 'like', '%' . $request->search . '%')->where('status', 1)->paginate(10);
+        $page_data['blogs'] = $this->blog->where('title', 'like', '%' . $request->search . '%')->where('status', 1)->paginate(10);
         return view('frontend.blogs', $page_data);
     }
 
@@ -530,6 +550,11 @@ class FrontendController extends Controller
         ];
         $appointment->aditional_information = json_encode($additionalInfo);
         $appointment->save();
+        $payment_method = "paypal";
+        // return redirect()->route('payment.create', [
+        //     'identifier' => $payment_method,
+        //     'appointment_id' => $appointment->id
+        // ]);
     
         Session::flash('success', get_phrase('Appointment placed successfully!'));
         return redirect()->back();

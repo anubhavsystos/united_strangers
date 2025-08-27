@@ -365,12 +365,21 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/offers-create',[OfferController::class, 'offer_create'])->name('admin.offer.create');
     Route::post('/offers-store',[OfferController::class, 'store'])->name('admin.offer.store');
     Route::get('/offers-type',[OfferController::class, 'offer_type'])->name('admin.offer.type');
+    Route::get('/offers/edit/{id}', [OfferController::class, 'offer_edit'])->name('admin.offer.edit');
+    Route::post('/offers/update/{id}', [OfferController::class, 'offer_update'])->name('admin.offer.update');
+    Route::get('/offers/delete/{id}', [OfferController::class, 'offer_delete'])->name('admin.offer.delete');
+    Route::get('/offers-image-delete/{id}/{image}', [OfferController::class, 'offer_image_delete'])->name('admin.offers.image.delete');
    
     // EventController
     Route::get('/events',[EventController::class, 'index'])->name('admin.event');
     Route::get('/events-create',[EventController::class, 'event_create'])->name('admin.event.create');
     Route::post('/events-store',[EventController::class, 'store'])->name('admin.event.store');
     Route::get('/events-type',[EventController::class, 'event_type'])->name('admin.event.type');
+    Route::get('/events/edit/{id}', [EventController::class, 'event_edit'])->name('admin.event.edit');
+    Route::post('/events/update/{id}', [EventController::class, 'event_update'])->name('admin.event.update');
+    Route::get('/events/delete/{id}', [EventController::class, 'event_delete'])->name('admin.event.delete');
+     Route::get('/events-image-delete/{id}/{image}', [EventController::class, 'event_image_delete'])->name('admin.events.image.delete');
+
 });
 
 Route::prefix('user')->middleware(['auth'])->group(function () {

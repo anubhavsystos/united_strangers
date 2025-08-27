@@ -6,7 +6,11 @@
     @stack('css')
     
 </head>
-
+<style>
+    .image_size{
+        height: 100px;
+    }
+</style>
 <body>
 
    <header class="{{ request()->is('work') ? '' : 'header-section' }} mb-3">
@@ -17,9 +21,7 @@
                         <div>
                             <a href="" class="d-block atn-logo">
                                 @if (get_frontend_settings('light_logo'))
-                                    <img src="{{ asset('uploads/logo/' . get_frontend_settings('light_logo')) }}" alt="" class="radious-15px px-2 py-2 light-logo-preview h-77">
-                                @else
-                                    <img src="{{ asset('uploads/logo/light_logo.svg') }}" alt="" class="radious-15px px-2 py-2 light-logo-preview h-77">
+                                    <img src="{{ asset('uploads/logo/' . get_frontend_settings('light_logo')) }}" alt="" class="image_size radious-15px px-2 py-2 light-logo-preview h-77">
                                 @endif
                             </a>
                         </div>
@@ -30,9 +32,7 @@
                                     <div>
                                         <a href="" class="d-block atn-logo">
                                             @if (get_frontend_settings('light_logo'))
-                                                <img src="{{ asset('uploads/logo/' . get_frontend_settings('light_logo')) }}" alt="" class="radious-15px px-2 py-2 light-logo-preview h-77">
-                                            @else
-                                                <img src="{{ asset('uploads/logo/light_logo.svg') }}" alt="" class="radious-15px px-2 py-2 light-logo-preview h-77">
+                                                <img src="{{ asset('uploads/logo/' . get_frontend_settings('light_logo')) }}"  alt="" class="image_size radious-15px px-2 py-2 light-logo-preview h-77 ">
                                             @endif
                                         </a>
                                     </div>
@@ -178,6 +178,7 @@
   
     @yield('frontend_layout')
     @include('layouts.include_bottom')
+    @include('layouts.toaster')
     @stack('js')   
 
 </body>

@@ -22,11 +22,11 @@
                                 <input type="hidden" name="view" value="grid">
                                 <select class="search-select" name="type" id="type">
                                     <option value="" selected>{{ get_phrase('Choose Type') }}</option>
-                                    <option value="beauty" @if ($currect_route_name == 'beauty.home' || request()->type == 'beauty') selected @endif>{{ get_phrase('Beauty') }}</option>
+                                    
                                     <option value="sleep" @if ($currect_route_name == 'sleep.home' || request()->type == 'sleep') selected @endif>{{ get_phrase('Sleep') }}</option>
-                                    <option value="play" @if ($currect_route_name == 'playhome' || request()->type == 'play') selected @endif>{{ get_phrase('Play') }}</option>
+                                    <option value="play" @if ($currect_route_name == 'play.home' || request()->type == 'play') selected @endif>{{ get_phrase('Play') }}</option>
                                     <option value="work" @if ($currect_route_name == 'work.home' || request()->type == 'work') selected @endif>{{ get_phrase('Work') }}</option>
-                                    <option value="car" @if ($currect_route_name == 'car.home' || request()->type == 'car') selected @endif>{{ get_phrase('Car') }}</option>
+                                    
                                 </select>
                                 <input type="search" class="form-control header-search-input" value="{{ request()->title }}" name="title" placeholder="Search here...">
                                 <button type="submit" class="search-submit-btn">
@@ -87,12 +87,8 @@
                                                                     <li><a class="{{ request()->routeIs('sleep.home') ? 'active' : '' }}" href="{{ route('sleep.home') }}">{{ get_phrase('Sleep') }}</a></li>
                                                                 @elseif($item == 'work')
                                                                     <li><a class="{{ request()->routeIs('work.home') ? 'active' : '' }}" href="{{ route('work.home') }}">{{ get_phrase('Real Estate') }}</a></li>
-                                                                @elseif($item == 'Car')
-                                                                    <li><a class="{{ request()->routeIs('car.home') ? 'active' : '' }}" href="{{ route('car.home') }}">{{ get_phrase('Car') }}</a></li>
                                                                 @elseif($item == 'Play')
                                                                     <li><a class="{{ request()->routeIs('playhome') ? 'active' : '' }}" href="{{ route('playhome') }}">{{ get_phrase('Play') }}</a></li>
-                                                                @elseif($item == 'Beauty')
-                                                                    <li><a class="{{ request()->routeIs('beauty.home') ? 'active' : '' }}" href="{{ route('beauty.home') }}">{{ get_phrase('Beauty') }}</a></li>
                                                                 @endif
                                                             @endif
                                                         @endforeach

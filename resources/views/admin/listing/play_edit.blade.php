@@ -1,9 +1,6 @@
 @extends('layouts.admin')
 @section('title', get_phrase('Update Listing'))
 @push('css') 
-<!-- <link rel="stylesheet" href="{{ asset('assets/frontend/css/mapbox-gl.css') }}"> -->
-<!-- <script src="{{ asset('assets/frontend/js/mapbox-gl.js') }}"></script> -->
-
 @section('admin_layout')
     @include('admin.listing.listing_style')
     @php

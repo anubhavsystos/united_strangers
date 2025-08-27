@@ -51,6 +51,7 @@ class WorkListing extends Model
             'status' => $this->status,
             'is_verified' => optional($this->claimed)->status == 1,
             'is_in_wishlist' => check_wishlist_status($this->id, $this->type),
+            'created_at' => $this->created_at,
             'details_url' => route('listing.details', [
                 'type' => 'work',
                 'id' => $this->id ?? 0,

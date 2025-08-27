@@ -9,7 +9,7 @@
         <div class="row row-28 mb-80 mt-3">
             <!-- Sidebar -->
             <div class="col-xl-3 col-lg-4">
-                @include('frontend.real-estate.sidebar_real-estate')
+                @include('frontend.work.sidebar_work')
             </div>
             <!-- Right Content Area -->
             <div class="col-xl-9 col-lg-8">
@@ -23,7 +23,7 @@
                               
                             </div>
                             <div class="filter-tab-switch d-flex align-items-center flex-wrap">
-                                <a href="{{route('listing.view',['type'=>'real-estate','view'=>'grid'])}}" class="{{request()->is('listing/real-estate/grid')?'active':''}} grid-list">
+                                <a href="{{route('listing.view',['type'=>'work','view'=>'grid'])}}" class="{{request()->is('listing/work/grid')?'active':''}} grid-list">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M21.5 10.9V4.1C21.5 2.6 20.86 2 19.27 2H15.23C13.64 2 13 2.6 13 4.1V10.9C13 12.4 13.64 13 15.23 13H19.27C20.86 13 21.5 12.4 21.5 10.9Z" fill="#555558"/>
                                         <path d="M11 13.1V19.9C11 21.4 10.36 22 8.77 22H4.73C3.14 22 2.5 21.4 2.5 19.9V13.1C2.5 11.6 3.14 11 4.73 11H8.77C10.36 11 11 11.6 11 13.1Z" fill="#555558"/>
@@ -31,7 +31,7 @@
                                         <path d="M11 6.9V4.1C11 2.6 10.36 2 8.77 2H4.73C3.14 2 2.5 2.6 2.5 4.1V6.9C2.5 8.4 3.14 9 4.73 9H8.77C10.36 9 11 8.4 11 6.9Z" fill="#555558"/>
                                     </svg>                                            
                                 </a>
-                                <a href="{{route('listing.view',['type'=>'real-estate','view'=>'list'])}}" class="{{request()->is('listing/real-estate/list')?'active':''}} grid-list">
+                                <a href="{{route('listing.view',['type'=>'work','view'=>'list'])}}" class="{{request()->is('listing/work/list')?'active':''}} grid-list">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                                         <path d="M22 5.21429C22 5.88619 21.4417 6.42857 20.75 6.42857H3.25C2.55833 6.42857 2 5.88619 2 5.21429C2 4.54238 2.55833 4 3.25 4H20.75C21.4417 4 22 4.54238 22 5.21429ZM7.41667 18.5714H3.25C2.55833 18.5714 2 19.1138 2 19.7857C2 20.4576 2.55833 21 3.25 21H7.41667C8.10833 21 8.66667 20.4576 8.66667 19.7857C8.66667 19.1138 8.10833 18.5714 7.41667 18.5714ZM14.0833 11.2857H3.25C2.55833 11.2857 2 11.8281 2 12.5C2 13.1719 2.55833 13.7143 3.25 13.7143H14.0833C14.775 13.7143 15.3333 13.1719 15.3333 12.5C15.3333 11.8281 14.775 11.2857 14.0833 11.2857Z" fill="#555558"/>
                                     </svg>                                            
@@ -69,7 +69,7 @@
                                             $images = json_decode($listing->image);
                                             $image = isset($images[0]) ? $images[0] : null;
 
-                                            $claimStatus = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type', 'real-estate')->first(); 
+                                            $claimStatus = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type', 'work')->first(); 
                                         @endphp
                                         <a class="w-100 h-100" href="{{route('listing.details',['type'=>$type, 'id'=>$listing->id, 'slug'=>slugify($listing->title)])}}">
                                             <img class="card-item-image" src="{{ get_all_image('listing-images/' . $image) }}">
@@ -184,7 +184,7 @@
         method: 'POST', 
         data: {
             listing_id: listingId,
-            type: 'real-estate', 
+            type: 'work', 
             user_id: {{ auth()->check() ? auth()->id() : 'null' }}, 
             _token: '{{ csrf_token() }}',
         },

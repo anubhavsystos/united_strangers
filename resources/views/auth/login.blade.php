@@ -90,12 +90,12 @@
                                 </div>
                                 <p class="btn-text"><b>Sign in with Google</b></p>
                             </a> -->
- <div class="col-xl-5 col-lg-6">
-                            <button type="button" class="otp-btn flex-fill" data-bs-toggle="modal" data-bs-target="#otpModal">
-                                <div class="otp-icon-wrapper"><i class="fas fa-mobile-alt"></i></div>
-                                <span class="btn-text"><b>Login with OTP</b></span>
-                            </button>
-                        </div>
+                            <div class="col-xl-5 col-lg-6">
+                                <button type="button" class="otp-btn flex-fill" data-bs-toggle="modal" data-bs-target="#otpModal">
+                                    <div class="otp-icon-wrapper"><i class="fas fa-mobile-alt"></i></div>
+                                    <span class="btn-text"><b>Login with OTP</b></span>
+                                </button>
+                            </div>
                         </div>
 
                     </div>
@@ -103,8 +103,46 @@
             </div>
 
             <div class="col-xl-7 col-lg-6">
-                <!-- Banner Section -->
-            </div>
+                    <div class="d-flex justify-content-center justify-content-lg-end">
+                        <div class="ua-banner-slider-wrap">
+                            @php
+                                $homeBanner = json_decode(get_frontend_settings('mother_homepage_banner'), true);
+                            @endphp
+                            <!-- Swiper -->
+                            <div class="swiper ua-slider">
+                                <div class="swiper-wrapper">
+                                    @if (!empty($homeBanner) && is_array($homeBanner))
+                                        @foreach ($homeBanner as $banner)
+                                            <div class="swiper-slide">
+                                                <div class="ua-slider-banner">
+                                                    <img class="banner" src="{{ asset('uploads/mother_homepage_banner/' . $banner['image']) }}" alt="banner">
+                                                </div>
+                                                <div class="ua-slider-content">
+                                                    <img class="mb-3" src="{{ asset('assets/frontend/images/login/ua-star-shape.svg') }}" alt="shape">
+                                                    <h1 class="ua-title-36px text-white mb-3">{{ $banner['title'] }}</h1>
+                                                    <p class="in-subtitle-16px text-white ua-slider-subtitle-margin">{{ $banner['description'] }}</p>
+                                                </div>
+                                            </div>
+                                        @endforeach
+                                    @else
+                                        <div class="swiper-slide">
+                                            <div class="ua-slider-banner">
+                                                <img class="banner" src="{{ asset('assets/frontend/images/login/ua-login-banner1.webp') }}" alt="banner">
+                                            </div>
+                                            <div class="ua-slider-content">
+                                                <img class="mb-3" src="{{ asset('assets/frontend/images/login/ua-star-shape.svg') }}" alt="shape">
+                                                <h1 class="ua-title-36px text-white mb-3"></h1>
+                                                <p class="in-subtitle-16px text-white ua-slider-subtitle-margin"></p>
+
+                                            </div>
+                                        </div>
+                                    @endif
+                                </div>
+                                <div class="swiper-pagination"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
         </div>
     </div>
 </section>

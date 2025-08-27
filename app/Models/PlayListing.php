@@ -43,6 +43,7 @@ class PlayListing extends Model
             'claimed' => !empty($this->claimed) && $this->claimed->status == 1,
             'reviews_count' => $this->reviews ? $this->reviews->where('user_id', '!=', $this->user_id)->count() : 0,
             'wishlist' => check_wishlist_status($this->id ?? 0, $this->type ?? ''),
+            'created_at' => $this->created_at,
             'details_url' => route('listing.details', [
                 'type' => 'play',
                 'id' => $this->id ?? 0,
