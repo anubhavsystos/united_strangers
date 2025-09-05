@@ -57,7 +57,7 @@ $countries = App\Models\PlayListing::select('country')->groupBy('country')->get(
         $selectedMaxPrice = request()->input('max_price', $max_price); 
     @endphp
 
-        <li>
+        <!-- <li>
             <div class="accordion-item-range">
                 <h4 class="title mb-3 capitalize">{{ get_phrase('Price') }}</h4>
                 <div id="price-slide" 
@@ -66,15 +66,15 @@ $countries = App\Models\PlayListing::select('country')->groupBy('country')->get(
                     data-start-min="{{ $selectedMinPrice }}" 
                     data-start-max="{{ $selectedMaxPrice }}"></div>
                 <div class="accordion-range-value d-flex align-items-center justify-content-between">
-                    <!-- Visible price inputs without "name" attributes -->
+                    <!-- Visible price inputs without "name" attributes 
                     <input type="text" class="value" id="min-price" value="{{ currency() }}{{ $selectedMinPrice }}">
                     <input type="text" class="value text-end" id="max-price" value="{{ currency() }}{{ $selectedMaxPrice }}">
-                    <!-- Hidden numeric inputs -->
+                    <!-- Hidden numeric inputs 
                     <input type="hidden" id="clean-min-price" name="min_price" value="{{ $selectedMinPrice }}">
                     <input type="hidden" id="clean-max-price" name="max_price" value="{{ $selectedMaxPrice }}">
                 </div>
             </div>
-        </li>
+        </li> -->
 
         <li class="sidebar-accordion-li">
             <a href="javascript:void(0);">

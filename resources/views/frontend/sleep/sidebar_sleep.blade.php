@@ -7,7 +7,7 @@ $countries = App\Models\SleepListing::select('country')->groupBy('country')->get
 isset($searched_bedroom) ? '' : ($searched_bedroom = []);
 isset($searched_bathroom) ? '' : ($searched_bathroom = []);
 isset($status_type) ? '' : ($status_type = []);
-$numbers = ['1', '2', '3', '4', '5'];
+$numbers = ['1', '2', '3', '4', '5','6','7','8'];
 @endphp
 
 <form class="sidebar-accordion-area" id="filter-form" action="{{ route('ListingsFilter') }}" method="get">

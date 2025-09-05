@@ -545,7 +545,7 @@
             <img src="{{$eventsitem['image']}}" alt="" class="w-full h-56 object-cover mb-3">
             <h3 class="text-lg font-bold leading-tight uppercase">{{$eventsitem['title']}}</h3>
             <p class="text-xs mt-1">{{ $eventsitem['from_date'] }} to {{ $eventsitem['to_date'] }}</p>
-            <p class="text-sm text-gray-700 mb-4">
+            <p class="text-sm  leading-tight  mb-4">
                 <span id="desc-short-{{ $eventsitem['id'] }}">{{ $eventsitem['description'] }}</span>
                 <span id="desc-full-{{ $eventsitem['id'] }}" style="display: none;">{{ $eventsitem['full_desc'] }}</span>
                 @if($eventsitem['read_more'])

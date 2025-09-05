@@ -3,9 +3,7 @@
 namespace App\Http\Controllers\Frontend;
 
 use App\Http\Controllers\Controller;
-use App\Models\BeautyListing;
 use App\Models\Blog;
-use App\Models\CarListing;
 use App\Models\Category;
 use App\Models\SleepListing;
 use App\Models\Pricing;
@@ -28,6 +26,7 @@ use App\Models\ReportedListing;
 use App\Models\Contact;
 use App\Models\Offer;
 use App\Models\Event;
+use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Brian2694\Toastr\Facades\Toastr;
@@ -38,7 +37,7 @@ class FrontendController extends Controller
     protected $blog;
     protected $blog_category;
 
-   public function __construct(BeautyListing $beautyListing,CarListing $carListing,SleepListing $sleepListing,WorkListing $workListing,PlayListing $playListing,User $user,Message_thread $messageThread,Message $message,Review $review,Wishlist $wishlist,City $city,Country $country,Menu $menu,Appointment $appointment,Amenities $amenities,Newsletter $newsletter,Newsletter_subscriber $newsletterSubscriber,ClaimedListing $claimedListing,ReportedListing $reportedListing,Contact $contact,Pricing $pricing,Category $category,Offer $offer, Event $event, Blog $blog) {       
+   public function __construct(SleepListing $sleepListing,WorkListing $workListing,PlayListing $playListing,User $user,Message_thread $messageThread,Message $message,Review $review,Wishlist $wishlist,City $city,Country $country,Menu $menu,Appointment $appointment,Amenities $amenities,Newsletter $newsletter,Newsletter_subscriber $newsletterSubscriber,ClaimedListing $claimedListing,ReportedListing $reportedListing,Contact $contact,Pricing $pricing,Category $category,Offer $offer, Event $event, Blog $blog,Room $room) {
         $this->sleepListing = $sleepListing;
         $this->workListing = $workListing;
         $this->playListing = $playListing;
@@ -58,6 +57,7 @@ class FrontendController extends Controller
         $this->offer = $offer;
         $this->event = $event;
         $this->blog = $blog;
+        $this->room = $room;
     }
 
 
@@ -90,8 +90,6 @@ class FrontendController extends Controller
 
         return view('frontend.index', compact('sleeplistings','worklistings','playlistings','offers','events','blogs'));
     }
-
-   
 
     public function details(){
         $sleepListing_data = [];
@@ -195,113 +193,76 @@ class FrontendController extends Controller
         return response()->json($products);
     }
 
-
-
-    // public function data_injection(){   
-    //     $data = "sleep";
-    //      $images = json_decode($sleepList->image) ?? [];
-    //                     $image = isset($images[0]) ? $images[0] : null;
-    //                     $countryName = App\Models\Country::where('id', $sleepList->country)->first();
-    //                     $cityName = App\Models\City::where('id', $sleepList->city)->first();
-
-    //                     $claimStatus = App\Models\ClaimedListing::where('listing_id', $sleepList->id)->where('listing_type', 'sleep')->first();  
-    //     return $data ;
-    // }
-
     public function sleep_home(){
         $page_data['cities'] = City::get();
         $uniqueCountryIds = City::distinct()->pluck('country');
         $page_data['listing_countries'] = Country::whereIn('id', $uniqueCountryIds)->take(6)->get();
         $page_data['categories'] = Category::where('type','sleep')->get();
-        $page_data['top_listings'] = SleepListing::orderBy('id', 'desc')->where('visibility', 'visible')->get();
+        $page_data['top_listings'] = $this->sleepListing->orderBy('id', 'desc')->where('visibility', 'visible')->get();
         $page_data['directory'] = 'sleep';
         return view('frontend.sleep.home', $page_data);
-    }    
+    } 
 
-    public function car_home(){
-        $page_data['categories'] = Category::where('type','car')->get();
-        $page_data['top_listings'] = CarListing::orderBy('id', 'desc')->where('visibility', 'visible')->get();
-        $page_data['directory'] = 'car';
-        return view('frontend.car.home', $page_data);
-    }
-
-    public function beauty_home(){
-        $page_data['BeautyPopular'] = BeautyListing::orderBy('id', 'desc')->where('visibility', 'visible')->where('is_popular','popular')->limit(4)->get();
-        $page_data['BeautyBest'] = BeautyListing::orderBy('id', 'desc')->where('visibility', 'visible')->where('is_popular','best')->limit(4)->get();
-        $page_data['BeautyWellness'] = BeautyListing::orderBy('id', 'desc')->where('visibility', 'visible')->where('is_popular','wellness')->limit(4)->get();
-        $page_data['directory'] = 'beauty';
-        return view('frontend.beauty.home', $page_data);
-    }
-
-    public function doctor_home(){
-        $page_data['top_listings'] = SleepListing::orderBy('id', 'desc')->where('visibility', 'visible')->limit(4)->get();
-        $page_data['directory'] = 'doctor';
-        return view('frontend.doctor.home', $page_data);
-    }
     public function realestate_home(){
         $page_data['categories'] = Category::where('type','work')->get();
-        $cityIdsWithListings = WorkListing::distinct()->pluck('city');
+        $cityIdsWithListings = $this->workListing->distinct()->pluck('city');
         $page_data['listing_cities'] = City::whereIn('id', $cityIdsWithListings)->take(4)->get();
-        $page_data['top_listings'] = WorkListing::orderBy('id', 'desc')->where('visibility', 'visible')->get();
+        $page_data['top_listings'] = $this->workListing->orderBy('id', 'desc')->where('visibility', 'visible')->get();
         $page_data['directory'] = 'work';
         return view('frontend.work.home', $page_data);
     }
+
     public function play_home(){
-        $countryIdsWithListings = PlayListing::distinct()->pluck('country');
+        $countryIdsWithListings = $this->playListing->distinct()->pluck('country');
         $page_data['countries'] = Country::whereIn('id', $countryIdsWithListings)->take(4)->get();
-
-        $cityIdsWithListings = PlayListing::distinct()->pluck('city');
+        $cityIdsWithListings = $this->playListing->distinct()->pluck('city');
         $page_data['cities'] = City::whereIn('id', $cityIdsWithListings)->take(4)->get();
-
         $page_data['categories'] = Category::where('type','work')->get();
-        $page_data['top_listings'] = PlayListing::orderBy('id', 'desc')->where('visibility', 'visible')->get();
+        $page_data['top_listings'] = $this->playListing->orderBy('id', 'desc')->where('visibility', 'visible')->get();
         $page_data['directory'] = 'play';
         return view('frontend.playhome', $page_data);
     }
 
-    public function listing_view($type, $view){
-        if($type == 'car'){
-            $page_data['listings'] = CarListing::where('visibility', 'visible')->paginate(9);
-            $page_data['directory'] = 'car';
-        }elseif($type == 'beauty'){
-            $page_data['listings'] = BeautyListing::where('visibility', 'visible')->paginate(9);
-            $page_data['directory'] = 'beauty';
-        }elseif($type == 'sleep'){
-            $page_data['listings'] = SleepListing::where('visibility', 'visible')->paginate(9);
+    public function listing_view($type, $view){   
+        $count  = 25;
+        if($type == 'sleep'){
+            $page_data['listings'] = $this->sleepListing->where('visibility', 'visible')->latest()->paginate($count);            
             $page_data['directory'] = 'sleep';
         }elseif($type == 'work'){
-            $page_data['listings'] = WorkListing::where('visibility', 'visible')->paginate(9);
+            $page_data['listings'] = $this->workListing->where('visibility', 'visible')->latest()->paginate($count);
             $page_data['directory'] = 'work';
         }elseif($type == 'play'){
-            $page_data['listings'] = PlayListing::where('visibility', 'visible')->paginate(9);
+            $page_data['listings'] = $this->playListing->where('visibility', 'visible')->latest()->paginate($count);
             $page_data['directory'] = 'play';
-        }elseif($type == 'doctor') {
-            $page_data['listings'] = User::where('type', 'doctor')->paginate(9);
         }
+
+        $page_data['listings']->getCollection()->transform(function ($item) {
+            return $item->productFormattedArray();
+        });
         
         $page_data['categories'] = Category::where('type', $type)->get();
         $page_data['type'] = $type;
         $page_data['view'] = $view;
+        
         return view('frontend.'.$type.'.'.$view.'_listing', $page_data);
     }
 
-    public function listing_details($type, $id, $slug){
-        if($type == 'car'){
-            $page_data['listing'] = CarListing::where('id', $id)->first();
-            $page_data['directory'] = 'car';
-        }elseif($type == 'beauty'){
-            $page_data['listing'] = BeautyListing::where('id', $id)->first();
-            $page_data['directory'] = 'beauty';
-        }elseif($type == 'sleep'){
-            $page_data['listing'] = SleepListing::where('id', $id)->first();
+    public function listing_details($type, $id, $slug){       
+        if($type == 'sleep'){            
+            $page_data['listing'] = $this->sleepListing->where('id', $id)->first();
             $page_data['directory'] = 'sleep';
         }elseif($type == 'work'){
-            $page_data['listing'] = WorkListing::where('id', $id)->first();
+            $page_data['listing'] = $this->workListing->where('id', $id)->first();
             $page_data['directory'] = 'work';
         }elseif($type == 'play'){
-            $page_data['listing'] = PlayListing::where('id', $id)->first();
+            $page_data['listing'] = $this->playListing->where('id', $id)->first();
             $page_data['directory'] = 'play';
         }
+
+        $page_data['rooms'] = $this->room->where('listing_id', $id)->get()->map(function ($item) {
+            return $item->roomFormattedArray();
+        }); 
+
         $page_data['type'] = $type;
         $page_data['listing_id'] = $id;
         return view('frontend.'.$type.'.details_'.$type, $page_data);
@@ -338,31 +299,31 @@ class FrontendController extends Controller
 
     // Reviews System 
     public function ListingReviews(Request $request, $listing_id)
-{
-    if (!Auth::check()) {
-        Session::flash('warning', get_phrase('Please Login First!'));
-        return redirect()->route('login');
+    {
+        if (!Auth::check()) {
+            Session::flash('warning', get_phrase('Please Login First!'));
+            return redirect()->route('login');
+        }
+        
+        // Validate input
+        $request->validate([
+            'rating' => 'required|integer', 
+            'review' => 'required|string',
+        ]);
+
+        // Create new review
+        $review = new Review;
+        $review->rating = $request->rating; 
+        $review->review = sanitize($request->review);
+        $review->type = sanitize($request->listing_type);
+        $review->agent_id = sanitize($request->agent_id);
+        $review->user_id = auth()->user()->id;
+        $review->listing_id = $listing_id;
+        $review->save();
+
+        Session::flash('success', get_phrase('Your review was successfully submitted!'));
+        return redirect()->back();
     }
-    
-    // Validate input
-    $request->validate([
-        'rating' => 'required|integer', 
-        'review' => 'required|string',
-    ]);
-
-    // Create new review
-    $review = new Review;
-    $review->rating = $request->rating; 
-    $review->review = sanitize($request->review);
-    $review->type = sanitize($request->listing_type);
-    $review->agent_id = sanitize($request->agent_id);
-    $review->user_id = auth()->user()->id;
-    $review->listing_id = $listing_id;
-    $review->save();
-
-    Session::flash('success', get_phrase('Your review was successfully submitted!'));
-    return redirect()->back();
-}
 
 
     public function ListingReviewsUpdate(Request $request, $listing_id)
@@ -583,215 +544,190 @@ class FrontendController extends Controller
     // All Filter
     public function ListingsFilter(Request $request)
     {
-        $listing_type = $request->type ?? 'beauty';
-        $listings = null; 
-      
-        if ($listing_type == 'car') {
-            $listings = CarListing::where('visibility', 'visible');
-            $page_data['directory'] = 'car';
-            if (isset($request->category) && $request->category != 'all') {
-                $listings = $listings->where('category', $request->category);
+        $listing_type = $request->input('type', 'sleep');
+        $perPage = 25;
+
+        $page_data = [];
+        $page_data['type'] = $listing_type;
+        $page_data['view'] = $request->input('view', '');
+        $query = null;
+        if ($listing_type === 'sleep') {
+            $query = $this->sleepListing
+                ->with(['countryDetail','cityDetail','claimed','reviews'])
+                ->where('visibility', 'visible')
+                ->latest();
+
+            $page_data['directory'] = 'sleep';
+
+            if ($request->filled('category') && $request->category !== 'all') {
+                $query->where('category', sanitize($request->category));
                 $page_data['category_type'] = sanitize($request->category);
-                $page_data['activeMenu '] = sanitize($request->category);
-            }
-            if (isset($request->car_type) && $request->car_type != 'all') {
-                $listings = $listings->where('car_type', $request->car_type);
-                $page_data['car_type'] = sanitize($request->car_type);
-                $page_data['activeMenu '] = sanitize($request->car_type);
-            }
-            if (isset($request->model) && $request->model != 'all') {
-                $listings = $listings->where('model', $request->model);
-                $page_data['model_type'] = sanitize($request->model);
-                $page_data['activeMenu '] = sanitize($request->model);
-            }
-            if (isset($request->brand) && $request->brand != 'all') {
-                $listings = $listings->where('brand', $request->brand);
-                $page_data['brand_type'] = sanitize($request->brand);
-            }
-            if (isset($request->year) && $request->year != 'all') {
-                $listings = $listings->where('year', $request->year);
-                $page_data['year_type'] = sanitize($request->year);
-            }
-            if (isset($request->color) && $request->color != 'all') {
-                $listings = $listings->where('exterior_color', $request->color);
-                $page_data['color_type'] = sanitize($request->color);
-            }
-            if($request->min_price || $request->max_price ){
-                $minPrice = sanitize($request->min_price);
-                $maxPrice = sanitize($request->max_price);
-                $listings = $listings->whereBetween('price', [$minPrice, $maxPrice]);
-            }
-            if (isset($request->title) && $request->title != 'all') {
-                $listings = $listings->where('title', 'like', '%' . sanitize($request->title) . '%');
-            }
-        } elseif ($listing_type == 'beauty') {
-            $listings = BeautyListing::where('visibility', 'visible');
-            $page_data['directory'] = 'beauty';
-            
-            if (isset($request->category) && $request->category != 'all') {
-                $listings = $listings->where('category', $request->category);
-                $page_data['category_type'] = sanitize($request->category);
-                $page_data['activeMenu '] = sanitize($request->category);
-            }
-           
-            // Listing pricing
-            $amenity_ids = $this->get_amenity_filtered_ids($request->min_price, $request->max_price);
-            $listings->where(function ($query) use ($amenity_ids) {
-                foreach ($amenity_ids as $id_key => $amenity_id) {
-                    if($id_key == 0)
-                        $query->whereJsonContains('service', $amenity_id);
-                    else
-                        $query->orWhereJsonContains('service', $amenity_id);
-                }
-            });
-            // Listing pricing end
-            if (isset($request->city) && $request->city != 'all') {
-                $listings = $listings->where('city', $request->city);
-                $page_data['city_type'] = sanitize($request->city);
-            }
-            if (isset($request->country) && $request->country != 'all') {
-                $listings = $listings->where('country', $request->country);
-                $page_data['country_type'] = sanitize($request->country);
-            }
-            if (isset($request->title) && $request->title != 'all') {
-                $listings = $listings->where('title', 'like', '%' . sanitize($request->title) . '%');
+                $page_data['activeMenu'] = sanitize($request->category);
             }
 
-        } elseif ($listing_type == 'sleep') {
-            $listings = SleepListing::where('visibility', 'visible');
-            $page_data['directory'] = 'sleep';
-            if (isset($request->category) && $request->category != 'all') {
-                $listings = $listings->where('category', $request->category);
-                $page_data['category_type'] = sanitize($request->category);
-                $page_data['activeMenu '] = sanitize($request->category);
+            if ($request->filled('min_price') || $request->filled('max_price')) {
+                $min = sanitize($request->min_price ?? 0);
+                $max = sanitize($request->max_price ?? 9999999);
+                $query->whereBetween('price', [$min, $max]);
             }
-            if($request->min_price || $request->max_price ){
-                $minPrice = sanitize($request->min_price);
-                $maxPrice = sanitize($request->max_price);
-                $listings = $listings->whereBetween('price', [$minPrice, $maxPrice]);
-            }
-            if (isset($request->is_popular) && $request->is_popular != 'all') {
-                $listings = $listings->where('is_popular', sanitize($request->is_popular));
+
+            if ($request->filled('is_popular') && $request->is_popular !== 'all') {
+                $query->where('is_popular', sanitize($request->is_popular));
                 $page_data['status_type'] = sanitize($request->is_popular);
             }
-            if (isset($request->city) && $request->city != 'all') {
-                $listings = $listings->where('city', $request->city);
+
+            if ($request->filled('city') && $request->city !== 'all') {
+                $query->where('city', sanitize($request->city));
                 $page_data['city_type'] = sanitize($request->city);
             }
-            if (isset($request->country) && $request->country != 'all') {
-                $listings = $listings->where('country', $request->country);
+
+            if ($request->filled('country') && $request->country !== 'all') {
+                $query->where('country', sanitize($request->country));
                 $page_data['country_type'] = sanitize($request->country);
             }
-            if (isset($request->bed) && $request->bed != 'all') {
-                $listings = $listings->where('bed', $request->bed);
+
+            if ($request->filled('bed') && $request->bed !== 'all') {
+                $query->where('bed', sanitize($request->bed));
                 $page_data['searched_bedroom'] = sanitize($request->bed);
             }
-            if (isset($request->bath) && $request->bath != 'all') {
-                $listings = $listings->where('bath', $request->bath);
+
+            if ($request->filled('bath') && $request->bath !== 'all') {
+                $query->where('bath', sanitize($request->bath));
                 $page_data['searched_bathroom'] = sanitize($request->bath);
             }
 
-            if (isset($request->title) && $request->title != 'all') {
-                $listings = $listings->where('title', 'like', '%' . sanitize($request->title) . '%');
+            if ($request->filled('title') && $request->title !== 'all') {
+                $query->where('title', 'like', '%' . sanitize($request->title) . '%');
             }
-           
+        } elseif ($listing_type === 'work') {
+            $query = $this->workListing
+                ->with(['countryDetail','cityDetail','claimed','reviews'])
+                ->where('visibility', 'visible')
+                ->latest();
 
-        } elseif ($listing_type == 'work') {
-            $listings = WorkListing::where('visibility', 'visible');
             $page_data['directory'] = 'work';
 
-            if (isset($request->category) && $request->category != 'all') {
-                $listings = $listings->where('category', $request->category);
+            if ($request->filled('category') && $request->category !== 'all') {
+                $query->where('category', sanitize($request->category));
                 $page_data['category_type'] = sanitize($request->category);
-                $page_data['activeMenu '] = sanitize($request->category);
+                $page_data['activeMenu'] = sanitize($request->category);
             }
-            if($request->min_price || $request->max_price ){
-                $minPrice = sanitize($request->min_price);
-                $maxPrice = sanitize($request->max_price);
-                $listings = $listings->whereBetween('price', [$minPrice, $maxPrice]);
+
+            if ($request->filled('min_price') || $request->filled('max_price')) {
+                $minPrice = sanitize($request->min_price ?? 0);
+                $maxPrice = sanitize($request->max_price ?? 9999999);
+                $query->whereBetween('price', [$minPrice, $maxPrice]);
             }
-            if (isset($request->status) && $request->status != 'all') {
-                $listings = $listings->where('status', $request->status);
+
+            if ($request->filled('status') && $request->status !== 'all') {
+                $query->where('status', sanitize($request->status));
                 $page_data['status_type'] = sanitize($request->status);
             }
-            if (isset($request->bed) && $request->bed != 'all') {
-                $listings = $listings->where('bed', $request->bed);
+
+            if ($request->filled('bed') && $request->bed !== 'all') {
+                $query->where('bed', sanitize($request->bed));
                 $page_data['searched_bedroom'] = sanitize($request->bed);
             }
-            if (isset($request->bath) && $request->bath != 'all') {
-                $listings = $listings->where('bath', $request->bath);
+
+            if ($request->filled('bath') && $request->bath !== 'all') {
+                $query->where('bath', sanitize($request->bath));
                 $page_data['searched_bathroom'] = sanitize($request->bath);
             }
-            if (isset($request->garage) && $request->garage != 'all') {
-                $listings = $listings->where('garage', $request->garage);
-                $page_data['searched_garage'] = sanitize($request->bath);
+
+            if ($request->filled('garage') && $request->garage !== 'all') {
+                $query->where('garage', sanitize($request->garage));
+                $page_data['searched_garage'] = sanitize($request->garage);
             }
-            if (isset($request->city) && $request->city != 'all') {
-                $listings = $listings->where('city', $request->city);
+
+            if ($request->filled('city') && $request->city !== 'all') {
+                $query->where('city', sanitize($request->city));
                 $page_data['city_type'] = sanitize($request->city);
             }
-            if (isset($request->country) && $request->country != 'all') {
-                $listings = $listings->where('country', sanitize($request->country));
+
+            if ($request->filled('country') && $request->country !== 'all') {
+                $query->where('country', sanitize($request->country));
                 $page_data['country_type'] = sanitize($request->country);
             }
-            
-            if (isset($request->title) && $request->title != 'all') {
-                $listings = $listings->where('title', 'like', '%' . sanitize($request->title) . '%');
+
+            if ($request->filled('title') && $request->title !== 'all') {
+                $query->where('title', 'like', '%' . sanitize($request->title) . '%');
             }
 
+        } elseif ($listing_type === 'play') {
+            $query = $this->playListing
+                ->with(['countryDetail','cityDetail','claimed','reviews'])
+                ->where('visibility', 'visible')
+                ->latest();
 
-        } elseif ($listing_type == 'play') {
-            $listings = PlayListing::where('visibility', 'visible');
             $page_data['directory'] = 'play';
 
-            if (isset($request->category) && $request->category != 'all') {
-                $listings = $listings->where('category', $request->category);
+            if ($request->filled('category') && $request->category !== 'all') {
+                $query->where('category', sanitize($request->category));
                 $page_data['category_type'] = sanitize($request->category);
-                $page_data['activeMenu '] = sanitize($request->category);
+                $page_data['activeMenu'] = sanitize($request->category);
             }
-            if (isset($request->city) && $request->city != 'all') {
-                $listings = $listings->where('city', $request->city);
+
+            if ($request->filled('city') && $request->city !== 'all') {
+                $query->where('city', sanitize($request->city));
                 $page_data['city_type'] = sanitize($request->city);
             }
-            if (isset($request->country) && $request->country != 'all') {
-                $listings = $listings->where('country', $request->country);
+
+            if ($request->filled('country') && $request->country !== 'all') {
+                $query->where('country', sanitize($request->country));
                 $page_data['country_type'] = sanitize($request->country);
             }
-             // Listing pricing
-             $amenity_ids = $this->get_menu_filtered_ids($request->min_price, $request->max_price);
-             $listings->where(function ($query) use ($amenity_ids) {
-                 foreach ($amenity_ids as $id_key => $amenity_id) {
-                     if($id_key == 0)
-                         $query->whereJsonContains('menu', $amenity_id);
-                     else
-                         $query->orWhereJsonContains('menu', $amenity_id);
-                 }
-             }); 
-             // Listing pricing end
 
-             if (isset($request->title) && $request->title != 'all') {
-                $listings = $listings->where('title', 'like', '%' . $request->title . '%');
+            // $amenity_ids = $this->get_menu_filtered_ids($request->min_price ?? null, $request->max_price ?? null);
+            // if (!empty($amenity_ids)) {
+            //     $query->where(function ($q) use ($amenity_ids) {
+            //         foreach ($amenity_ids as $id_key => $amenity_id) {
+            //             if ($id_key === 0) {
+            //                 $q->whereJsonContains('menu', $amenity_id);
+            //             } else {
+            //                 $q->orWhereJsonContains('menu', $amenity_id);
+            //             }
+            //         }
+            //     });
+            // }
+
+            if ($request->filled('title') && $request->title !== 'all') {
+                $query->where('title', 'like', '%' . sanitize($request->title) . '%');
             }
-         
 
-            } 
-        $page_data['categories'] = Category::where('type', $request->type)->get();
-       
-        $page_data['listings'] = $listings->paginate(9); 
-        $page_data['type'] = $request->type ?? 'beauty';
-        $page_data['view'] = $request->view;
-    
-        return view('frontend.' . $page_data['type'] . '.' . $request->view . '_listing', $page_data);
+        } else {
+            $query = $this->sleepListing
+                ->with(['countryDetail','cityDetail','claimed','reviews'])
+                ->where('visibility', 'visible')
+                ->latest();
+
+            $page_data['directory'] = 'sleep';
+        }
+
+        // ensure $query is set (extra safety)
+        if (! $query) {
+            $query = $this->sleepListing
+                ->with(['countryDetail','cityDetail','claimed','reviews'])
+                ->where('visibility', 'visible')
+                ->latest();
+            $page_data['directory'] = $page_data['directory'] ?? 'sleep';
+        }
+
+        // categories for the given type
+        $page_data['categories'] = Category::where('type', $listing_type)->get();
+
+        // paginate + preserve query string
+        $page_data['listings'] = $query->paginate($perPage)->appends($request->all());
+
+        // transform each item to productFormattedArray (keeps paginator structure)
+        $page_data['listings']->getCollection()->transform(function ($item) {
+            return $item->productFormattedArray();
+        });
+
+        // return the view
+        return view('frontend.' . $page_data['type'] . '.grid_listing', $page_data);
     }
-    
 
-    // Agent Details
-    public function agent_details($id, $slug){
-        $page_data['users'] = User::where('id', $id)->firstOrNew();
-        return view('frontend.agent_details', $page_data);
-    }
-
-
+   
     // Newsletter
     public function newslater_subscribe(Request $request)
     {

@@ -9,6 +9,16 @@
         $segment_type  = "play";
         $segment_id = $listing->id;
     @endphp
+        
+<div class="ol-card">
+    <div class="ol-card-body p-3 d-flex align-items-center justify-content-between">
+        <h3 class="title fs-16px d-flex align-items-center"> <i class="fi-rr-settings-sliders me-2"></i> {{ucwords($type).' '.get_phrase('Listing Update')}} on =>  {{$listing->title}}</h3>
+        <a href="{{route('admin.listing.create')}}" class="btn ol-btn-outline-secondary d-flex align-items-center cg-10px">
+            <span class="fi-rr-plus"></span>
+            <span> {{get_phrase('Add New Listing')}} </span>
+        </a>
+    </div>
+</div>
     
     <div class="ol-card mt-3">
         <div class="ol-card-body p-3">

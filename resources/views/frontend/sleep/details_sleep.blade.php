@@ -11,8 +11,6 @@
     <script src="{{ asset('assets/frontend/js/venobox.min.js') }}"></script>
 @endpush
 @section('frontend_layout')
-    <!-- Start Top Area -->
-     
     <section>
         <div class="container">
             <div class="row row-28 align-items-center mb-4">
@@ -139,59 +137,48 @@
                             </a>
                         @endif
                     </div>
-                    {{-- Shop Addon --}}
-                     @if (addon_status('shop') == 1)
-                            @php 
-                            $shopItems = App\Models\Inventory::where('type', $listing->type)->where('listing_id', $listing->id)->where('availability', 1)->get();
-                            $shopCategories = App\Models\InventoryCategory::where('type', $listing->type)->where('listing_id', $listing->id)->get();
-
-                            @endphp
-                        @if($shopItems && $shopItems->count() > 0)
-                            @include('frontend.shop')
-                        @endif
-                    @endif
-                
-                    <!-- Gallery for Room 1 -->
-                    @php
-                        $roomList = App\Models\Room::where('listing_id', $listing->id)->get();
-                    @endphp
-                    @foreach ($roomList as $plus => $room)
-                        <div class="sleep-details-gallery mb-50px">
-                            <h1 class="in-title3-24px mb-16">{{ $room->title }}</h1>
-                            <div class="sleepdetails-gallery-list mb-16">
-                                @foreach (json_decode($room->image) as $key => $image)
-                                    <a href="{{ get_all_image('room-images/' . $image) }}">
-                                        <img src="{{ get_all_image('room-images/' . $image) }}" alt="">
-                                    </a>
-                                @endforeach
-                            </div>
-                            <div class="room-price d-flex align-items-center justify-content-between flex-wrap">
-                                <h3 class="name">{{ get_phrase('Room') }} {{ ++$plus }}</h3>
-                                <h3 class="price">{{ currency($room->price) }}</h3>
-                            </div>
-                            <div class="member-time mb-16 d-flex align-items-center justify-content-between flex-wrap">
-                                <div class="member d-flex align-items-center">
-                                    <img src="{{ asset('assets/frontend/images/icons/users-gray.svg') }}" alt="">
-                                    <p class="members">{{ $room->person }} {{ get_phrase('Persons') }}, {{ $room->child }} {{ get_phrase('Child') }}</p>
+                    @php $plus = 1 @endphp
+                    <div class="row row-28">
+                        @foreach ($rooms as $room)
+                        <div class="col-xl-12">
+                                    <div class="single-list-card d-flex">
+                            <div class="  sleep-details-gallery mb-50px">
+                                <h1 class="in-title3-24px mb-16">{{ get_phrase('Room') }} {{ $room['title'] }}</h1>
+                                <div class="sleepdetails-gallery-list mb-16">
+                                    @foreach ($room['image'] as  $image)
+                                        <a href="{{  $image }}">
+                                            <img src="{{ $image }}" alt="">
+                                        </a>
+                                    @endforeach
                                 </div>
-                            </div>
-                            <div class="btn-wrap mb-16 d-flex align-items-center justify-content-between flex-wrap"></div>
-                            <ul class="room-benefit-list mb-16 d-flex align-items-center flex-wrap">
-                                @foreach (json_decode($room->feature, true) ?? [] as $key => $amen)
-                                    @php
-                                        $amenitis = App\Models\Amenities::where('id', $amen)->first();
-                                    @endphp
+                                <div class="room-price d-flex align-items-center justify-content-between flex-wrap">
+                                    <!-- <h3 class="name"> {{ get_phrase('Room') }}{{ $room['title'] }}</h3> -->
+                                    <h3 class="price">{{ currency($room['price']) }}</h3>
+                                </div>
+                                <div class="member-time mb-16 d-flex align-items-center justify-content-between flex-wrap">
+                                    <div class="member d-flex align-items-center">
+                                        <img src="{{ asset('assets/frontend/images/icons/users-gray.svg') }}" alt="">
+                                        <p class="members">{{ $room['person'] }} {{ get_phrase('Persons') }}, {{ $room['child'] }} {{ get_phrase('Child') }}</p>
+                                    </div>
+                                </div>
+                                <div class="btn-wrap mb-16 d-flex align-items-center justify-content-between flex-wrap"></div>
+                                <ul class="room-benefit-list mb-16 d-flex align-items-center flex-wrap">
+                                 @foreach ($room['features'] as  $feature)                                    
                                     <li>
-                                        {{ $amenitis->name }}
+                                        <div  class="">
+                                        <div  class="d-flex">
+                                        <img src="{{ url('public/'.$feature['image']) }}" alt="" style="height: 32px;width: 33px;">                                      
+                                        {{ $feature['name'] }}
+                                        </div>
+                                        </div>
                                     </li>
                                 @endforeach
-                            </ul>
-                        </div>
-                    @endforeach
-                    <!-- Gallery for Room 2 -->
-
-                   
-
+                                </ul>
+                            </div>
+                            </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div>
                 <!-- Right Sidebar -->
                 <div class="col-xl-4 col-lg-5">
@@ -223,10 +210,6 @@
             </div>
         </div>
     </section>
-    <!-- End Main Content Area -->
-
-
-    <!-- Start Related Product Area -->
     <section>
         <div class="container">
             <div class="row">
@@ -235,7 +218,6 @@
                 </div>
             </div>
             <div class="row row-28 mb-80">
-                <!-- Single Card -->
                 @php
                     $relatedListing = App\Models\SleepListing::where('is_popular', $listing->is_popular)->where('id', '!=', $listing->id)->take(4)->get();
                 @endphp

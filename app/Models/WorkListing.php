@@ -36,27 +36,28 @@ class WorkListing extends Model
         $image = isset($imageArray[0]) ? $imageArray[0] : null;
 
         return [
-            'id' => $this->id,
-            'slug' => slugify($this->title),
-            'title' => $this->title,
-            'description' => Str::limit(strip_tags($this->description), 100),
-            'image' => get_all_image('listing-images/' . $image),
-            'price' => $this->price,
-            'discount' => $this->discount,
-            'bed' => $this->bed,
-            'bath' => $this->bath,
-            'size' => $this->size,
-            'country' => $this->countryDetail->name ?? '',
-            'city' => $this->cityDetail->name ?? '',
-            'status' => $this->status,
-            'is_verified' => optional($this->claimed)->status == 1,
-            'is_in_wishlist' => check_wishlist_status($this->id, $this->type),
-            'created_at' => $this->created_at,
-            'details_url' => route('listing.details', [
-                'type' => 'work',
-                'id' => $this->id ?? 0,
-                'slug' => slugify($this->title ?? '')
+            'id'            => $this->id ?? '',
+            'slug'          => slugify($this->title ?? ''),
+            'title'         => $this->title ?? '',
+            'description'   => Str::limit(strip_tags($this->description ?? ''), 100),
+            'image'         => get_all_image('listing-images/' . ($image ?? '')),
+            'price'         => $this->price ?? '',
+            'discount'      => $this->discount ?? '',
+            'bed'           => $this->bed ?? '',
+            'bath'          => $this->bath ?? '',
+            'size'          => $this->size ?? '',
+            'country'       => optional($this->countryDetail)->name ?? '',
+            'city'          => optional($this->cityDetail)->name ?? '',
+            'status'        => $this->status ?? '',
+            'is_verified'   => optional($this->claimed)->status == 1,
+            'is_in_wishlist'=> check_wishlist_status($this->id ?? 0, $this->type ?? ''),
+            'created_at'    => $this->created_at ?? '',
+            'details_url'   => route('listing.details', [
+                'type'  => $this->type ?? 'work',
+                'id'    => $this->id ?? 0,
+                'slug'  => slugify($this->title ?? '')
             ]),
         ];
+
     }
 }

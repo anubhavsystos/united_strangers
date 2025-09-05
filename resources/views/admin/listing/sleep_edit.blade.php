@@ -15,7 +15,7 @@
     
 <div class="ol-card">
     <div class="ol-card-body p-3 d-flex align-items-center justify-content-between">
-        <h3 class="title fs-16px d-flex align-items-center"> <i class="fi-rr-settings-sliders me-2"></i> {{ucwords($type).' '.get_phrase('Listing Update')}} </h3>
+        <h3 class="title fs-16px d-flex align-items-center"> <i class="fi-rr-settings-sliders me-2"></i> {{ucwords($type).' '.get_phrase('Listing Update')}} on =>  {{$listing->title}}</h3>
         <a href="{{route('admin.listing.create')}}" class="btn ol-btn-outline-secondary d-flex align-items-center cg-10px">
             <span class="fi-rr-plus"></span>
             <span> {{get_phrase('Add New Listing')}} </span>
@@ -42,7 +42,7 @@
                 <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false"> {{ get_phrase('appointments') }} </button>
             </li>
             <li class="nav-item" role="presentation">
-                <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calander') }} </button>
+                <button class="nav-link" id="Calender-tab" data-bs-toggle="tab" data-bs-target="#Calender" type="button" role="tab" aria-controls="Calender" aria-selected="false"> {{ get_phrase('Calender') }} </button>
             </li>
             <li class="nav-item" role="presentation">
               <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false"> {{get_phrase('Seo')}} </button>
@@ -391,7 +391,7 @@
                         </div>
                     </div>
                 </div>
-                <div class="tab-pane fade" id="calander" role="tabpanel" aria-labelledby="calander-tab">
+                <div class="tab-pane fade" id="Calender" role="tabpanel" aria-labelledby="Calender-tab">
                     <div class="row">  
                         <div class="col-sm-12">
                             <div class="container mt-4">

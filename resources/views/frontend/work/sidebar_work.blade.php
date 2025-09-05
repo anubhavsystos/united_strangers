@@ -8,20 +8,20 @@ isset($searched_bedroom) ? '' : ($searched_bedroom = []);
 isset($searched_bathroom) ? '' : ($searched_bathroom = []);
 isset($searched_garage) ? '' : ($searched_garage = []);
 isset($status_type) ? '' : ($status_type = []);
-$numbers = ['1', '2', '3', '4', '5'];
+$numbers = ['1', '2', '3', '4', '5','6','7','8'];
 @endphp
 <form class="sidebar-accordion-area" id="filter-form" action="{{ route('ListingsFilter') }}" method="get">
     <div class="sidebar-title mb-24 d-flex align-items-center justify-content-between flex-wrap">
         <h3 class="title">{{get_phrase('Filters')}}</h3>
         <a href="javascript:;" onclick="resetForm(event)" class="clear d-none">{{get_phrase('Clear')}}</a>
     </div>
-    <input type="hidden" name="type" value="real-estate">
+    <input type="hidden" name="type" value="work">
     <input type="hidden" name="view" value="{{$view}}">
 
     <ul class="sidebar-accordion">
         <li class="sidebar-accordion-li">
             <a href="javascript:void(0);">
-                <span>{{ get_phrase('Real-estate Category') }}</span>
+                <span>{{ get_phrase('work Category') }}</span>
                 <img src="{{asset('assets/frontend/images/icons/angle-down-black-20.svg')}}" alt="">
             </a>
             <ul class="sidebar-accordion-menu nBlock" id="categoryList" >
@@ -30,7 +30,7 @@ $numbers = ['1', '2', '3', '4', '5'];
                         $categoryCount = App\Models\WorkListing::where('category', $category->id)->count();
                     @endphp
                     <li class="{{ $index >= 6 ? 'hidden' : '' }}">
-                        <a href="{{ route('ListingsFilter') }}?type=real-estate&view={{ $view }}&category={{ $category->id }}" class="filter {{ (isset($category_type) && $category->id == $category_type) ? 'active' : '' }}" for="category{{ $category->id }}" >
+                        <a href="{{ route('ListingsFilter') }}?type=work&view={{ $view }}&category={{ $category->id }}" class="filter {{ (isset($category_type) && $category->id == $category_type) ? 'active' : '' }}" for="category{{ $category->id }}" >
                             <input class="d-none" type="radio" name="category" value="{{ $category->id }}" id="category{{ $category->id }}" {{ (isset($category_type) && $category->id == $category_type) ? 'checked' : '' }} >
                             <label class="form-check-label d-flex justify-content-between" for="category{{ $category->id }}">
                                 <span>{{ $category->name }}</span>
@@ -77,16 +77,10 @@ $numbers = ['1', '2', '3', '4', '5'];
             </a>
             <ul class="sidebar-accordion-menu">
                 @php
-                    $statusCounts = DB::table('real_estate_listings')
-                        ->select('status', DB::raw('COUNT(*) as total'))
-                        ->groupBy('status')
-                        ->get()
-                        ->keyBy('status');
+                    $statusCounts = DB::table('work_listings')->select('status', DB::raw('COUNT(*) as total'))->groupBy('status')->get()->keyBy('status');
                 @endphp
-            
-                <!-- Sell Filter -->
                 <li>
-                    <a href="{{ route('ListingsFilter') }}?type=real-estate&view={{ $view }}&status=sell" 
+                    <a href="{{ route('ListingsFilter') }}?type=work&view={{ $view }}&status=sell" 
                        class="filter {{ (request()->get('status') == 'sell') ? 'active' : '' }}">
                         <label class="form-check-label d-flex justify-content-between">
                             <input class="d-none" type="radio" name="status" value="sell" @if ($status_type == 'sell') checked @endif>
@@ -98,7 +92,7 @@ $numbers = ['1', '2', '3', '4', '5'];
             
                 <!-- Rent Filter -->
                 <li>
-                    <a href="{{ route('ListingsFilter') }}?type=real-estate&view={{ $view }}&status=rent" 
+                    <a href="{{ route('ListingsFilter') }}?type=work&view={{ $view }}&status=rent" 
                        class="filter {{ (request()->get('status') == 'rent') ? 'active' : '' }}">
                         <label class="form-check-label d-flex justify-content-between">
                             <input class="d-none" type="radio" name="status" value="rent"  @if ($status_type == 'rent') checked @endif>
@@ -182,7 +176,7 @@ $numbers = ['1', '2', '3', '4', '5'];
                         $countryCount = App\Models\WorkListing::where('country', $country->id)->count();
                     @endphp
                     <li class="{{ $index >= 6 ? 'hidden' : '' }}">
-                        <a href="{{ route('ListingsFilter') }}?type=real-estate&view={{ $view }}&country={{ $country->id }}" class="filter {{ (isset($country_type) && $country->id == $country_type) ? 'active' : '' }}" for="country{{ $country->id }}" >
+                        <a href="{{ route('ListingsFilter') }}?type=work&view={{ $view }}&country={{ $country->id }}" class="filter {{ (isset($country_type) && $country->id == $country_type) ? 'active' : '' }}" for="country{{ $country->id }}" >
                             <input class="d-none" type="radio" name="country" value="{{ $country->id }}" id="country{{ $country->id }}" {{ (isset($country_type) && $country->id == $country_type) ? 'checked' : '' }} >
                             <label class="form-check-label d-flex justify-content-between" for="country{{ $country->id }}">
                                 <span>{{ $country->name }}</span>
@@ -208,7 +202,7 @@ $numbers = ['1', '2', '3', '4', '5'];
                         $cityCount = App\Models\WorkListing::where('city', $city->id)->count();
                     @endphp
                     <li class="{{ $index >= 6 ? 'hidden' : '' }}">
-                        <a href="{{ route('ListingsFilter') }}?type=real-estate&view={{ $view }}&city={{ $city->id }}" class="filter {{ (isset($city_type) && $city->id == $city_type) ? 'active' : '' }}" for="city{{ $city->id }}" >
+                        <a href="{{ route('ListingsFilter') }}?type=work&view={{ $view }}&city={{ $city->id }}" class="filter {{ (isset($city_type) && $city->id == $city_type) ? 'active' : '' }}" for="city{{ $city->id }}" >
                             <input class="d-none" type="radio" name="city" value="{{ $city->id }}" id="city{{ $city->id }}" {{ (isset($city_type) && $city->id == $city_type) ? 'checked' : '' }} >
                             <label class="form-check-label d-flex justify-content-between" for="city{{ $city->id }}">
                                 <span>{{ $city->name }}</span>
@@ -349,7 +343,7 @@ document.querySelectorAll('.show-more').forEach(function(button) {
 
     function resetForm(event) {
         event.preventDefault(); 
-        const baseUrl = "{{ route('listing.view', ['type' => 'real-estate', 'view' => 'grid']) }}";
+        const baseUrl = "{{ route('listing.view', ['type' => 'work', 'view' => 'grid']) }}";
         window.location.href = baseUrl;
     }
 </script>
