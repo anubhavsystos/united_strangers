@@ -21,7 +21,7 @@
     font-size: 12px;
 }
 .feature-body .card-body {
-    width: 139px;
+    /* width: 139px; */
     font-size: 14px;
 }
 .team-checkbox .team-body .checked {

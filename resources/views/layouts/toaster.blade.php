@@ -56,7 +56,7 @@
         error("{!! $message !!}");
     </script>
 @endif
-<script>
+<!-- <script>
       document.addEventListener('DOMContentLoaded', function () {
     let calendar;                          
     const calTabBtn   = document.getElementById('calander-tab');   
@@ -135,6 +135,7 @@
         });
 </script>
 <script>
+    
 function appointmentForm_data(e) {
     e.preventDefault();
     const type = document.getElementById("type");
@@ -162,4 +163,60 @@ function appointmentForm_data(e) {
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("appointmentForm_data").addEventListener("submit", appointmentForm_data);
 });
+</script> -->
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let calendar;                          
+    const calTabBtn  = document.getElementById('calander-tab');   
+    const calTabPane = document.getElementById('calander');   
+    const calendarEl = document.getElementById('calendar');
+
+    function initCalendarOnce() {
+        if (calendar) return; 
+
+        const segment_type = document.getElementById('segment_type').value; 
+        const segment_id   = document.getElementById('segment_id').value; 
+
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            selectable: true,
+            events: "{{ route('appointments.fetch') }}" 
+                     + "?segment_id=" + segment_id 
+                     + "&segment_type=" + segment_type,
+            dateClick: function(info) {
+                // set selected date in all modals (if they exist)
+                document.querySelectorAll('.appointmentDate').forEach(el => el.value = info.dateStr);
+
+                // choose modal by segment_type
+                let modalId = '';
+                if (segment_type === 'sleep') modalId = 'appointmentModalSleep';
+                else if (segment_type === 'work') modalId = 'appointmentModalWork';
+                else if (segment_type === 'play') modalId = 'appointmentModalPlay';
+                else modalId = 'appointmentModal'; // fallback
+
+                const modalEl = document.getElementById(modalId);
+                if (modalEl) {
+                    const modal = new bootstrap.Modal(modalEl);
+                    modal.show();
+                }
+            }
+        });
+
+        calendar.render();
+        window.calendar = calendar;
+    }
+
+    if (calTabBtn) {
+        calTabBtn.addEventListener('shown.bs.tab', function () {
+            initCalendarOnce();
+            setTimeout(() => calendar.updateSize(), 50);
+        });
+    }
+
+    if (calTabPane && calTabPane.classList.contains('active')) {
+        initCalendarOnce();
+    }
+});
+
 </script>

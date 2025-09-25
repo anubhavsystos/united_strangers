@@ -31,14 +31,17 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab" aria-controls="address" aria-selected="false"> {{ get_phrase('Address') }} </button>
                 </li>
-                <!-- <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $tab == 'feature' ? 'active' : '' }}" id="feature-tab" data-bs-toggle="tab" data-bs-target="#feature" type="button" role="tab" aria-controls="feature" aria-selected="false"> {{ get_phrase('Features') }} </button>
-                </li> -->
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false"> {{ get_phrase('appointments') }} </button>
+                    <button class="nav-link {{($tab == 'feature')?'active':''}}" id="feature-tab" data-bs-toggle="tab" data-bs-target="#feature" type="button" role="tab" aria-controls="feature" aria-selected="false"> {{get_phrase('Features')}} </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calander') }} </button>
+                    <button class="nav-link {{($tab == 'property')?'active':''}}" id="property-tab" data-bs-toggle="tab" data-bs-target="#property" type="button" role="tab" aria-controls="property" aria-selected="false"> {{get_phrase('Property')}} </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false"> {{ get_phrase('Appointments') }} </button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calender') }} </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false"> {{ get_phrase('Seo') }} </button>
@@ -50,13 +53,11 @@
                     <button class="nav-link" id="claim-tab" data-bs-toggle="tab" data-bs-target="#claim" type="button" role="tab" aria-controls="claim" aria-selected="false"> {{ get_phrase('Claim') }} </button>
                 </li> -->
                 
-                 {{-- Shop addon --}}
                  @if (addon_status('shop') == 1)
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="shop-tab" data-bs-toggle="tab" data-bs-target="#shop" type="button" role="tab" aria-controls="shop" aria-selected="false"> {{ get_phrase('Shop') }} </button>
                 </li>
                 @endif
-                {{-- Shop Addon --}}
             </ul>
             <form action="{{ route('admin.listing.update', ['type' => 'work', 'id' => $listing->id]) }}" id="form-action" method="post" enctype="multipart/form-data" class="position-relative">
                 @csrf
@@ -244,37 +245,121 @@
                             </div>
                         </div>
                     </div>
-                    <!-- <div class="tab-pane fade show {{ $tab == 'feature' ? 'active' : '' }}" id="feature" role="tabpanel" aria-labelledby="feature-tab">
+                    <div class="tab-pane fade show {{($tab == 'feature')?'active':''}}" id="feature" role="tabpanel" aria-labelledby="feature-tab">
                         <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h5 class="fs-16px title mb-3"> {{ get_phrase('Add some feature') }} </h5>
-                            <a href="javascript:void(0);" onclick="modal('modal-md', '{{ route('admin.amenities.add', ['prefix' => 'admin', 'type' => 'work', 'item' => 'feature', 'page' => 'listing', 'listing_id' => $listing->id]) }}', '{{ get_phrase('Add New Service') }}')" class="btn ol-btn-primary fs-14px"> {{ get_phrase('Add Feature') }} </a>
-                        </div>
-                        @php
-                            $features = App\Models\Amenities::where('type', 'work')->where('identifier', 'feature')->get();
-                        @endphp
+                            <h5 class="fs-16px title mb-3"> {{get_phrase('Add some listing feature')}} </h5>
+                            <a href="javascript:void(0);" onclick="modal('modal-md', '{{route('admin.amenities.add',['prefix' =>'admin', 'type'=>'sleep','item'=>'feature','page'=>'listing','listing_id'=>$listing->id])}}', '{{get_phrase('Add New Service')}}')" class="btn ol-btn-primary fs-14px"> {{get_phrase('Add Feature')}} </a>
+                        </div>                    
                         <div class="work-feature">
-                            @foreach ($features as $key => $feature)
-                                <div class="feature-item">
-                                    <input class="form-check-input d-none" name="feature[]" type="checkbox" value="{{ $feature->id }}" id="flexCheckDefau{{ $key }}" @if ($listing->feature && $listing->feature != 'null' && in_array($feature->id, json_decode($listing->feature))) checked @endif>
-                                    <label class="form-check-label w-100" onclick="feature_select('{{ $key }}')" for="flexCheckDefau{{ $key }}">
+                            @if(count($features) != 0)
+                                @foreach ($features as $key => $feature)
+                                    <div class="feature-item">
+                                        <input class="form-check-input d-none" name="feature[]" type="checkbox" value="{{$feature->id}}" id="flexCheckDefau{{$key}}" @if($listing->feature && $listing->feature != 'null' && in_array($feature->id, json_decode($listing->feature))) checked @endif>
+                                    <label class="form-check-label w-100" onclick="feature_select('{{$key}}')" for="flexCheckDefau{{$key}}">
                                         <div class="card mb-3 team-checkbox me-2">
                                             <div class="col-md-12 team-body feature-body">
                                                 <div class="card-body py-2 px-2 ms-1">
                                                     <div class="icon">
-                                                        <img src="{{ asset($feature->image ? '/' . $feature->image : 'image/placeholder.png') }}" alt="" class="rounded">
+                                                        <img  src="{{ asset($feature->image ? '/' . $feature->image : '/image/placeholder.png') }}"    alt=""  class="rounded">
                                                     </div>
-                                                    <span class="text-center d-block w-100"> {{ $feature->name }} </span>
+                                                    <span class="text-center d-block w-100"> {{$feature->name}} </span>
                                                 </div>
-                                                <div class="checked @if ($listing->feature && $listing->feature != 'null' && in_array($feature->id, json_decode($listing->feature))) @else d-none @endif" id="feature-checked{{ $key }}">
+                                                <div class="checked @if($listing->feature && $listing->feature != 'null' && in_array($feature->id, json_decode($listing->feature))) @else d-none @endif" id="feature-checked{{$key}}">
                                                     <i class="fas fa-check"></i>
                                                 </div>
                                             </div>
                                         </div>
                                     </label>
-                                </div>
-                            @endforeach
+                                    </div>
+                                @endforeach
+                            @endif
                         </div>
-                    </div> -->
+                    </div>
+
+                    <!-- Property -->
+                    <div class="tab-pane fade show {{($tab == 'property')?'active':''}}" id="property" role="tabpanel" aria-labelledby="property-tab">
+                        <div class="d-flex align-items-center justify-content-between mb-2">
+                            <h5 class="fs-16px title mb-3"> {{get_phrase('Add some Property')}} </h5>
+                            <a href="javascript:void()" onclick="modal('modal-xl', '{{route('admin.add.listing.property',['prefix' =>'admin','id'=>$listing->id,'property_id'=>0, 'page'=>'add'])}}', '{{get_phrase('Add New Property')}}')" class="btn ol-btn-primary fs-14px"> {{get_phrase('Add Property')}} </a>
+                        </div>                    
+                        <div class="row">
+                            @if(count($rooms) != 0  )
+                                @foreach ($rooms as $key => $property)
+                                <div class="col-sm-6"> 
+                                        <input class="form-check-input d-none" name="property[]" type="checkbox" value="{{ $property->id }}" id="flckDefault{{ $key }}" @if($listing->property && $listing->property != 'null' && in_array($property->id, json_decode($listing->property))) checked @endif >
+                                        <label class="form-check-label w-100" onclick="property_select('{{ $key }}')" for="flckDefault{{ $key }}">
+                                            <div class="card mb-3 eproperty eproperty2 property-checkbox h-100">
+                                                <div class="row g-0 h-100">
+                                                    <div class="col-md-4">
+                                                        <img src="{{ get_all_image('property-images/' . (json_decode($property->image)[0] ?? 'default.jpg')) }}" 
+                                                            class="img-fluid rounded-start h-100 object-fit-cover" 
+                                                            alt="property Image">
+                                                    </div>
+                                                    
+                                                    <div class="col-md-8 property-body">
+                                                        <div class="card-body py-2 px-2 h-100 position-relative d-flex flex-column">
+
+                                                            <div class="d-flex justify-content-between align-items-start mb-1">
+                                                                <p class="card-title mb-0 fw-bold line-1"> {{ $property->title }} </p>
+                                                                <div class="ms-auto">
+                                                                    <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('admin.add.listing.property',['prefix'=>'admin','id'=>$listing->id,'property_id'=>$property->id,'page'=>'edit']) }}', '{{ get_phrase('Update New property') }}')" class="p-1"> 
+                                                                        <i class="fas fa-edit"></i> 
+                                                                    </a>
+                                                                    <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('admin.delete.listing.property',['prefix'=>'admin','id'=>$property->id,'listing_id'=>$listing->id]) }}')" class="p-1 text-danger"> <i class="fas fa-trash-alt"></i> 
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                            <p class="card-text fs-12px text-success fw-bold"> {{ currency($property->price) }} </p>
+                                                            
+                                                            <p class="mb-1 fs-12px">
+                                                                <i class="fas fa-user"></i> {{ $property->person ?? 0 }} {{ get_phrase('Persons') }}
+                                                                |<i class="fas fa-baby"></i> {{ $property->child ?? 0 }} {{ get_phrase('Child') }}
+                                                            </p>
+
+                                                            @php
+                                                                $featureNames = $property->features->pluck('name')->toArray() ?? [];
+                                                            @endphp
+                                                            @if(!empty($featureNames))
+                                                                <p class="mb-1 fs-12px">
+                                                                    <strong>{{ get_phrase('Features') }}:</strong> {{ implode(', ', $featureNames) }}
+                                                                </p>
+                                                            @endif
+
+                                                            @php
+                                                                $propertyTypes = [];
+                                                                if (!empty($property->room_type)) {
+                                                                    if (is_array($property->room_type)) {
+                                                                        $propertyTypes = $property->room_type;
+                                                                    } elseif (is_string($property->room_type)) {
+                                                                        $decoded = json_decode($property->room_type, true);
+                                                                        $propertyTypes = is_array($decoded) ? $decoded : array_map('trim', explode(',', $property->room_type));
+                                                                    }
+                                                                }
+                                                            @endphp
+                                                            @if(!empty($propertyTypes))
+                                                                <p class="mb-1 fs-12px">
+                                                                    <strong>{{ get_phrase('Property Type') }}:</strong> {{ implode(', ', $propertyTypes) }}
+                                                                </p>
+                                                            @endif
+
+                                                            {{-- Green check icon when selected --}}
+                                                            <div class="checked 
+                                                                @if($listing->property && $listing->property != 'null' && in_array($property->id, json_decode($listing->property))) 
+                                                                @else d-none 
+                                                                @endif" 
+                                                                id="property-checked{{ $key }}">
+                                                                <i class="fas fa-check"></i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </label>
+                                    </div>
+                                @endforeach
+                            @endif 
+                        </div>
+                    </div>
 
                     <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
                         <div class="row">                          

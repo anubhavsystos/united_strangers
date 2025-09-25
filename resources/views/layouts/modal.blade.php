@@ -66,7 +66,7 @@
       </div>
     </div>
 </div>
-<div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
+    <div class="modal fade" id="appointmentModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog">
             <form id="appointmentForm_data" action="{{ route('appointments.store') }}" method="POST">
                 @csrf
@@ -101,6 +101,32 @@
         </div>
     </div>
 {{-- @push('js') --}}
+
+
+{{-- Work Modal --}}
+<div class="modal fade" id="appointmentModalWork" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="appointmentFormWork" method="POST" action="{{ route('appointments.store') }}">
+        @csrf
+        <input type="hidden" name="segment_type" value="work">
+        <input type="hidden" class="appointmentDate" name="date">
+        {{-- form fields --}}
+    </form>
+  </div>
+</div>
+
+{{-- Play Modal --}}
+<div class="modal fade" id="appointmentModalPlay" tabindex="-1">
+  <div class="modal-dialog">
+    <form id="appointmentFormPlay" method="POST" action="{{ route('appointments.store') }}">
+        @csrf
+        <input type="hidden" name="segment_type" value="play">
+        <input type="hidden" class="appointmentDate" name="date">
+        {{-- form fields --}}
+    </form>
+  </div>
+</div>
+
 <script>
     "use script"
     function modal(size, url, title){

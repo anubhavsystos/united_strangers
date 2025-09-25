@@ -91,8 +91,8 @@
                                     $total_ratings = App\Models\Review::where('listing_id', $listing->id)->where('user_id', '!=', $listing->user_id)->where('type', 'sleep')->where('reply_id', null)->sum('rating');
                                     $average_rating = $reviews_count > 0 ? $total_ratings / $reviews_count : 0;
                                 @endphp
-                                <img src="{{ asset('assets/frontend/images/icons/star-yellow-20.svg') }}" alt="">
-                                <p>{{ number_format($average_rating, 1) }} ({{ $reviews_count }})</p>
+                                <!-- <img src="{{ asset('assets/frontend/images/icons/star-yellow-20.svg') }}" alt=""> -->
+                                <!-- <p>{{ number_format($average_rating, 1) }} ({{ $reviews_count }})</p> -->
                             </div>
                             <p class="date">{{ get_phrase('Published:') }} {{ \Carbon\Carbon::parse($listing->created_at)->format('M d, Y') }}</p>
 

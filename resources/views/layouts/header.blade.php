@@ -246,13 +246,7 @@
                                 @else
                                     <a href="{{ route('customer.wishlist') }}" class="login">{{ get_phrase('Login') }}</a>
                                 @endif
-                                @if (!auth()->user())
-                                    @if (check_subscription(user('id')))
-                                        
-                                    @else
-                                        
-                                    @endif
-                                @endif
+
                                 <button class="mobile-menu-btn" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasMenu" aria-controls="offcanvasMenu">
                                     <svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="20" height="20" x="0" y="0" viewBox="0 0 24 24" style="enable-background:new 0 0 20 20" xml:space="preserve" class="">
                                         <g>

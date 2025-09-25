@@ -25,7 +25,7 @@
         }
 
         .feature-body .card-body {
-            width: 139px;
+            /* width: 139px; */
             font-size: 14px;
         }
 

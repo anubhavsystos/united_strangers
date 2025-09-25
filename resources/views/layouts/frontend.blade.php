@@ -4,6 +4,7 @@
     @include('layouts.seo')
     @include('layouts.include_top')
     @stack('css')
+    <script src="https://cdn.tailwindcss.com"></script>
     
 </head>
 <style>
@@ -13,7 +14,7 @@
 </style>
 <body>
 
-   <header class="{{ request()->is('work') ? '' : 'header-section' }} mb-3">
+   <header class="{{ request()->is('work') ? '' : 'header-section' }} ">
         <div class="container">
             <div class="row">
                 <div class="col-12">
@@ -41,19 +42,9 @@
                                 <div class="offcanvas-body">
                                     <nav>
                                         <ul class="at-home-navbar-nav bt-home-navbar-nav">
-                                            
-
-                                            <li><a href="{{  route('home.details', ['segment' => 'sleep'])  }}" class="at-home-nav-link {{ request()->routeIs('listing.view') ? 'active' : '' }}">
-                                                    {{ get_phrase('Sleep') }}
-                                                </a></li>
-
-                                            <li><a href="{{  route('home.details', ['segment' => 'Work'])  }}" class="at-home-nav-link {{ request()->routeIs('listing.view') ? 'active' : '' }}">
-                                                    {{ get_phrase('Work') }}
-                                                </a></li>
-
-                                            <li><a href="{{  route('home.details', ['segment' => 'play'])  }}" class="at-home-nav-link {{ request()->routeIs('listing.view') ? 'active' : '' }}">
-                                                    {{ get_phrase('Play') }}
-                                                </a></li>
+                                            <li><a href="{{ route('listing.view', ['type' => 'sleep', 'view' => 'grid']) }}" class="at-home-nav-link {{ request()->routeIs('listing.view') ? 'active' : '' }}">{{ get_phrase('Sleep') }}</a></li>
+                                            <li><a href="{{ route('listing.view', ['type' => 'work', 'view' => 'grid']) }}" class="at-home-nav-link {{ request()->routeIs('listing.view') ? 'active' : '' }}">{{ get_phrase('Work') }}</a></li>
+                                            <li><a href="{{ route('listing.view', ['type' => 'play', 'view' => 'grid']) }}" class="at-home-nav-link {{ request()->routeIs('listing.view') ? 'active' : '' }}">{{ get_phrase('Play') }}</a></li>
                                         </ul>
                                     </nav>
                                 </div>
@@ -174,8 +165,14 @@
                 </div>
             </div>
         </div>
+    <div class="flex justify-start space-x-6 bg-white border-t border-black px-6 py-2 text-sm">
+        <a href="{{ route('blogs')}}" class="hover:underline"> Blogs </a>
+        <a href="{{ route('contact-us')}}" class="hover:underline"> Contact us </a>
+        <a href="{{ route('privacy-policy')}}" class="hover:underline"> Privacy-Policy </a>
+        <a href="{{ route('refund-policy')}}" class="hover:underline"> Refund Policy</a>
+        <a href="{{ route('terms-and-condition')}}" class="hover:underline">Terms and Condition</a>
+      </div>
     </header> 
-  
     @yield('frontend_layout')
     @include('layouts.include_bottom')
     @include('layouts.toaster')

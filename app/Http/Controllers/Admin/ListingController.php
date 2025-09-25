@@ -13,7 +13,10 @@ use App\Models\Room;
 use App\Models\Menu;
 use App\Models\ClaimedListing;
 use App\Models\ReportedListing;
-use App\Models\appointment;
+use App\Models\Appointment;
+use App\Models\City;
+use App\Models\Country;
+use App\Models\Amenities;
 use Brian2694\Toastr\Facades\Toastr;
 use App\Models\NearByLocation;
 use Carbon\Carbon;
@@ -23,21 +26,24 @@ use Illuminate\Support\Facades\Validator;
 
 class ListingController extends Controller
 {
-    public function __construct(Category $category,SleepListing $sleepListing,Listing_Feature $listingFeature,Listing_Specification $listingSpecification,WorkListing $workListing,PlayListing $playListing,Room $room,Menu $menu,ClaimedListing $claimedListing,ReportedListing $reportedListing,NearByLocation $nearByLocation, appointment $appointment) {
-    
-    $this->category = $category;
-    $this->sleepListing = $sleepListing;
-    $this->listingFeature = $listingFeature;
-    $this->listingSpecification = $listingSpecification;
-    $this->workListing = $workListing;
-    $this->playListing = $playListing;
-    $this->room = $room;
-    $this->menu = $menu;
-    $this->claimedListing = $claimedListing;
-    $this->reportedListing = $reportedListing;
-    $this->nearByLocation = $nearByLocation;
-    $this->appointment = $appointment;
-}
+    public function __construct(Category $category,SleepListing $sleepListing,Listing_Feature $listingFeature,Listing_Specification $listingSpecification,WorkListing $workListing,PlayListing $playListing,Room $room,Menu $menu,ClaimedListing $claimedListing,ReportedListing $reportedListing,NearByLocation $nearByLocation, Amenities $amenities, Appointment $appointment, City $city, Country $country) {
+
+        $this->category = $category;
+        $this->sleepListing = $sleepListing;
+        $this->listingFeature = $listingFeature;
+        $this->listingSpecification = $listingSpecification;
+        $this->workListing = $workListing;
+        $this->playListing = $playListing;
+        $this->room = $room;
+        $this->menu = $menu;
+        $this->claimedListing = $claimedListing;
+        $this->reportedListing = $reportedListing;
+        $this->nearByLocation = $nearByLocation;
+        $this->appointment = $appointment;
+        $this->amenities = $amenities;
+        $this->city = $city;
+        $this->country = $country;
+    }
 
 
     public function listing_list($type){
@@ -154,15 +160,18 @@ class ListingController extends Controller
             $page_data['listing'] = $this->sleepListing->where('id', $id)->first();
         }elseif($type == 'play'){            
             $page_data['listing'] = $this->playListing->where('id', $id)->first();
-            $page_data['menus'] = $this->menu->where('listing_id', $id)->get();
+            $page_data['menus'] = $this->menu->where('listing_id', $id)->get();            
         }
         $page_data['appointments'] =   $this->appointment->where("listing_type", $type)->where("listing_id", $id) ->get()->map(function ($item) use ($type) {
-                return $item->appointmentFormatted($type);
-            });    
-        $page_data['categories'] = $this->category->where('type', $type)->get();
+            return $item->appointmentFormatted($type);
+        });   
         $page_data['tab'] = $tab;
         $page_data['type'] = $type;
-         
+        $page_data['rooms'] = $this->room->where('listing_id', $id)->where('segment_type', $type)->get(); 
+        $page_data['features'] = $this->amenities->get(); 
+        $page_data['city'] = $this->city->get();
+        $page_data['country'] = $this->country->get();
+        $page_data['categories'] = $this->category->get();
         return view('admin.listing.'.$type.'_edit', $page_data);
     }
 
@@ -606,12 +615,26 @@ class ListingController extends Controller
     public function listing_add_room($prefix, $id, $room_id, $action){
         $page_data['id'] = $id;
         $page_data['action'] = $action;
-        if($action == 'edit'){
-            $page_data['room'] = Room::where('id', $room_id)->first();
+        if ($action == 'edit') {
+            $page_data['room'] = $this->room->where('id', $room_id)->where('segment_type', 'sleep')->first();
         }
+        $page_data['features'] = $this->amenities->get();
         $page_data['page'] = 'room';
         return view('admin.listing.room', $page_data);
     }
+
+    public function listing_add_property($prefix, $id, $room_id, $action){
+        $page_data['id'] = $id;
+        $page_data['action'] = $action;
+        if ($action == 'edit') {
+            $page_data['property'] = $this->room->where('id', $room_id)->where('segment_type', 'work')->first();
+        }
+        $page_data['features'] = $this->amenities->get();
+        $page_data['page'] = 'property';
+        // return $page_data;
+        return view('admin.listing.property', $page_data);
+    }
+
 
     public function listing_store_room(Request $request, $prefix, $id){
         $validated = $request->validate([
@@ -624,10 +647,16 @@ class ListingController extends Controller
         $data['title'] = sanitize($request->title);
         $data['person'] = sanitize($request->person);
         $data['child'] = sanitize($request->child);
+        $data['segment_type'] = sanitize($request->segment_type);
         $data['listing_id'] = $id;
         $data['user_id'] = user('id');
         $data['price'] = sanitize($request->price);
         $data['feature'] = json_encode($request->feature);
+        if ($request->has('room_type')) {
+            $data['room_type'] = implode(',', $request->room_type);
+        } else {
+            $data['room_type'] = null;
+        }
         $room_image = [];
         if ($request->hasFile('image')) {
             foreach ($request->file('image') as $key => $image) {
@@ -642,7 +671,7 @@ class ListingController extends Controller
         if(user('role') == 2) {
             return redirect()->route('user.listing.edit',['id'=>$id, 'type'=>'sleep','tab'=>'room']);
         }else{
-            return redirect()->route('admin.listing.edit', ['type' => 'sleep', 'id' => $id, 'tab'=>'room']);
+            return redirect()->route('admin.listing.edit', ['id'=> $id, 'type' =>'sleep','tab'=>'room']);
         }
     }
 
@@ -659,6 +688,11 @@ class ListingController extends Controller
         $data['listing_id'] = $id;
         $data['price'] = sanitize($request->price);
         $data['feature'] = json_encode($request->feature);
+        if ($request->has('room_type')) {
+            $data['room_type'] = implode(',', $request->room_type);
+        } else {
+            $data['room_type'] = null;
+        }
         $room_image = [];
         if ($request->hasFile('image')) {
             foreach ($request->file('image') as $key => $image) {
@@ -677,6 +711,80 @@ class ListingController extends Controller
         }
     }
 
+    public function listing_update_property(Request $request, $prefix, $id, $property_id){
+        $validated = $request->validate([
+            'title' => 'required|max:50',
+            'person' => 'required|max:100',
+            'price' => 'required|max:50',
+            'feature' => 'required',
+        ]);
+        $data['title'] = sanitize($request->title);
+        $data['person'] = sanitize($request->person);
+        $data['child'] = sanitize($request->child);
+        $data['listing_id'] = $id;
+        $data['price'] = sanitize($request->price);
+        $data['feature'] = json_encode($request->feature);
+        if ($request->has('room_type')) {
+            $data['room_type'] = implode(',', $request->room_type);
+        } else {
+            $data['room_type'] = null;
+        }
+        $room_image = [];
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $key => $image) {
+                $imageName = $key.'-'.time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/room-images'), $imageName);
+                array_push($room_image, $imageName);
+            }
+            $data['image'] = json_encode($room_image);
+        }
+        Room::where('id', $property_id)->update($data);
+        Session::flash('success', get_phrase('Sleep Property Update successful!'));
+        if(user('role') == 2) {
+            return redirect()->route('user.listing.edit',['id'=>$id, 'type'=>'work','tab'=>'property']);
+        }else{
+            return redirect()->route('admin.listing.edit', ['type' => 'work', 'id' => $id, 'tab'=>'property']);
+        }
+    }
+    public function listing_store_property(Request $request, $prefix, $id){      
+        $validated = $request->validate([
+            'title' => 'required|max:50',
+            'person' => 'required|max:100',
+            'price' => 'required|max:50',
+            'feature' => 'required',
+            'image' => 'required',
+        ]);
+        $data['title'] = sanitize($request->title);
+        $data['person'] = sanitize($request->person);
+        $data['child'] = sanitize($request->child);
+        $data['segment_type'] = sanitize($request->segment_type);
+        $data['listing_id'] = $id;
+        $data['user_id'] = user('id');
+        $data['price'] = sanitize($request->price);
+        $data['feature'] = json_encode($request->feature);
+        if ($request->has('room_type')) {
+            $data['room_type'] = implode(',', $request->room_type);
+        } else {
+            $data['room_type'] = null;
+        }
+        $room_image = [];
+        if ($request->hasFile('image')) {
+            foreach ($request->file('image') as $key => $image) {
+                $imageName = $key.'-'.time() . '.' . $image->getClientOriginalExtension();
+                $image->move(public_path('uploads/room-images'), $imageName);
+                array_push($room_image, $imageName);
+            }
+        }
+        $data['image'] = json_encode($room_image);
+        $this->room->insert($data);
+        Session::flash('success', get_phrase('Work Property Create successful!'));
+        if(user('role') == 2) {
+            return redirect()->route('user.listing.edit',['id'=>$id, 'type'=>'work','tab'=>'property']);
+        }else{
+            return redirect()->route('admin.listing.edit', ['id'=> $id, 'type' =>'work','tab'=>'property']);
+        }
+    }
+    
     public function listing_room($prefix, $id, $listing_id){
         Room::where('id', $id)->delete();
         Session::flash('success', get_phrase('Sleep room delete successful!'));
@@ -684,6 +792,16 @@ class ListingController extends Controller
             return redirect()->route('user.listing.edit',['id'=>$listing_id, 'type'=>'sleep','tab'=>'room']);
         }else{
             return redirect()->route('admin.listing.edit', ['type' => 'sleep', 'id' => $listing_id, 'tab'=>'feature']);
+        }
+    }
+
+    public function listing_property($prefix, $id, $listing_id){
+        Room::where('id', $id)->delete();
+        Session::flash('success', get_phrase('Sleep Property delete successful!'));
+        if(user('role') == 2) {
+            return redirect()->route('user.listing.edit',['id'=>$listing_id, 'type'=>'work','tab'=>'property']);
+        }else{
+            return redirect()->route('admin.listing.edit', ['type' => 'work', 'id' => $listing_id, 'tab'=>'property']);
         }
     }
 

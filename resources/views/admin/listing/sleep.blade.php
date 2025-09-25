@@ -62,6 +62,16 @@
                 </div>
                 <div class="col-sm-6">
                     <div class="mb-3">
+                        <label for="accommodation_type" class="form-label ol-form-label"> {{get_phrase('Accommodation Type')}} *</label>
+                        <select name="accommodation_type" id="accommodation_type" class="form-control ol-form-control ol-select2" required data-minimum-results-for-search="Infinity">
+                            <option value=""> {{get_phrase('Select Type')}} </option>
+                            <option value="hostels" > {{get_phrase('Hostels')}} </option>
+                            <option value="co‑living" > {{get_phrase('Co‑Living')}} </option>
+                        </select>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
                         <label for="visibility" class="form-label ol-form-label"> {{get_phrase('Type')}} *</label>
                         <select name="is_popular" id="is_popular" class="form-control ol-form-control ol-select22 ol-select2" required >
                             <option value=""> {{get_phrase('Select Type')}} </option>

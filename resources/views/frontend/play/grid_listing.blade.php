@@ -56,9 +56,6 @@
                                                                 <img src="{{ asset('assets/frontend/images/icons/location-red2-20.svg') }}" alt="">                                                                
                                                                 <p class="info f-14"> {{ $listing['city'] . ', ' . $listing['country'] }} </p>
                                                             </div>
-                                                            <!-- <div class="ratings d-flex align-items-center">
-                                                                <img src="{{ asset('assets/frontend/images/icons/star-yellow-16.svg') }}" alt="">                                                               
-                                                            </div> -->
                                                         </div>
                                                         <ul class="restgrid-list-items d-flex align-items-center flex-wrap">
                                                             <li>{{ get_phrase('Dine in') }}</li>

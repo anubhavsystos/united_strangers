@@ -171,7 +171,7 @@
         flex-wrap: wrap;
     }
     .feature-body .card-body {
-        width: 150px;
+        /* width: 150px; */
     }
     .room-body .position-relative {
         position: relative;

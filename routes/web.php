@@ -133,6 +133,12 @@ Route::prefix('{prefix}')->middleware(['auth', 'anyAuth'])->group(function () {
     Route::post('/listing-store-listing-room/{id}', [ListingController::class, 'listing_store_room'])->name('admin.store.listing.room');
     Route::post('/listing-update-listing-room/{id}/{room_id}', [ListingController::class, 'listing_update_room'])->name('admin.update.listing.room');
     Route::get('/listing-delete-listing-room/{id}/{listing_id}', [ListingController::class, 'listing_room'])->name('admin.delete.listing.room');
+    
+    // Property
+    Route::get('/listing-add-listing-property/{id}/{property_id}/{page}', [ListingController::class, 'listing_add_property'])->name('admin.add.listing.property');
+    Route::post('/listing-store-listing-property/{id}', [ListingController::class, 'listing_store_property'])->name('admin.store.listing.property');
+    Route::post('/listing-update-listing-property/{id}/{property_id}', [ListingController::class, 'listing_update_property'])->name('admin.update.listing.property');
+    Route::get('/listing-delete-listing-property/{id}/{listing_id}', [ListingController::class, 'listing_property'])->name('admin.delete.listing.property');
 
     Route::get('/listing-menu-add/{id}', [ListingController::class, 'listing_menu_add'])->name('admin.add.listing.menu');
     Route::post('/listing-menu-store/{id}', [ListingController::class, 'listing_menu_store'])->name('admin.store.listing.menu');

@@ -58,6 +58,7 @@ class FrontendController extends Controller
         $this->event = $event;
         $this->blog = $blog;
         $this->room = $room;
+        $this->review = $review;
     }
 
 
@@ -87,8 +88,11 @@ class FrontendController extends Controller
         $blogs = $this->blog->orderBy('created_at', 'desc')->limit(15)->get()->map(function ($item) {
             return $item->blogformatted();
         });
-
-        return view('frontend.index', compact('sleeplistings','worklistings','playlistings','offers','events','blogs'));
+        $Totalsleeps = $this->sleepListing->where('visibility','visible')->take(8)->get();
+        $Totalplay =  $this->playListing->where('visibility','visible')->take(8)->get();         
+        $Totalwork =  $this->workListing->where('visibility','visible')->take(8)->get();
+        $reviews = $this->review->whereNull('reply_id')->where('rating',5)->orderBy('created_at', 'DESC')->take(50)->get();
+        return view('frontend.index', compact('sleeplistings','worklistings','playlistings','offers','events','blogs','reviews'));
     }
 
     public function details(){

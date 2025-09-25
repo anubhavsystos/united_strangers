@@ -1,4 +1,4 @@
-/* Default Css Start ***
+ /* Default Css Start ***
 **********************/
 /* Other Fonts */
 @import url("../fonts/dm-sens/stylesheet.css");
@@ -4509,7 +4509,7 @@ textarea.meeting-textarea{
     border-radius: 12px;
 }
 .atn-banner-slider .swiper-slide{
-    height: auto;
+    height: 350px !important;
 }
 .atn-slide-banner{
     width: 100%;
