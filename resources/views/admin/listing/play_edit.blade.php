@@ -27,16 +27,13 @@
                     <button class="nav-link {{ $tab == 0 ? 'active' : '' }}" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button" role="tab" aria-controls="basic" aria-selected="true"> {{ get_phrase('Basic Info') }} </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="open-time-tab" data-bs-toggle="tab" data-bs-target="#open-time" type="button" role="tab" aria-controls="open-time" aria-selected="false"> {{ get_phrase('Opening Time') }} </button>
+                    <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab" aria-controls="address" aria-selected="false"> {{ get_phrase('Address') }} </button>
+                </li>
+                 <li class="nav-item" role="presentation">
+                    <button class="nav-link {{ $tab == 'feature' ? 'active' : '' }}" id="feature-tab" data-bs-toggle="tab" data-bs-target="#feature" type="button" role="tab" aria-controls="feature" aria-selected="false"> {{ get_phrase('Feature') }} </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link {{ $tab == 'menu' ? 'active' : '' }}" id="menu-tab" data-bs-toggle="tab" data-bs-target="#menu" type="button" role="tab" aria-controls="menu" aria-selected="false"> {{ get_phrase('Menu') }} </button>
-                </li>
-                <!-- <li class="nav-item" role="presentation">
-                    <button class="nav-link {{ $tab == 'feature' ? 'active' : '' }}" id="feature-tab" data-bs-toggle="tab" data-bs-target="#feature" type="button" role="tab" aria-controls="feature" aria-selected="false"> {{ get_phrase('Feature') }} </button>
-                </li> -->
-                <li class="nav-item" role="presentation">
-                    <button class="nav-link" id="address-tab" data-bs-toggle="tab" data-bs-target="#address" type="button" role="tab" aria-controls="address" aria-selected="false"> {{ get_phrase('Address') }} </button>
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="appointments-tab" data-bs-toggle="tab" data-bs-target="#appointments" type="button" role="tab" aria-controls="appointments" aria-selected="false"> {{ get_phrase('appointments') }} </button>
@@ -44,6 +41,9 @@
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calander') }} </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="open-time-tab" data-bs-toggle="tab" data-bs-target="#open-time" type="button" role="tab" aria-controls="open-time" aria-selected="false"> {{ get_phrase('Opening Time') }} </button>
+                </li>                
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false"> {{ get_phrase('Seo') }} </button>
                 </li>
@@ -126,11 +126,7 @@
                                         maxZoom: 5,
                                         attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
                                     }).addTo(map);
-
-                                    // Create a popup
                                     var popup = L.popup();
-
-                                    // Define a function to handle map clicks
                                     function onMapClick(e) {
                                         var lat = e.latlng.lat.toFixed(5);
                                         var lng = e.latlng.lng.toFixed(5);
@@ -230,36 +226,8 @@
                             @endforeach
                         </div>
                     </div>
-                    <div class="tab-pane fade show {{ $tab == 'feature' ? 'active' : '' }}" id="feature" role="tabpanel" aria-labelledby="feature-tab">
-                        <div class="d-flex align-items-center justify-content-between mb-3">
-                            <h5 class="fs-16px title mb-3"> {{ get_phrase('Add some feature') }} </h5>
-                            <a href="javascript:void(0);" onclick="modal('modal-md', '{{ route('admin.amenities.add', ['prefix' => 'admin', 'type' => 'play', 'item' => 'feature', 'page' => 'listing', 'listing_id' => $listing->id]) }}', '{{ get_phrase('Add New Feature') }}')" class="btn ol-btn-primary fs-14px"> {{ get_phrase('Add Feature') }} </a>
-                        </div>
-                        @php
-                            $features = App\Models\Amenities::where('type', 'play')->where('identifier', 'feature')->get();
-                        @endphp
-                        <div class="work-feature">
-                            @foreach ($features as $key => $amenities)
-                                <div class="feature-item">
-                                    <input class="form-check-input d-none" name="feature[]" type="checkbox" value="{{ $amenities->id }}" id="flexCheckDefau{{ $key }}" @if ($listing->amenities && $listing->amenities != 'null' && in_array($amenities->id, json_decode($listing->amenities))) checked @endif>
-                                    <label class="form-check-label w-100" onclick="feature_select('{{ $key }}')" for="flexCheckDefau{{ $key }}">
-                                        <div class="card mb-3 team-checkbox me-2">
-                                            <div class="col-md-12 team-body feature-body">
-                                                <div class="card-body py-2 px-2 ms-1">
-                                                    <div class="icon">
-                                                        <img src="{{ asset($amenities->image ? '/' . $amenities->image : 'image/placeholder.png') }}" alt="" class="rounded">
-                                                    </div>
-                                                    <span class="text-center d-block w-100"> {{ $amenities->name }} </span>
-                                                </div>
-                                                <div class="checked @if ($listing->amenities && $listing->amenities != 'null' && in_array($amenities->id, json_decode($listing->amenities))) @else d-none @endif" id="feature-checked{{ $key }}">
-                                                    <i class="fas fa-check"></i>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </label>
-                                </div>
-                            @endforeach
-                        </div>
+                    <div class="tab-pane fade show {{($tab == 'feature')?'active':''}}" id="feature" role="tabpanel" aria-labelledby="feature-tab">
+                        @include('admin.listing.feature_tab')
                     </div>
                     <div class="tab-pane fade" id="address" role="tabpanel" aria-labelledby="address-tab">
                         <div class="row">
@@ -360,88 +328,118 @@
                     </div>
                     <div class="tab-pane fade" id="appointments" role="tabpanel" aria-labelledby="appointments-tab">
                         <div class="row">                          
-                            <div class="col-sm-12">
+                            <div class="col-sm-12">                                        
                                 <div class="ol-card mt-3">
-                                    <div class="ol-card mt-3">
-                                        <div class="ol-card-body p-3">
-                                            <div class="ol-card mt-3">
-                                                <div class="ol-card-body p-3">
-                                                    @if(count($appointments))
-                                                    <table id="datatable" class=" table nowrap w-100">
-                                                         <thead class="ca-thead">
-                                                            <tr class="ca-tr">
-                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Id')}}</th>                                                                
-                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Customer')}}</th>
-                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Details')}}</th>
-                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Listing')}}</th>                                                                
-                                                                <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>                                                                
-                                                            </tr>
-                                                            </thead>
-                                                        <tbody>
-                                                            @php $num = 1 @endphp
-                                                            @foreach ($appointments as $key => $appointment)    
-                                                                <tr class="ca-tr">
-                                                                    <td ><p class="ca-subtitle-14px ca-text-dark mb-2"> {{++$key}}.</p></td>                                                                    
-                                                                    <td class="min-w-140px">                                                                                                                                            
-                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">
-                                                                            <img src="{{isset($appointment['image']) ? $appointment['image'] : ''}}" class="rounded" height="50px" width="50px" alt="">                                                                            
-                                                                        </p>             
-                                                                    </td>
-                                                                    <td class="min-w-140px">                                                                        
-                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">                                                                            
-                                                                            {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}
-                                                                        </p>
-                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1">                                                                            
-                                                                            {{isset($appointment['customer_email']) ? $appointment['customer_email'] : ''}}
-                                                                        </p>
-                                                                        <div class="d-flex align-items-center gap-2">
-                                                                            <p class="badge-dark">{{isset($appointment['customer_phone']) ? $appointment['customer_phone'] : ''}} </p>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td class="min-w-110px">
-                                                                        <p class="ca-subtitle-14px ca-text-dark mb-2">
-                                                                           {{isset($appointment['date']) ? date('d M y', strtotime($appointment['date'])) : ''}}
-                                                                        </p>
-                                                                        <div class="d-flex gap-1 align-items-center">
-                                                                            <img src="{{ asset('assets/frontend/images/icons/clock-gray-12.svg') }}" alt="icon">
-                                                                            <p class="in-subtitle-14px">{{!empty($appointment['time']) ? date('h:i A', strtotime($appointment['time'])) : ''}}</p>
-                                                                        </div>
-                                                                       
-                                                                        <div class="eMessage">
-                                                                            <p class="ca-subtitle-14px ca-text-dark mb-6px mb-2">
-                                                                                <span class="short-text d-inline">
-                                                                                    {{ \Illuminate\Support\Str::words($appointment['message'], 30, '...') }}
-                                                                                </span>
-                                                                                <span class="full-text d-none">
-                                                                                    {{ $appointment['message'] }}
-                                                                                </span>                                                                                
-                                                                            </p>
-                                                                            @if(str_word_count($appointment['message']) > 30)
-                                                                                <a href="javascript:void(0)" class="read-more">{{ get_phrase('Read More') }}</a>
-                                                                            @endif
-                                                                        </div>                                                                        
-                                                                    </td>                                                                        
+                                    
+                                    <div class="ol-card-body p-3">
+                                        <div class="d-flex align-items-center justify-content-between mb-3">
+                                            <h5 class="fs-16px title mb-3"> {{get_phrase('Appointments Listing ')}} </h5>
+                                        </div> 
+                                        @if(count($appointments))
+                                        <table id="datatable" class=" table nowrap w-100">
+                                                <thead class="ca-thead">
+                                                    <tr class="ca-tr">
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Id')}}</th>                                                                
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Customer')}}</th>
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Contact')}}</th>
+                                                        
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Menu Name')}}</th>
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Total Price')}}</th>
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Person')}}</th>
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Booking Date')}}</th>
 
-                                                                    <td>
-                                                                        @if ($appointment['status'] == 1)
-                                                                            <p class="badge-success-light">{{get_phrase('Successfully Ended')}}</p>
-                                                                        @else
-                                                                            <p class="badge-danger-light">{{get_phrase('Not start yet')}}</p>
-                                                                        @endif
-                                                                    </td>
-                                                   
-                                                                </tr>
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Details')}}</th>                                                             
+                                                        <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>                                                                
+                                                    </tr>
+                                                </thead>
+                                            <tbody>
+                                                @php $num = 1 @endphp
+                                                @foreach ($appointments as $key => $appointment)    
+                                                    <tr class="ca-tr">
+                                                        <td ><p class="ca-subtitle-14px ca-text-dark mb-2"> {{++$key}}.</p></td>  
+                                                        <td class="min-w-140px">                                                                        
+                                                            <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}</p>
+                                                            <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{isset($appointment['name']) ? "For :" . $appointment['name'] : ''}}</p>
+                                                        </td>
+                                                        <td class="min-w-140px">
+                                                            <div class="align-items-center gap-2"><p class="badge-dark">{{isset($appointment['customer_phone']) ? $appointment['customer_phone'] : ''}} </p>
+                                                            <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{isset($appointment['phone']) ?  $appointment['phone'] : ''}}</p></div>
+                                                        </td>
+                                                        <td class="min-w-140px">
+                                                            @php 
+                                                                $menuSummary = is_array($appointment['menu_summary']) 
+                                                                    ? $appointment['menu_summary'] 
+                                                                    : explode(',', $appointment['menu_summary']);
+                                                            @endphp
+
+                                                            <div class="d-flex flex-column">
+                                                                @foreach(array_slice($menuSummary, 0, 2) as $item)
+                                                                    <p class="badge-dark mb-1">{{ trim($item) }}</p>
                                                                 @endforeach
-                                                        </tbody>
-                                                    </table>
-                                                    @else
-                                                        @include('layouts.no_data_found')
-                                                    @endif
-                                                </div>
-                                            </div>
-                                        </div>
+
+                                                                @if(count($menuSummary) > 2)
+                                                                    <a href="javascript:void(0);" 
+                                                                    onclick="this.nextElementSibling.classList.toggle('d-none'); this.classList.add('d-none')">
+                                                                    ... Show more
+                                                                    </a>
+
+                                                                    <div class="d-none">
+                                                                        @foreach(array_slice($menuSummary, 2) as $item)
+                                                                            <p class="badge-dark mb-1">{{ trim($item) }}</p>
+                                                                        @endforeach
+                                                                    </div>
+                                                                @endif
+                                                            </div>
+                                                        </td>
+
+                                                        <td class="min-w-140px">
+                                                            <div class="d-flex align-items-center gap-2"><p class="badge-dark">{{isset($appointment['total_price']) ? $appointment['total_price'] : ''}} </p></div>
+                                                        </td>
+                                                        <td class="min-w-140px">
+                                                            <div class="d-flex gap-1 align-items-center">
+                                                                <p class="in-subtitle-14px">Adults :{{!empty($appointment['adults']) ? $appointment['adults'] : ''}} Child : {{!empty($appointment['child']) ? $appointment['child'] : ''}}</p>
+                                                            </div> 
+                                                        </td>
+                                                        <td class="min-w-140px">
+                                                            <div class="d-flex align-items-center gap-2"><p class="badge-dark">{{isset($appointment['date']) ? $appointment['date'] : ''}} </p></div>
+                                                        </td>
+                                                        <td class="min-w-110px">
+                                                            <div class="d-flex gap-1 align-items-center">
+                                                                <img src="{{ asset('assets/frontend/images/icons/clock-gray-12.svg') }}" alt="icon">
+                                                                <p class="in-subtitle-14px">{{!empty($appointment['in_time']) ? $appointment['in_time'] : ''}} - {{!empty($appointment['out_time']) ? $appointment['out_time'] : ''}}</p>
+                                                            </div>                                                                    
+                                                            <div class="eMessage">
+                                                                <p class="ca-subtitle-14px ca-text-dark mb-6px mb-2">
+                                                                    <span class="short-text d-inline">
+                                                                        {{ \Illuminate\Support\Str::words($appointment['message'], 30, '...') }}
+                                                                    </span>
+                                                                    <span class="full-text d-none">
+                                                                        {{ $appointment['message'] }}
+                                                                    </span>                                                                                
+                                                                </p>
+                                                                @if(str_word_count($appointment['message']) > 30)
+                                                                    <a href="javascript:void(0)" class="read-more">{{ get_phrase('Read More') }}</a>
+                                                                @endif
+                                                            </div>                                                                        
+                                                        </td>                                                                     
+
+                                                        <td>
+                                                            @if ($appointment['status'] == 1)
+                                                                <p class="badge-success-light">{{get_phrase('Successfully Ended')}}</p>
+                                                            @else
+                                                                <p class="badge-danger-light">{{get_phrase('Not start yet')}}</p>
+                                                            @endif
+                                                        </td>
+                                        
+                                                    </tr>
+                                                    @endforeach
+                                            </tbody>
+                                        </table>
+                                        @else
+                                            @include('layouts.no_data_found')
+                                        @endif
                                     </div>
-                                </div>
+                                </div>                                   
                             </div>
                         </div>
                     </div>
@@ -459,7 +457,87 @@
             </form>
         </div>
     </div>
-    
+    <div class="modal fade" id="appointmentModalPlay" tabindex="-1">
+        <div class="modal-dialog">
+            <form id="appointmentFormPlay" method="POST" action="{{ route('appointments.store') }}">
+                @csrf
+                <input type="hidden" name="listing_type" value="play">
+                <input type="hidden" name="listing_id" value="{{isset($listing->id) ? $listing->id : ''}}">
+
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Play Appointment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Customer Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Customer Contact</label>
+                        <input type="number" class="form-control" name="phone" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Appointment Date</label>
+                        <input type="date" class=" appointmentDate form-control mform-control flat-input-picker3 input-calendar-icon"  id="appointmentDate" name="date" >
+                    </div>             
+                    <div class="mb-3 row">
+                        <div class="col">
+                            <label class="form-label">Check In Time</label>
+                            <input type="time" class="form-control" name="in_time" required>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Check Out Time</label>
+                            <input type="time" class="form-control" name="out_time" required>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <div class="col">
+                            <label class="form-label">Adults</label>
+                            <input type="number" class="form-control" name="adults" required>
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Child</label>
+                            <input type="number" class="form-control" name="child" required>
+                        </div>
+                    </div>
+                   <div class="mb-3">
+                        <label class="form-label">Select Menus</label>
+                        <div class="row">
+                            @foreach($menus as $menu)
+                                <div class="col-md-6 mb-2">
+                                    <div class="card p-2">
+                                        <div class="d-flex align-items-center justify-content-between">
+                                            <input type="checkbox" class="form-check-input menu-checkbox me-2" name="menu_id[]" value="{{ $menu->id }}" data-title="{{ $menu->title }}"data-price="{{ $menu->price }}" onclick="updateTotal()">
+                                            <span>{{ $menu->title }} ({{ currency($menu->price) }})</span>
+                                            <input type="number" class="form-control form-control-sm ms-2 menu-qty" name="menu_qty[{{ $menu->id }}]" value="1" min="1" style="width:80px;" oninput="updateTotal()">
+                                        </div>
+                                    </div>
+                                </div>
+                            @endforeach
+                        </div>
+                        <input type="hidden" name="total_price" id="total_price">
+                        <input type="hidden" name="menu_summary" id="menu_summary">
+                        <div class="mt-2">
+                            <strong>Total: </strong> <span id="total_display">0</span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Description</label>
+                        <textarea name="message" id="message" cols="30" rows="3" placeholder="{{ get_phrase('Write your description') }}" class="form-control"></textarea>                        
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Save Play</button>
+                </div>
+                </div>
+            </form>
+        </div>
+    </div>
     @include('admin.listing.listing_script')
     <script>
         "use strict";
@@ -562,6 +640,31 @@
         }
     }); 
     </script>    
+<script>
+function updateTotal() {
+    let total = 0;
+    let summary = [];
+
+    document.querySelectorAll('.menu-checkbox').forEach((checkbox) => {
+        if (checkbox.checked) {
+            let price = parseFloat(checkbox.getAttribute('data-price')) || 0;
+            let title = checkbox.getAttribute('data-title') || '';
+            let qtyInput = checkbox.closest('.d-flex').querySelector('.menu-qty');
+            let qty = parseInt(qtyInput.value) || 1;
+
+            total += price * qty;
+
+            summary.push( qty + ' ' + title);
+        }
+    });
+
+    document.getElementById('total_display').innerText = total;
+    document.getElementById('total_price').value = total;
+
+    // Save summary as comma-separated string
+    document.getElementById('menu_summary').value = summary.join(', ');
+}
+</script>
 
 
 @endsection

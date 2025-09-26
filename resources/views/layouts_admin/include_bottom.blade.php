@@ -1,13 +1,8 @@
 
-    @include('layouts.modal')
-    
+    @include('layouts.modal')    
     <script src="{{ asset('assets/frontend/vendors/bootstrap/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/vendors/nice-select/jquery.nice-select.min.js') }}"></script>
     <script src="{{ asset('assets/frontend/js/swiper-bundle.min.js') }}"></script>
-    
-
-
-
     <!-- toastr js -->
     <script src="{{asset('plugin/toastr/toastr.min.js')}}"></script>
     {!! Toastr::message() !!}

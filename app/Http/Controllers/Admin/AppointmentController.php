@@ -31,10 +31,24 @@ class AppointmentController extends Controller
         return response()->json($appointments);
     }
 
-    public function appointment_store(Request $request){
+   public function appointment_store(Request $request)
+    {
         $request['date'] = date("Y-m-d", strtotime($request['date']));
-        $request['customer_id'] = auth()->user()->id ?? 1;        
-        $appointment = $this->appointment->create($request->except('_token'));        
-        return response()->json($appointment);
+        $request['in_time'] = date("H:i:s", strtotime($request['in_time']));
+        $request['out_time'] = date("H:i:s", strtotime($request['out_time']));
+        $request['customer_id'] = auth()->user()->id ?? 1;
+       
+        if (is_array($request->menu_id)) {
+            $request['menu_id'] = json_encode($request->menu_id); 
+        }
+        if (is_array($request->menu_qty)) {
+            $request['menu_qty'] = json_encode($request->menu_qty);
+        }
+        if (is_array($request->menu_summary)) {
+            $request['menu_summary'] = implode(', ', $request->menu_summary); 
+        }
+         $appointment = $this->appointment->create($request->except('_token'));
+        return redirect()->back();
     }
+
 }

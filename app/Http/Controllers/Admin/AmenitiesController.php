@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Amenities;
-use App\Models\BeautyListing;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
 use Carbon\Carbon;
@@ -12,12 +11,10 @@ use Carbon\Carbon;
 class AmenitiesController extends Controller
 {
     protected $amenities;
-    protected $beautyListing;
 
-    public function __construct(Amenities $amenities, BeautyListing $beautyListing)
+    public function __construct(Amenities $amenities)
     {
         $this->amenities = $amenities;
-        $this->beautyListing = $beautyListing;
     }
 
     public function amenities_list($type)
@@ -64,7 +61,7 @@ class AmenitiesController extends Controller
         try {
             $data['type'] = $type;
 
-            if (in_array($type, ['car', 'work', 'sleep', 'play'])) {
+            if (in_array($type, ['work', 'sleep', 'play'])) {
                 $request->validate([
                     'name' => 'required|max:50',
                 ]);
@@ -79,42 +76,7 @@ class AmenitiesController extends Controller
                     $data['image'] = 'uploads/amenities/' . $imageName;
                 }
 
-            } elseif ($type == 'beauty') {
-                if ($request->item == 'service') {
-                    $request->validate([
-                        'name' => 'required|max:50',
-                        'time' => 'required|max:50',
-                        'price' => 'required|max:50',
-                    ]);
-
-                    $data['name'] = sanitize($request->name);
-                    $data['user_id'] = auth()->user()->id;
-                    $data['time'] = sanitize($request->time);
-                    $data['price'] = sanitize($request->price);
-                    $data['identifier'] = 'service';
-
-                } else {
-                    $request->validate([
-                        'name' => 'required|max:50',
-                        'designation' => 'required|max:50',
-                        'image' => 'required',
-                        'rating' => 'required|max:50',
-                    ]);
-
-                    $data['identifier'] = 'team';
-                    $data['name'] = sanitize($request->name);
-                    $data['user_id'] = auth()->user()->id;
-                    $data['designation'] = sanitize($request->designation);
-                    $data['rating'] = sanitize($request->rating);
-
-                    if ($request->hasFile('image')) {
-                        $image = $request->file('image');
-                        $imageName = time() . '.' . $image->getClientOriginalExtension();
-                        $image->move(public_path('uploads/team'), $imageName);
-                        $data['image'] = $imageName;
-                    }
-                }
-            }
+            } 
 
             $data['created_at'] = Carbon::now();
             $data['updated_at'] = Carbon::now();
@@ -157,36 +119,7 @@ class AmenitiesController extends Controller
         try {
             $amenity = $this->amenities->findOrFail($id);
             $data = ['updated_at' => Carbon::now()];
-
-            if ($amenity->type == 'beauty') {
-                $data['name'] = sanitize($request->name);
-                if ($amenity->identifier == 'service') {
-                    $data['time'] = sanitize($request->time);
-                    $data['price'] = sanitize($request->price);
-                } else {
-                    $request->validate([
-                        'name' => 'required|max:50',
-                        'designation' => 'required|max:50',
-                        'rating' => 'required|max:50',
-                    ]);
-
-                    $data['designation'] = sanitize($request->designation);
-                    $data['rating'] = sanitize($request->rating);
-
-                    if ($request->hasFile('image')) {
-                        $image = $request->file('image');
-                        $imageName = time() . '.' . $image->getClientOriginalExtension();
-                        $image->move(public_path('uploads/team'), $imageName);
-
-                        if ($amenity->image && file_exists(public_path('uploads/team/' . $amenity->image))) {
-                            unlink(public_path('uploads/team/' . $amenity->image));
-                        }
-
-                        $data['image'] = $imageName;
-                    }
-                }
-
-            } else {
+           
                 $request->validate([
                     'name' => 'required|max:50',
                 ]);
@@ -205,7 +138,7 @@ class AmenitiesController extends Controller
                         unlink(public_path($amenity->image));
                     }
                 }
-            }
+            
 
             $amenity->update($data);
 
@@ -222,30 +155,11 @@ class AmenitiesController extends Controller
     {
         try {
             $amenity = $this->amenities->findOrFail($id);
-
-            // Delete related images
-            if (in_array($amenity->type, ['car', 'work', 'sleep', 'play']) && $amenity->image) {
+            if ($amenity->image) {
                 $path = public_path($amenity->image);
                 if (file_exists($path)) unlink($path);
             }
-
-            if ($amenity->type == 'beauty' && $amenity->image) {
-                $path = public_path('uploads/team/' . $amenity->image);
-                if (file_exists($path)) unlink($path);
-            }
-
             $amenity->delete();
-
-            // Remove from any beauty listings
-            $beautyListings = $this->beautyListing->where('service', 'like', '%' . $id . '%')->get();
-            foreach ($beautyListings as $listing) {
-                $services = json_decode($listing->service);
-                if (($key = array_search($id, $services)) !== false) {
-                    unset($services[$key]);
-                    $listing->service = json_encode(array_values($services));
-                    $listing->save();
-                }
-            }
 
             Session::flash('success', get_phrase('Amenity deleted successfully!'));
             return redirect()->back();

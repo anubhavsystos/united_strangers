@@ -162,7 +162,7 @@ class ListingController extends Controller
             $page_data['listing'] = $this->playListing->where('id', $id)->first();
             $page_data['menus'] = $this->menu->where('listing_id', $id)->get();            
         }
-        $page_data['appointments'] =   $this->appointment->where("listing_type", $type)->where("listing_id", $id) ->get()->map(function ($item) use ($type) {
+        $page_data['appointments'] =   $this->appointment->where("listing_type", $type)->orderBy('date', 'desc')->where("listing_id", $id)->get()->map(function ($item) use ($type) {
             return $item->appointmentFormatted($type);
         });   
         $page_data['tab'] = $tab;
