@@ -19,7 +19,7 @@
                            <h1 class="title">{{$listing->title}}</h1>
                         <p class="title capitalize">{{-- $listing->is_popular --}}</p>
                         <div class="sleeprent-price-area d-flex align-items-center flex-wrap">
-                            <p class="price">{{ get_phrase('Total Price : ') }}<span>{{ currency($listing->price) }}</span></p>
+                            <!-- <p class="price">{{ get_phrase('Total Price : ') }}<span>{{ currency($listing->price) }}</span></p> -->
                         </div>
                     </div>
                 </div>
@@ -40,14 +40,10 @@
             </div>
         </div>
     </section>
-    <!-- End Top Area -->
-
-    <!-- Start Main Content Area -->
     <section>
         <div class="container">
             <div class="row row-28 mb-80px">
                 <div class="col-xl-8 col-lg-7">
-                    <!-- Banners Slider -->
                     <div class="swiper atn-banner-slider mb-30px">
                         <div class="swiper-wrapper">
                             @foreach (json_decode($listing->image) as $key => $image)
@@ -57,25 +53,14 @@
                                     </div>
                                 </div>
                             @endforeach
-
                         </div>
                         <div class="swiper-button-next"></div>
                         <div class="swiper-button-prev"></div>
                         <div class="swiper-pagination"></div>
                     </div>
                     <!-- Title Area -->
-                    <div class="sleep-details-title mb-30px">
-                        @php 
-                           $claimStatus = App\Models\ClaimedListing::where('listing_id', $listing->id)->where('listing_type', 'sleep')->first();   
-                        @endphp
-                        <h1 class="title mb-20">
-                            @if(isset($claimStatus) && $claimStatus->status == 1) 
-                                <span data-bs-toggle="tooltip" 
-                                data-bs-title=" {{ get_phrase('This listing is verified') }}">
-                                <svg fill="none" height="34" viewBox="0 0 24 24" width="34" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="paint0_linear_16_1334" gradientUnits="userSpaceOnUse" x1="12" x2="12" y1="-1.2" y2="25.2"><stop offset="0" stop-color="#ce9ffc"/><stop offset=".979167" stop-color="#7367f0"/></linearGradient><path d="m3.783 2.826 8.217-1.826 8.217 1.826c.2221.04936.4207.17297.563.3504.1424.17744.22.39812.22.6256v9.987c-.0001.9877-.244 1.9602-.7101 2.831s-1.14 1.6131-1.9619 2.161l-6.328 4.219-6.328-4.219c-.82173-.5478-1.49554-1.2899-1.96165-2.1605-.46611-.8707-.71011-1.8429-.71035-2.8305v-9.988c.00004-.22748.07764-.44816.21999-.6256.14235-.17743.34095-.30104.56301-.3504zm8.217 10.674 2.939 1.545-.561-3.272 2.377-2.318-3.286-.478-1.469-2.977-1.47 2.977-3.285.478 2.377 2.318-.56 3.272z" fill="url(#paint0_linear_16_1334)"/></svg>
-                                </span>
-                            @endif
-                            {{ $listing->title }}</h1>
+                    <div class="sleep-details-title mb-30px">                       
+                        <h1 class="title mb-20">{{ $listing->title }}</h1>
                         <div class="sleepdetails-location-rating mb-3 d-flex align-items-center flex-wrap">
                             <div class="location d-flex align-items-center">
                                 <img src="{{ asset('assets/frontend/images/icons/location-blue2-20.svg') }}" alt="">
@@ -91,8 +76,6 @@
                                     $total_ratings = App\Models\Review::where('listing_id', $listing->id)->where('user_id', '!=', $listing->user_id)->where('type', 'sleep')->where('reply_id', null)->sum('rating');
                                     $average_rating = $reviews_count > 0 ? $total_ratings / $reviews_count : 0;
                                 @endphp
-                                <!-- <img src="{{ asset('assets/frontend/images/icons/star-yellow-20.svg') }}" alt=""> -->
-                                <!-- <p>{{ number_format($average_rating, 1) }} ({{ $reviews_count }})</p> -->
                             </div>
                             <p class="date">{{ get_phrase('Published:') }} {{ \Carbon\Carbon::parse($listing->created_at)->format('M d, Y') }}</p>
 
@@ -113,98 +96,225 @@
                                 <img src="{{ asset('assets/frontend/images/icons/bath-gray-24.svg') }}" alt="">
                                 <span>{{ $listing->bath }} {{ get_phrase('Bath') }}</span>
                             </li>
-                            <li>
+                            <!-- <li>
                                 <img src="{{ asset('assets/frontend/images/icons/move-arrow-gray-24.svg') }}" alt="">
                                 <span>{{ $listing->size }} {{ get_phrase('sft') }}</span>
+                            </li> -->
+                            <li>
+                                <img src="{{ asset('assets/frontend/images/icons/move-arrow-gray-24.svg') }}" alt="">
+                                <span>{{ $listing->accommodation_type }} {{ get_phrase('Accommodation Type') }}</span>
                             </li>
                         </ul>
                     </div>
-                    <!-- Description -->
-                    <div class="at-details-description mb-36">
-                        <h4 class="title mb-16">{{ get_phrase('Description') }}</h4>
-                        <p class="info mb-16">
+                    
+                    <div class="at-details-description mb-6">
+                        <h4 class="title mb-6">{{ get_phrase('Description') }}</h4>
+                        <p class="info mb-6">
                             <span id="short-description" class="d-block">{{ Str::limit($listing->description, 400) }}</span>
                             <span id="full-description" class="d-none">{!! removeScripts($listing->description) !!}</span>
                         </p>
                         @if (strlen($listing->description) > 400)
                             <a href="javascript:void(0);" id="read-more-btn" class="icontext-link-btn" onclick="toggleDescription()">
-                                <span>{{ get_phrase('Read More') }}</span>
-                                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                    <path
-                                        d="M1.33217 8.33306H13.0562L9.52751 4.8044C9.46383 4.7429 9.41304 4.66933 9.37811 4.588C9.34317 4.50666 9.32478 4.41918 9.32401 4.33066C9.32324 4.24214 9.34011 4.15436 9.37363 4.07243C9.40715 3.9905 9.45665 3.91606 9.51924 3.85347C9.58184 3.79087 9.65627 3.74137 9.7382 3.70785C9.82014 3.67433 9.90792 3.65746 9.99644 3.65823C10.085 3.659 10.1724 3.67739 10.2538 3.71233C10.3351 3.74727 10.4087 3.79806 10.4702 3.86173L15.1368 8.5284C15.2618 8.65341 15.332 8.82295 15.332 8.99973C15.332 9.17651 15.2618 9.34604 15.1368 9.47106L10.4702 14.1377C10.3444 14.2592 10.176 14.3264 10.0012 14.3248C9.82644 14.3233 9.65923 14.2532 9.53563 14.1296C9.41202 14.006 9.34191 13.8388 9.34039 13.664C9.33887 13.4892 9.40607 13.3208 9.52751 13.1951L13.0562 9.6664H1.33217C1.15536 9.6664 0.985792 9.59616 0.860768 9.47113C0.735744 9.34611 0.665506 9.17654 0.665506 8.99973C0.665506 8.82292 0.735744 8.65335 0.860768 8.52832C0.985792 8.4033 1.15536 8.33306 1.33217 8.33306Z"
-                                        fill="#242D3D"></path>
-                                </svg>
+                                <span>{{ get_phrase('Read More') }}</span>                                
                             </a>
                         @endif
+                    </div>                  
+                    <div class="row mb-3">
+                        <div class="col-md-3">
+                            <label for="filter_date"> Date</label>
+                            <input type="date" id="filter_date" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filter_in_time">In Time</label>
+                            <input type="time" id="filter_in_time" class="form-control">
+                        </div>
+                        <div class="col-md-3">
+                            <label for="filter_out_time">Out Time</label>
+                            <input type="time" id="filter_out_time" class="form-control">
+                        </div>
+                        <div class="col-md-3 mt-4">
+                            <button type="button" id="filterBtn" class="btn btn-primary">Check Availability</button>
+                        </div>
                     </div>
+                    <samp id="filter_rooms"></samp>
                     @php $plus = 1 @endphp
-                    <div class="row row-28">
-                        @foreach ($rooms as $room)
-                        <div class="col-xl-12">
-                                    <div class="single-list-card d-flex">
-                            <div class="  sleep-details-gallery mb-50px">
-                                <h1 class="in-title3-24px mb-16">{{ get_phrase('Room') }} {{ $room['title'] }}</h1>
-                                <div class="sleepdetails-gallery-list mb-16">
-                                    @foreach ($room['image'] as  $image)
-                                        <a href="{{  $image }}">
-                                            <img src="{{ $image }}" alt="">
-                                        </a>
-                                    @endforeach
-                                </div>
-                                <div class="room-price d-flex align-items-center justify-content-between flex-wrap">
-                                    <!-- <h3 class="name"> {{ get_phrase('Room') }}{{ $room['title'] }}</h3> -->
-                                    <h3 class="price">{{ currency($room['price']) }}</h3>
-                                </div>
-                                <div class="member-time mb-16 d-flex align-items-center justify-content-between flex-wrap">
-                                    <div class="member d-flex align-items-center">
-                                        <img src="{{ asset('assets/frontend/images/icons/users-gray.svg') }}" alt="">
-                                        <p class="members">{{ $room['person'] }} {{ get_phrase('Persons') }}, {{ $room['child'] }} {{ get_phrase('Child') }}</p>
+                    <div class="row row-28 filter_rooms_row">
+                        @foreach (($rooms ?? []) as $key => $room)
+                            <div class="col-sm-12">
+                                <input class="form-check-input d-none" name="room[]" 
+                                    type="checkbox" 
+                                    value="{{ $room['id'] ?? '' }}"
+                                    id="flckDefault{{ $key }}"
+                                    @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+
+                                <label class="form-check-label w-100" 
+                                    onclick="selectRoom('{{ $key }}', '{{ $room['id'] ?? '' }}', '{{ $room['title'] ?? 'Untitled Room' }}', '{{ $room['price'] ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
+
+                                    <div class="card mb-3 room-checkbox  position-relative">
+                                        {{-- Green Check Overlay --}}
+                                        <div class="room-check position-absolute top-0 end-0 p-2 d-none" id="roomCheck{{ $key }}">
+                                            <i class="fas fa-check-circle text-success fs-4"></i>
+                                        </div>
+
+                                        <div class="row g-0 h-100">
+                                            {{-- Left: Room Image --}}
+                                            <div class="col-md-4">
+                                                @php 
+                                                    $images = $room['image'] ?? []; 
+                                                    $firstImage = $images[0] ?? 'default.jpg';
+                                                @endphp
+                                                <img src="{{ $firstImage }}" 
+                                                    class="img-fluid rounded-start h-40 w-100 object-fit-cover" 
+                                                    alt="Room Image">
+                                            </div>
+
+                                            {{-- Right: Room Info --}}
+                                            <div class="col-md-8 room-body">
+                                                <div class="card-body py-2 px-3 h-100 position-relative d-flex flex-column">
+
+                                                    {{-- Row 1: Title | Price | Persons | Child --}}
+                                                    <div class="d-flex  align-items-center mb-1 flex-wrap">
+                                                        <p class="card-title mb-0 mr-3 fw-bold line-1">{{ $room['title'] ?? 'Untitled Room' }}</p>
+                                                        <p class="mb-0 text-success fw-bold">{{ !empty($room['price']) ? currency($room['price']) : currency(0) }}</p>
+                                                    </div>
+                                                    <div class="d-flex gap-2 fs-12px text-muted mb-1">
+                                                        <span><i class="fas fa-user"></i> {{ $room['person'] ?? 0 }} {{ get_phrase('Persons') }}</span>
+                                                        <span>|</span>
+                                                        <span><i class="fas fa-baby"></i> {{ $room['child'] ?? 0 }} {{ get_phrase('Child') }}</span>
+                                                    </div>
+
+                                                    {{-- Row 2: Room Type --}}
+                                                    @if(!empty($room['room_type']))
+                                                        <p class="mb-1 fs-12px">
+                                                            <strong>{{ get_phrase('Room Type') }}:</strong> {{ $room['room_type'] }}
+                                                        </p>
+                                                    @endif
+
+                                                    {{-- Row 3: Features --}}
+                                                    @if(!empty($room['features']))
+                                                        <div class="d-flex flex-wrap gap-2 mt-2">
+                                                            @foreach ($room['features'] as $fKey => $feature)
+                                                                <div class="text-center" style="width: 80px;">
+                                                                    <img src="{{ asset(!empty($feature['image']) ? '/' . $feature['image'] : '/image/placeholder.png') }}"
+                                                                        alt="{{ $feature['name'] ?? 'Feature' }}"
+                                                                        class="rounded mb-1" style="width:30px;height:30px;">
+                                                                    <span class="fs-11px d-block" style="font-size: 9px;">{{ $feature['name'] ?? '' }}</span>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                </div>
-                                <div class="btn-wrap mb-16 d-flex align-items-center justify-content-between flex-wrap"></div>
-                                <ul class="room-benefit-list mb-16 d-flex align-items-center flex-wrap">
-                                 @foreach ($room['features'] as  $feature)                                    
-                                    <li>
-                                        <div  class="">
-                                        <div  class="d-flex">
-                                        <img src="{{ url('public/'.$feature['image']) }}" alt="" style="height: 32px;width: 33px;">                                      
-                                        {{ $feature['name'] }}
-                                        </div>
-                                        </div>
-                                    </li>
-                                @endforeach
-                                </ul>
-                            </div>
-                            </div>
+                                </label>
                             </div>
                         @endforeach
                     </div>
+                    <div class="hoteldetails-location-area mb-50px">
+                        <h2 class="in-title3-24px mb-20px">{{ get_phrase('Location') }}</h2>
+                        <div class="hoteldetails-location-header d-flex align-items-end justify-content-between flex-wrap">
+                            <div class="hoteldetails-location-name">
+                                @php
+                                    $city_name = App\Models\City::where('id', $listing->city)->first()->name;
+                                    $country_name = App\Models\Country::where('id', $listing->country)->first()->name;
+                                @endphp
+                                <h4 class="name">{{ $country_name }}</h4>
+                                <p class="location d-flex align-items-center">
+                                    <img src="{{ asset('assets/frontend/images/icons/location-blue2-20.svg') }}" alt="">
+                                    <span>{{ $listing->address }}, {{ $city_name }}</span>
+                                </p>
+                            </div>
+                            <a href="javascript:;" class="white-btn1" id="dynamicLocation">{{ get_phrase('Get Direction') }}</a>
+                        </div>
+                        <div class="hoteldetails-location-map mb-16">
+                            <div id="map" class="h-297"></div>
+                        </div>
+                    </div>
                 </div>
-                <!-- Right Sidebar -->
                 <div class="col-xl-4 col-lg-5">
                     <div class="sleepdetails-form-area mb-30px">
-                        <h4 class="sub-title mb-16">{{ get_phrase('Book a Meeting') }}</h4>
-                        @if (addon_status('form_builder') == 1 && get_settings('form_builder') == 1)
-                           @include('frontend.form_builder.form')  
-                      @else
-                        <form action="{{ route('customerBookAppointment') }}" method="post">
-                            @csrf
-                            <input type="hidden" name="type" value="person">
-                            <input type="hidden" name="listing_type" value="sleep">
-                            <input type="hidden" name="listing_id" value="{{ $listing->id }}">
-                            <input type="hidden" name="agent_id" value="{{ $listing->user_id }}">
-                            <div class="sleepdetails-form-inputs mb-16">
-                                <!-- Only Date -->
-                                <input type="text" name="date"  placeholder="{{get_phrase('Select date')}}" class="form-control mform-control flat-input-picker3 input-calendar-icon" id="datetime" required />
-                                <input type="text" class="form-control mform-control mb-14" name="name" placeholder="Name" required>
-                                <input type="number" class="form-control mform-control mb-14" name="phone" placeholder="Phone" required>
-                                <input type="email" class="form-control mform-control mb-14" name="email" placeholder="Email" required>
-                                <textarea class="form-control mform-control review-textarea mb-14" name="message" placeholder="Message" required></textarea>
+                    <h4 class="sub-title ">{{ get_phrase('Booking') }}</h4>                    
+                    <form action="{{ route('customerBookAppointment') }}" method="post">
+                        @csrf
+                        <input type="hidden" name="listing_type" value="sleep">
+                        <input type="hidden" name="listing_id" value="{{ $listing->id }}">
+                        <input type="hidden" name="customer_id" value="{{ $listing->id }}">
+                        <div id="selectedRoomsContainer"></div>
+                        <div class="sleepdetails-form-inputs mb-16">
+                        <div class="mb-3">
+                            <label class="form-label">Appointment Date</label>
+                            <input type="date" class="appointmentDate form-control mform-control flat-input-picker3 " name="date">
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col">
+                                <label class="form-label">Check In Time</label>
+                                <input type="time" class="form-control" name="in_time" required>
                             </div>
-                            <button type="submit" class="submit-fluid-btn">{{ get_phrase('Proceed Booking') }}</button>
-                        </form>
-                        @endif
+                            <div class="col">
+                            <label class="form-label"> Check Out Time</label>
+                            <input type="time" class="form-control" name="out_time" required>
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col">
+                                <label class="form-label"> Adults</label>
+                                <input type="number" class="form-control" name="adults" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">   Child</label>
+                                <input type="number" class="form-control" name="child" >
+                            </div>
+                        </div>
                         
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="message" id="message" cols="30" rows="3" placeholder="{{ get_phrase('Write your description') }}" class="form-control"></textarea>                        
+                        </div>                        
+
+                        <div id="bookingSummary" class="card d-none mb-4 mt-3">
+                            <div class="card-header fw-bold">{{ get_phrase('Booking Summary') }}</div>
+                                <div class="card-body p-0">
+                                    <table class="table table-sm mb-0">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>{{ get_phrase('Room') }}</th>
+                                                <th class="text-end">{{ get_phrase('Rate') }}</th>
+                                                <th class="text-center">{{ get_phrase('Action') }}</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="summaryRooms"></tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th colspan="2" class="text-end">{{ get_phrase('Subtotal') }}</th>
+                                                <th class="text-end" id="summarySubtotal">₹0</th>
+                                                <th></th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="2" class="text-end">{{ get_phrase('Tax') }} (<span id="taxPercent">0</span>%)</th>
+                                                <th class="text-end" id="summaryTax">₹0</th>
+                                                <th></th>
+                                            </tr>
+                                            <tr>
+                                                <th colspan="2" class="text-end">{{ get_phrase('Total') }}</th>
+                                                <th class="text-end fw-bold" id="summaryTotal">₹0</th>
+                                                <th></th>
+                                            </tr>
+                                        </tfoot>
+                                    </table>
+                                </div>
+                        </div>
+
+                        <input type="hidden" id="tax_persent" value="{{ isset($listing->tax_persent) ? $listing->tax_persent : 0 }}">
+                        <input type="hidden" id="total_price" name="total_price" value="0">
+
+                        <button type="submit" class="submit-fluid-btn">
+                        {{ get_phrase('Proceed Booking') }}
+                        </button>
+                    </form>
                     </div>
                 </div>
             </div>
@@ -222,9 +332,7 @@
                     $relatedListing = App\Models\SleepListing::where('is_popular', $listing->is_popular)->where('id', '!=', $listing->id)->take(4)->get();
                 @endphp
                 @foreach ($relatedListing->sortByDesc('created_at') as $listings)
-                  @php 
-                     $claimStatus = App\Models\ClaimedListing::where('listing_id', $listings->id)->where('listing_type', 'sleep')->first(); 
-                  @endphp
+                 
                     <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
                         <div class="single-grid-card htd-grid-card">
                             <!-- Banner Slider -->
@@ -237,23 +345,11 @@
                                     <img class="card-item-image" src="{{ get_all_image('listing-images/' . $image) }}">
                                 </a>
                                 <p class="card-light-text theme-light capitalize">{{ $listings->is_popular }}</p>
-                                @php
-                                    $is_in_wishlist = check_wishlist_status($listings->id, $listings->type);
-                                @endphp
-                                <a href="javascript:void(0);" data-bs-toggle="tooltip" data-bs-title="{{ $is_in_wishlist ? get_phrase('Remove from Wishlist') : get_phrase('Add to Wishlist') }}" onclick="PopuralupdateWishlist(this, '{{ $listings->id }}')" class="grid-list-bookmark gray-bookmark {{ $is_in_wishlist ? 'active' : '' }}">
-                                    <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                        <path d="M13.4361 3C12.7326 3.01162 12.0445 3.22023 11.4411 3.60475C10.8378 3.98927 10.3407 4.53609 10 5.18999C9.65929 4.53609 9.16217 3.98927 8.55886 3.60475C7.95554 3.22023 7.26738 3.01162 6.56389 3C5.44243 3.05176 4.38583 3.57288 3.62494 4.44953C2.86404 5.32617 2.4607 6.48707 2.50302 7.67861C2.50302 10.6961 5.49307 13.9917 8.00081 16.2262C8.56072 16.726 9.26864 17 10 17C10.7314 17 11.4393 16.726 11.9992 16.2262C14.5069 13.9917 17.497 10.6961 17.497 7.67861C17.5393 6.48707 17.136 5.32617 16.3751 4.44953C15.6142 3.57288 14.5576 3.05176 13.4361 3Z" fill="#fff" />
-                                    </svg>
-                                </a>
+                               
                             </div>
                             <div class="sleep-grid-details position-relative">
                                 <a href="{{ route('listing.details', ['type' => $type, 'id' => $listings->id, 'slug' => slugify($listing->title)]) }}" class="title"> 
-                                    @if(isset($claimStatus) && $claimStatus->status == 1) 
-                                        <span data-bs-toggle="tooltip" 
-                                        data-bs-title=" {{ get_phrase('This listing is verified') }}">
-                                        <svg fill="none" height="18" viewBox="0 0 24 24" width="18" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"><linearGradient id="paint0_linear_16_1334" gradientUnits="userSpaceOnUse" x1="12" x2="12" y1="-1.2" y2="25.2"><stop offset="0" stop-color="#ce9ffc"/><stop offset=".979167" stop-color="#7367f0"/></linearGradient><path d="m3.783 2.826 8.217-1.826 8.217 1.826c.2221.04936.4207.17297.563.3504.1424.17744.22.39812.22.6256v9.987c-.0001.9877-.244 1.9602-.7101 2.831s-1.14 1.6131-1.9619 2.161l-6.328 4.219-6.328-4.219c-.82173-.5478-1.49554-1.2899-1.96165-2.1605-.46611-.8707-.71011-1.8429-.71035-2.8305v-9.988c.00004-.22748.07764-.44816.21999-.6256.14235-.17743.34095-.30104.56301-.3504zm8.217 10.674 2.939 1.545-.561-3.272 2.377-2.318-3.286-.478-1.469-2.977-1.47 2.977-3.285.478 2.377 2.318-.56 3.272z" fill="url(#paint0_linear_16_1334)"/></svg>
-                                        </span>
-                                    @endif
+                                   
                                     {{ $listings->title }} </a>
                                 <div class="sleepgrid-location-rating d-flex align-items-center justify-content-between flex-wrap">
                                     <div class="location d-flex">
@@ -263,16 +359,6 @@
                                             $country_name = App\Models\Country::where('id', $listings->country)->first()->name;
                                         @endphp
                                         <p class="name"> {{ $city_name . ', ' . $country_name }} </p>
-                                    </div>
-                                    @php
-                                        $reviews_count = App\Models\Review::where('listing_id', $listings->id)->where('user_id', '!=', $listings->user_id)->where('type', 'sleep')->where('reply_id', null)->count();
-                                        $total_ratings = App\Models\Review::where('listing_id', $listings->id)->where('user_id', '!=', $listings->user_id)->where('type', 'sleep')->where('reply_id', null)->sum('rating');
-                                        $average_rating = $reviews_count > 0 ? $total_ratings / $reviews_count : 0;
-                                    @endphp
-                                    <div class="ratings d-flex align-items-center">
-                                        <p class="rating">{{ number_format($average_rating, 1) }}</p>
-                                        <img src="{{ asset('assets/frontend/images/icons/star-yellow-20.svg') }}" alt="">
-                                        <p class="reviews">({{ $reviews_count }})</p>
                                     </div>
                                 </div>
                                 <ul class="sleepgrid-list-items d-flex align-items-center flex-wrap">
@@ -303,125 +389,57 @@
                         </div>
                     </div>
                 @endforeach
-                <!-- Single Card -->
-
             </div>
         </div>
     </section>
-    <!-- End Related Product Area -->
+      @if(count($offers) != 0)
+  <section class="px-4 md:px-10 py-12 bg-gray-50">
+    <div class="flex justify-between items-center mb-8">
+      <div>
+        <h2 class="text-5xl font-black uppercase" style="font-family: 'CHOXR', sans-serif;">Offers </h2>
+        <p class="text-sm text-gray-600 mt-2"> Available at most United Strangerss. </p>
+      </div>      
+    </div>
+    <div class="relative">
+      <div id="offer-slider" class="flex overflow-x-auto scroll-smooth snap-x gap-6 pb-6">
+          @foreach($offers as $offersitem)
+          <a href="{{isset($offersitem['details_url']) ? $offersitem['details_url'] : 'javascript:void(0);' }}" targat="_blank" >
+        <div class="min-w-[280px] max-w-sm bg-white rounded-md snap-start shadow-md">
+          <img src="{{$offersitem['image']}}" alt="Offer 1" class="w-full h-full object-cover rounded-t-md">
+          <div class="p-4">
+            <h3 class="text-lg md:text-xl font-bold mb-1 leading-tight" style="font-family: 'ANTON';">{{$offersitem['title']}}</h3>
+            <p class="text-sm text-gray-700 mb-4">{{ $offersitem['from_date'] }} to {{ $offersitem['to_date'] }}</p>
+            <p class="text-sm text-gray-700 mb-4">
+                <span id="desc-short-{{ $offersitem['id'] }}">
+                    {{ $offersitem['description'] }}
+                </span>
+                <span id="desc-full-{{ $offersitem['id'] }}" style="display: none;">
+                    {{ $offersitem['full_desc'] }}
+                </span>
 
-    
-
+                @if($offersitem['read_more'])
+                    <a href="javascript:void(0);"  id="toggle-{{ $offersitem['id'] }}"  class="text-blue-600 font-semibold" onclick="toggleDesc({{ $offersitem['id'] }})"> Read more </a>
+                @endif
+            </p>
+          </div>
+          </a>
+        </div>
+          @endforeach        
+      </div>
+      <!-- Arrows -->
+      <button data-dir="left" class="slider-btn hidden md:flex items-center justify-center absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border border-gray-400 rounded-full w-12 h-12 shadow-md z-10">
+        &#8592;
+      </button>
+      <button data-dir="right" class="slider-btn hidden md:flex items-center justify-center absolute right-0 top-1/2 transform -translate-y-1/2 bg-white border border-gray-400 rounded-full w-12 h-12 shadow-md z-10">
+        &#8594;
+      </button>
+    </div>
+  </section>
+@endif
+ 
 @endsection
 @push('js')
-    <script>
-        "use strict";
-        $('documnet').ready(function() {
-            flatpickr("#datetime", {
-                enableTime: true,
-                dateFormat: "Y-m-d H:i:S",
-                minDate: "today",
-            });
-        });
-    </script>
-
-
-    <script>
-        "use strict";
-        $(document).ready(function() {
-            $('#shareButton').on('click', function() {
-                var currentPageUrl = window.location.href;
-                $(this).toggleClass('active');
-                navigator.clipboard.writeText(currentPageUrl).then(function() {
-                    success('Successfully copied this link!');
-                }).catch(function(error) {
-                    error('Failed to copy the link!');
-                });
-            });
-        });
-    </script>
-
-    @if (Auth::check())
-        <script>
-            "use strict";
-
-            function updateWishlist(button, listingId) {
-                const bookmarkButton = $(button);
-                const isActive = bookmarkButton.hasClass('active');
-                bookmarkButton.toggleClass('active');
-                const newTooltipText = isActive ? 'Add to Wishlist' : 'Remove from Wishlist';
-                bookmarkButton.attr('data-bs-title', newTooltipText);
-
-                const tooltipInstance = bootstrap.Tooltip.getInstance(button);
-                if (tooltipInstance) tooltipInstance.dispose();
-                new bootstrap.Tooltip(button);
-
-                $.ajax({
-                    url: '{{ route('wishlist.update') }}',
-                    method: 'POST',
-                    data: {
-                        listing_id: listingId,
-                        type: 'sleep',
-                        user_id: {{ auth()->check() ? auth()->id() : 'null' }},
-                        _token: '{{ csrf_token() }}',
-                    },
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            success(response.message);
-                        } else if (response.status === 'error') {
-                            bookmarkButton.toggleClass('active');
-                            const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                            bookmarkButton.attr('data-bs-title', revertTooltipText);
-                            const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                            if (revertTooltipInstance) revertTooltipInstance.dispose();
-                            new bootstrap.Tooltip(button);
-                        }
-                    },
-                    error: function(xhr) {
-                        bookmarkButton.toggleClass('active');
-                        const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                        bookmarkButton.attr('data-bs-title', revertTooltipText);
-                        const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                        if (revertTooltipInstance) revertTooltipInstance.dispose();
-                        new bootstrap.Tooltip(button);
-                    },
-                });
-            }
-        </script>
-    @else
-        <script>
-            "use strict";
-
-            function updateWishlist(listing_id) {
-                warning("Please login first!");
-            }
-        </script>
-    @endif
-
-    <script>
-        "use strict";
-
-        function toggleDescription() {
-            var shortDesc = document.getElementById("short-description");
-            var fullDesc = document.getElementById("full-description");
-            var readMoreBtn = document.getElementById("read-more-btn");
-
-            if (shortDesc.classList.contains("d-block")) {
-                shortDesc.classList.remove("d-block");
-                shortDesc.classList.add("d-none");
-                fullDesc.classList.remove("d-none");
-                fullDesc.classList.add("d-block");
-                readMoreBtn.querySelector("span").textContent = "Read Less";
-            } else {
-                shortDesc.classList.remove("d-none");
-                shortDesc.classList.add("d-block");
-                fullDesc.classList.remove("d-block");
-                fullDesc.classList.add("d-none");
-                readMoreBtn.querySelector("span").textContent = "Read More";
-            }
-        }
-    </script>
-    <script>
+<script>
         "use strict";
         mapboxgl.accessToken = '{{ get_settings('map_access_token') }}';
         const latitude = {{ $listing->Latitude }};
@@ -447,177 +465,221 @@
         const nav = new mapboxgl.NavigationControl();
         map.addControl(nav, 'top-right');
     </script>
-
-    @if (Auth::check())
-        @if (isset(auth()->user()->id) && auth()->user()->id != $listing->user_id)
-            <script>
-                "use strict";
-
-                function followers(user_id) {
-                    $.ajax({
-                        url: "{{ route('followUnfollow') }}",
-                        method: "POST",
-                        data: {
-                            agent_id: user_id,
-                            _token: "{{ csrf_token() }}"
-                        },
-                        success: function(response) {
-                            if (response.status == 1) {
-                                $("#followStatus").html('Unfollow');
-                                success("Follow Successfully!");
-                            } else {
-                                $("#followStatus").html('Follow');
-                                success("Unfollow Successfully!");
-                            }
-                        },
-                        error: function() {
-                            error("An error occurred. Please try again.");
-                        }
-                    });
-                }
-            </script>
-        @else
-            <script>
-                "use strict";
-
-                function followers(user_id) {
-                    warning("You can't follow yourself!");
-                }
-            </script>
-        @endif
-    @else
-        <script>
-            "use strict";
-
-            function followers(listing_id) {
-                warning("Please login first!");
-            }
-        </script>
-    @endif
-
-
-    @if (Auth::check())
-        @if (isset(auth()->user()->id) && auth()->user()->id != $listing->user_id)
-            <script>
-                "use strict";
-
-                function send_message(user_id) {
-                    var message = $('#message').val();
-                    if (message != "") {
-                        $.ajax({
-                            url: '{{ route('customerMessage') }}',
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            data: {
-                                agent_id: user_id,
-                                message: message
-                            },
-                            success: function(response) {
-                                console.log(response);
-                                if (response.status == 'success') {
-                                    success("Message sent successfully");
-                                    $('#message').val('');
-                                } else {
-                                    error("Message send failed");
-                                }
-                            }
-                        });
-                    } else {
-                        warning("Please fill up the field first");
-                    }
-                }
-            </script>
-        @else
-            <script>
-                "use strict";
-
-                function send_message(user_id) {
-                    warning("You can't Message yourself");
-                }
-            </script>
-        @endif
-    @else
-        <script>
-            "use strict";
-
-            function send_message(listing_id) {
-                warning("Please login first!");
-            }
-        </script>
-    @endif
-
-
-
-    @if (Auth::check())
-        <script>
-            "use strict";
-
-            function PopuralupdateWishlist(button, listingId) {
-                const bookmarkButton = $(button);
-                const isActive = bookmarkButton.hasClass('active');
-                bookmarkButton.toggleClass('active');
-                const newTooltipText = isActive ? 'Add to Wishlist' : 'Remove from Wishlist';
-                bookmarkButton.attr('data-bs-title', newTooltipText);
-
-                const tooltipInstance = bootstrap.Tooltip.getInstance(button);
-                if (tooltipInstance) tooltipInstance.dispose();
-                new bootstrap.Tooltip(button);
-
-                $.ajax({
-                    url: '{{ route('wishlist.update') }}',
-                    method: 'POST',
-                    data: {
-                        listing_id: listingId,
-                        type: 'sleep',
-                        user_id: {{ auth()->check() ? auth()->id() : 'null' }},
-                        _token: '{{ csrf_token() }}',
-                    },
-                    success: function(response) {
-                        if (response.status === 'success') {
-                            success(response.message);
-                        } else if (response.status === 'error') {
-                            bookmarkButton.toggleClass('active');
-                            const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                            bookmarkButton.attr('data-bs-title', revertTooltipText);
-                            const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                            if (revertTooltipInstance) revertTooltipInstance.dispose();
-                            new bootstrap.Tooltip(button);
-                        }
-                    },
-                    error: function(xhr) {
-                        bookmarkButton.toggleClass('active');
-                        const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                        bookmarkButton.attr('data-bs-title', revertTooltipText);
-                        const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                        if (revertTooltipInstance) revertTooltipInstance.dispose();
-                        new bootstrap.Tooltip(button);
-                    },
-                });
-            }
-        </script>
-    @else
-        <script>
-            "use strict";
-
-            function PopuralupdateWishlist(listing_id) {
-                warning("Please login first!");
-            }
-        </script>
-    @endif
-
-
     <script>
         "use strict";
-        document.addEventListener('DOMContentLoaded', function() {
-            var latitude = "{{ $listing->Latitude }}";
-            var longitude = "{{ $listing->Longitude }}";
-            var googleMapsUrl = 'https://www.google.com/maps?q=' + latitude + ',' + longitude;
-            var linkElement = document.getElementById('dynamicLocation');
-            linkElement.href = googleMapsUrl;
-            linkElement.target = '_blank';
-        });
+
+        function toggleDescription() {
+            var shortDesc = document.getElementById("short-description");
+            var fullDesc = document.getElementById("full-description");
+            var readMoreBtn = document.getElementById("read-more-btn");
+
+            if (shortDesc.classList.contains("d-block")) {
+                shortDesc.classList.remove("d-block");
+                shortDesc.classList.add("d-none");
+                fullDesc.classList.remove("d-none");
+                fullDesc.classList.add("d-block");
+                readMoreBtn.querySelector("span").textContent = "Read Less";
+            } else {
+                shortDesc.classList.remove("d-none");
+                shortDesc.classList.add("d-block");
+                fullDesc.classList.remove("d-block");
+                fullDesc.classList.add("d-none");
+                readMoreBtn.querySelector("span").textContent = "Read More";
+            }
+        }
     </script>
+
+
+
+<script>
+let selectedRooms = [];
+
+function selectRoom(key, roomId, roomName, price) {
+    @if(auth()->check())
+        let checkbox = document.getElementById('flckDefault' + key);
+        checkbox.checked = !checkbox.checked;
+
+        let checkIcon = document.getElementById('roomCheck' + key);
+
+        if (checkbox.checked) {
+            checkIcon.classList.remove('d-none');
+            addRoom(roomId, roomName, price);
+        } else {
+            checkIcon.classList.add('d-none');
+            removeRoom(roomId);
+        }
+
+        updateSummary();
+    @else
+        window.location.href = "{{ route('login') }}";
+    @endif
+}
+
+function addRoom(roomId, roomName, price) {
+    if (selectedRooms.find(r => r.id == roomId)) return; // avoid duplicate
+    selectedRooms.push({id: roomId, name: roomName, price: parseFloat(price)});
+
+    let container = document.getElementById('selectedRoomsContainer');
+    let input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'room_id[]';
+    input.value = roomId;
+    input.id = 'roomHidden' + roomId;
+    container.appendChild(input);
+}
+
+function removeRoom(roomId) {
+    selectedRooms = selectedRooms.filter(r => r.id != roomId);
+    let input = document.getElementById('roomHidden' + roomId);
+    if (input) input.remove();
+
+    let checkIcon = document.getElementById('roomCheck' + roomId);
+    if (checkIcon) checkIcon.classList.add('d-none');
+    let checkbox = document.getElementById('flckDefault' + roomId);
+    if (checkbox) checkbox.checked = false;
+
+    updateSummary();
+}
+
+function updateSummary() {
+    let summaryBody = document.getElementById('summaryRooms');
+    let summarySubtotal = document.getElementById('summarySubtotal');
+    let summaryTax = document.getElementById('summaryTax');
+    let summaryTotal = document.getElementById('summaryTotal');
+    let total_price = document.getElementById('total_price');
+    let taxInput = document.getElementById('tax_persent');
+    let summaryDiv = document.getElementById('bookingSummary');
+
+    summaryBody.innerHTML = '';
+    let subtotal = 0;
+
+    if (selectedRooms.length === 0) {
+        summaryDiv.classList.add('d-none');
+        summarySubtotal.innerText = "₹0";
+        summaryTax.innerText = "₹0";
+        summaryTotal.innerText = "₹0";
+        if (total_price) total_price.value = 0;
+        return;
+    }
+
+    selectedRooms.forEach((r, index) => {
+        subtotal += r.price;
+        summaryBody.innerHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${r.name}</td>
+                <td class="text-end">₹${r.price.toLocaleString()}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeRoom('${r.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    // Tax calculation
+    let taxPercent = parseFloat(taxInput?.value) || 0;
+    let taxAmount = Math.round((subtotal * taxPercent) / 100);
+    let total = subtotal + taxAmount;
+
+    // Update display
+    summarySubtotal.innerText = "₹" + subtotal.toLocaleString();
+    summaryTax.innerText = "₹" + taxAmount.toLocaleString();
+    document.getElementById("taxPercent").innerText = taxPercent;
+    summaryTotal.innerText = "₹" + total.toLocaleString();
+
+    // Save raw total in hidden input
+    if (total_price) total_price.value = total;
+
+    summaryDiv.classList.remove('d-none');
+}
+
+</script>
+<script>
+  let url_u = "{{ route('getAvailableRooms') }}";
+  const BASE_URL = "{{ url('/public') }}";
+
+$('#filterBtn').on('click', function () {
+    let date       = $('#filter_date').val();
+    let in_time    = formatTo24Hr($('#filter_in_time').val());
+    let out_time   = formatTo24Hr($('#filter_out_time').val());
+    let listing_id = '{{ $listing->id }}';
+
+    $.ajax({
+        url: url_u,
+        type: 'GET',
+        data: { date, in_time, out_time, listing_id },
+        success: function (res) {
+            let rooms = res.rooms ?? [];
+            let roomsHtml = `<div class="row row-28">`;
+
+            rooms.forEach(function (room, key) {
+                let firstImage = (room.image && room.image.length > 0) ? room.image[0] : 'default.jpg';
+
+                let featuresHtml = '';
+                if (room.features && room.features.length > 0) {
+                    featuresHtml = '<div class="d-flex flex-wrap gap-2 mt-2">';
+                    room.features.forEach(function (feature) {
+                        featuresHtml += `
+                            <div class="text-center" style="width: 80px;">
+                                <img src="${BASE_URL}/${feature.image ?? 'image/placeholder.png'}"
+                                    alt="${feature.name ?? 'Feature'}"
+                                    class="rounded mb-1" style="width:30px;height:30px;">
+                                <span class="fs-11px d-block" style="font-size: 9px;">${feature.name ?? ''}</span>
+                            </div>`;
+                    });
+                    featuresHtml += '</div>';
+                }
+
+                roomsHtml += `
+                    <div class="col-sm-12">
+                        <input class="form-check-input d-none" name="room[]" type="checkbox" value="${room.id}" id="flckDefault${key}">
+                        <label class="form-check-label w-100" 
+                            onclick="selectRoom('${key}', '${room.id}', '${room.title}', '${room.price}')"
+                            for="flckDefault${key}">
+
+                            <div class="card mb-3 room-checkbox position-relative">
+                                <div class="room-check position-absolute top-0 end-0 p-2 d-none" id="roomCheck${key}">
+                                    <i class="fas fa-check-circle text-success fs-4"></i>
+                                </div>
+                                <div class="row g-0 h-100">
+                                    <div class="col-md-4">
+                                        <img src="${firstImage}" class="img-fluid rounded-start h-40 w-100 object-fit-cover" alt="Room Image">
+                                    </div>
+                                    <div class="col-md-8 room-body">
+                                        <div class="card-body py-2 px-3 h-100 position-relative d-flex flex-column">
+                                            <div class="d-flex align-items-center mb-1 flex-wrap">
+                                                <p class="card-title mb-0 mr-3 fw-bold line-1">${room.title ?? 'Untitled Room'}</p>
+                                                <p class="mb-0 text-success fw-bold">${room.price ?? 0}</p>
+                                            </div>
+                                            <div class="d-flex gap-2 fs-12px text-muted mb-1">
+                                                <span><i class="fas fa-user"></i> ${room.person ?? 0} Persons</span>
+                                                <span>|</span>
+                                                <span><i class="fas fa-baby"></i> ${room.child ?? 0} Child</span>
+                                            </div>
+                                            ${room.room_type ? `<p class="mb-1 fs-12px"><strong>Room Type:</strong> ${room.room_type}</p>` : ''}
+                                            ${featuresHtml}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>`;
+            });
+            roomsHtml += `</div>`;
+            $('#filter_rooms').html(roomsHtml).show();
+            $('.filter_rooms_row').hide();
+        }
+    });
+});
+
+function formatTo24Hr(timeStr) {
+    if (!timeStr) return null;
+    let parts = timeStr.split(':');
+    return parts[0].padStart(2, '0') + ':' + parts[1].padStart(2, '0') + ':00';
+}
+</script>
 
 
 @endpush

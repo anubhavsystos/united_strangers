@@ -114,12 +114,19 @@
                 <div class="restdetails-menu-wrap mb-50px">
                     <h2 class="in-title3-24px mb-20">{{get_phrase('Menu')}}</h2>
                     <div class="restdetails-menu-items">
-                        <!-- Menu Item -->
-                        @php 
-                            $menus = App\Models\Menu::where('listing_id',$listing->id)->get(); 
+                        
+                        @foreach (($menus ?? []) as $key => $menu)
+                        @php
+                            if(!empty($menu->dis_price)) {
+                                $menu_price = $menu->dis_price;
+                            } else {
+                                $menu_price = $menu->price;
+                            }
                         @endphp
-                        @foreach($menus as $menu)
-                        <div class="restdetails-menu-item d-flex">
+                        <input class="form-check-input d-none" name="room[]"  type="checkbox"  value="{{ $room['id'] ?? '' }}" id="flckDefault{{ $key }}"
+                        @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+                        <div class="restdetails-menu-item d-flex" onclick="selectRoom('{{ $key }}', '{{ $menu['id'] ?? '' }}', '{{ $menu['title'] ?? 'Untitled Room' }}', '{{ $menu_price ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
                             <div class="img">
                                 <img src="{{get_all_image('menu/'.$menu->image)}}" alt="">
                             </div>
@@ -158,90 +165,122 @@
                     @endif
                 </div>
                 
-          
+           <div class="hoteldetails-location-area mb-50px">
+                        <h2 class="in-title3-24px mb-20px">{{ get_phrase('Location') }}</h2>
+                        <div class="hoteldetails-location-header d-flex align-items-end justify-content-between flex-wrap">
+                            <div class="hoteldetails-location-name">
+                                @php
+                                    $city_name = App\Models\City::where('id', $listing->city)->first()->name;
+                                    $country_name = App\Models\Country::where('id', $listing->country)->first()->name;
+                                @endphp
+                                <h4 class="name">{{ $country_name }}</h4>
+                                <p class="location d-flex align-items-center">
+                                    <img src="{{ asset('assets/frontend/images/icons/location-blue2-20.svg') }}" alt="">
+                                    <span>{{ $listing->address }}, {{ $city_name }}</span>
+                                </p>
+                            </div>
+                            <a href="javascript:;" class="white-btn1" id="dynamicLocation">{{ get_phrase('Get Direction') }}</a>
+                        </div>
+                        <div class="hoteldetails-location-map mb-16">
+                            <div id="map" class="h-297"></div>
+                        </div>
+                    </div>
             </div>
             <!-- Right Sidebar -->
-            <div class="col-xl-4 col-lg-5">
-                <div class="restdetails-sidebar eRestaurent mb-16">
-                    <h1 class="title mb-16">{{get_phrase('Book a table')}}</h1>
-                    @if (addon_status('form_builder') == 1 && get_settings('form_builder') == 1)
-                       @include('frontend.form_builder.form')  
-                    @else
+             <div class="col-xl-4 col-lg-5">
+                    <div class="sleepdetails-form-area mb-30px">
+                    <h4 class="sub-title ">{{ get_phrase('Booking') }}</h4>
+                    
                     <form action="{{ route('customerBookAppointment') }}" method="post">
                         @csrf
-                        <input type="hidden" name="type" value="person">
                         <input type="hidden" name="listing_type" value="play">
                         <input type="hidden" name="listing_id" value="{{ $listing->id }}">
-                        <input type="hidden" name="agent_id" value="{{ $listing->user_id }}">
-                        <input type="hidden" id="adults-input" name="adults" value="0">
-                        <input type="hidden" id="children-input" name="children" value="0">
-                    
+                        <input type="hidden" name="customer_id" value="{{ $listing->id }}">
+                        <input type="hidden" name="menu_summary" id="menu_summary">
+                        <div id="selectedRoomsContainer"></div>
                         <div class="sleepdetails-form-inputs mb-16">
-                            <input type="text" name="date"  placeholder="{{get_phrase('Select date')}}" class="form-control mform-control flat-input-picker3 input-calendar-icon no-calendar-icon" id="datetime" required />
-                            <input type="text" class="form-control mform-control mb-14" name="name" placeholder="Name" required>
-                            <input type="number" class="form-control mform-control mb-14" name="phone" placeholder="Phone" required>
-                            <input type="email" class="form-control mform-control mb-14" name="email" placeholder="Email" required>
-                            <div class="guest-selection">
-                                <div class="dropdown">
-                                    <button class="dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        {{get_phrase('Guests')}} <span id="guest-count">0</span>
-                                    </button>
-                                    <ul class="dropdown-menu p-3">
-                                        <li class="d-flex justify-content-between align-items-center">
-                                            <span>{{get_phrase('Adults')}}</span>
-                                            <div class="d-flex align-items-center">
-                                                <button type="button" class="gstBtn" onclick="updateCount('adults', -1, event)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <rect x="4" y="9" width="12" height="2" rx="1" fill="#7E7E89"/>
-                                                    </svg>
-                                                    </button>
-                                                <span id="adults-count" class="mx-2">{{get_phrase('0')}}</span>
-                                                <button type="button" class="gstBtn plusBtn" onclick="updateCount('adults', 1, event)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M9.16602 10.8307H4.99935C4.76324 10.8307 4.56532 10.7509 4.4056 10.5911C4.24588 10.4314 4.16602 10.2335 4.16602 9.9974C4.16602 9.76128 4.24588 9.56337 4.4056 9.40365C4.56532 9.24392 4.76324 9.16406 4.99935 9.16406H9.16602V4.9974C9.16602 4.76128 9.24588 4.56337 9.4056 4.40365C9.56532 4.24392 9.76324 4.16406 9.99935 4.16406C10.2355 4.16406 10.4334 4.24392 10.5931 4.40365C10.7528 4.56337 10.8327 4.76128 10.8327 4.9974V9.16406H14.9993C15.2355 9.16406 15.4334 9.24392 15.5931 9.40365C15.7528 9.56337 15.8327 9.76128 15.8327 9.9974C15.8327 10.2335 15.7528 10.4314 15.5931 10.5911C15.4334 10.7509 15.2355 10.8307 14.9993 10.8307H10.8327V14.9974C10.8327 15.2335 10.7528 15.4314 10.5931 15.5911C10.4334 15.7509 10.2355 15.8307 9.99935 15.8307C9.76324 15.8307 9.56532 15.7509 9.4056 15.5911C9.24588 15.4314 9.16602 15.2335 9.16602 14.9974V10.8307Z" fill="#7E7E89"/>
-                                                    </svg>
-                                                    </button>
-                                            </div>
-                                        </li>
-                                        <li class="d-flex justify-content-between align-items-center mt-2">
-                                            <span>{{get_phrase('Children')}}</span>
-                                            <div class="d-flex align-items-center">
-                                                <button type="button" class="gstBtn" onclick="updateCount('children', -1, event)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <rect x="4" y="9" width="12" height="2" rx="1" fill="#7E7E89"/>
-                                                    </svg>
-                                                    </button>
-                                                <span id="children-count" class="mx-2">{{get_phrase('0')}}</span>
-                                                <button type="button" class="gstBtn plusBtn" onclick="updateCount('children', 1, event)"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M9.16602 10.8307H4.99935C4.76324 10.8307 4.56532 10.7509 4.4056 10.5911C4.24588 10.4314 4.16602 10.2335 4.16602 9.9974C4.16602 9.76128 4.24588 9.56337 4.4056 9.40365C4.56532 9.24392 4.76324 9.16406 4.99935 9.16406H9.16602V4.9974C9.16602 4.76128 9.24588 4.56337 9.4056 4.40365C9.56532 4.24392 9.76324 4.16406 9.99935 4.16406C10.2355 4.16406 10.4334 4.24392 10.5931 4.40365C10.7528 4.56337 10.8327 4.76128 10.8327 4.9974V9.16406H14.9993C15.2355 9.16406 15.4334 9.24392 15.5931 9.40365C15.7528 9.56337 15.8327 9.76128 15.8327 9.9974C15.8327 10.2335 15.7528 10.4314 15.5931 10.5911C15.4334 10.7509 15.2355 10.8307 14.9993 10.8307H10.8327V14.9974C10.8327 15.2335 10.7528 15.4314 10.5931 15.5911C10.4334 15.7509 10.2355 15.8307 9.99935 15.8307C9.76324 15.8307 9.56532 15.7509 9.4056 15.5911C9.24588 15.4314 9.16602 15.2335 9.16602 14.9974V10.8307Z" fill="#7E7E89"/>
-                                                    </svg></button>
-                                            </div>
-                                        </li>
-                                    </ul>
-                                </div>
+                        <div class="mb-3">
+                            <label class="form-label">Appointment Date</label>
+                            <input type="date" class="appointmentDate form-control mform-control flat-input-picker3 " name="date">
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col">
+                                <label class="form-label"> Adults</label>
+                                <input type="number" class="form-control" name="adults" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">   Child</label>
+                                <input type="number" class="form-control" name="child" >
                             </div>
                         </div>
-                        <button type="submit" class="submit-fluid-btn">{{get_phrase('Book A Table')}}</button>
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="message" id="message" cols="30" rows="3" placeholder="{{ get_phrase('Write your description') }}" class="form-control"></textarea>                        
+                        </div>
+                        <input type="hidden" id="tax_persent" value="{{ isset($listing->tax_persent) ? $listing->tax_persent : 0 }}">
+                        <input type="hidden" id="total_price" name="total_price" value="0">
+                        <div id="bookingSummary" class="card d-none mb-4 mt-3">
+                            <div class="card-header fw-bold">{{ get_phrase('Booking Summary') }}</div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ get_phrase('Item') }}</th>
+                                            <th class="text-end">{{ get_phrase('Rate') }}</th>
+                                            <th class="text-center">{{ get_phrase('Qty') }}</th>
+                                            <th class="text-end">{{ get_phrase('Subtotal') }}</th>
+                                            <th class="text-center">{{ get_phrase('Action') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="summaryRooms"></tbody>
+                                   <tfoot>
+                                        <tr>
+                                            <th colspan="4" class="text-end">{{ get_phrase('Subtotal') }}</th>
+                                            <th class="text-end" id="summarySubtotal">₹0</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="4" class="text-end">{{ get_phrase('Tax') }} (<span id="summaryTaxPercent">0</span>%)</th>
+                                            <th class="text-end" id="summaryTax">₹0</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="4" class="text-end">{{ get_phrase('Grand Total') }}</th>
+                                            <th class="text-end" id="summaryGrandTotal">₹0</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+
+                                </table>
+                            </div>
+                        </div>
+
+                        <button type="submit" class="submit-fluid-btn">
+                        {{ get_phrase('Proceed Booking') }}
+                        </button>
                     </form>
-                    @endif
-                    
+                    </div>
                 </div>
-            </div>
         </div>
     </div>
 </section>
 <!-- End Main Content Area -->
-
+ @php 
+$relatedListing = App\Models\PlayListing::where('is_popular', $listing->is_popular)->where('id', '!=', $listing->id)->take(4)->get();
+@endphp
  <!-- Start Related Product Area -->
+  @if(count($relatedListing) != 0)
  <section>
     <div class="container">
         <div class="row">
             <div class="col-md-12">
-                <h1 class="related-product-title mb-20">{{get_phrase('Related sleeps')}}</h1>
+                <h1 class="related-product-title mb-20">{{get_phrase('Related Play')}}</h1>
             </div>
         </div>
         <div class="row row-28 mb-80">
             <!-- Single Card -->
-            @php 
-            $relatedListing = App\Models\PlayListing::where('is_popular', $listing->is_popular)->where('id', '!=', $listing->id)->take(4)->get();
-            @endphp
+           
             @foreach ($relatedListing->sortByDesc('created_at') as $listing)
             <!-- Single Card -->
             <div class="col-xl-3 col-lg-4 col-md-6 col-sm-6">
@@ -311,6 +350,7 @@
         </div>
     </div>
 </section>
+@endif
 <!-- End Related Product Area -->
 
 
@@ -357,58 +397,58 @@
 </script>
 @if (Auth::check())
 <script>
-"use strict";
- function updateWishlist(button, listingId) {
-    const bookmarkButton = $(button);
-    const isActive = bookmarkButton.hasClass('active');
-    bookmarkButton.toggleClass('active'); 
-    const newTooltipText = isActive ? 'Add to Wishlist' : 'Remove from Wishlist';
-    bookmarkButton.attr('data-bs-title', newTooltipText);
+        "use strict";
+        function updateWishlist(button, listingId) {
+            const bookmarkButton = $(button);
+            const isActive = bookmarkButton.hasClass('active');
+            bookmarkButton.toggleClass('active'); 
+            const newTooltipText = isActive ? 'Add to Wishlist' : 'Remove from Wishlist';
+            bookmarkButton.attr('data-bs-title', newTooltipText);
 
-    const tooltipInstance = bootstrap.Tooltip.getInstance(button);
-    if (tooltipInstance) tooltipInstance.dispose(); 
-    new bootstrap.Tooltip(button); 
+            const tooltipInstance = bootstrap.Tooltip.getInstance(button);
+            if (tooltipInstance) tooltipInstance.dispose(); 
+            new bootstrap.Tooltip(button); 
 
-    $.ajax({
-        url: '{{ route("wishlist.update") }}', 
-        method: 'POST', 
-        data: {
-            listing_id: listingId,
-            type: 'play', 
-            user_id: {{ auth()->check() ? auth()->id() : 'null' }}, 
-            _token: '{{ csrf_token() }}',
-        },
-        success: function (response) {
-            if (response.status === 'success') {
-                success(response.message);
-            } 
-            else if (response.status === 'error') {
-                bookmarkButton.toggleClass('active');
-                const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                bookmarkButton.attr('data-bs-title', revertTooltipText);
-                const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                if (revertTooltipInstance) revertTooltipInstance.dispose();
-                new bootstrap.Tooltip(button);
-            }
-        },
-        error: function (xhr) {
-            bookmarkButton.toggleClass('active');
-            const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-            bookmarkButton.attr('data-bs-title', revertTooltipText);
-            const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-            if (revertTooltipInstance) revertTooltipInstance.dispose();
-            new bootstrap.Tooltip(button);
-        },
-    });
-}
-        </script>
-        @else
-        <script>
-            "use strict";
-            function updateWishlist(listing_id) {
-                warning("Please login first!");
-            }
-        </script>
+            $.ajax({
+                url: '{{ route("wishlist.update") }}', 
+                method: 'POST', 
+                data: {
+                    listing_id: listingId,
+                    type: 'play', 
+                    user_id: {{ auth()->check() ? auth()->id() : 'null' }}, 
+                    _token: '{{ csrf_token() }}',
+                },
+                success: function (response) {
+                    if (response.status === 'success') {
+                        success(response.message);
+                    } 
+                    else if (response.status === 'error') {
+                        bookmarkButton.toggleClass('active');
+                        const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
+                        bookmarkButton.attr('data-bs-title', revertTooltipText);
+                        const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
+                        if (revertTooltipInstance) revertTooltipInstance.dispose();
+                        new bootstrap.Tooltip(button);
+                    }
+                },
+                error: function (xhr) {
+                    bookmarkButton.toggleClass('active');
+                    const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
+                    bookmarkButton.attr('data-bs-title', revertTooltipText);
+                    const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
+                    if (revertTooltipInstance) revertTooltipInstance.dispose();
+                    new bootstrap.Tooltip(button);
+                },
+            });
+        }
+</script>
+@else
+<script>
+    "use strict";
+    function updateWishlist(listing_id) {
+        warning("Please login first!");
+    }
+</script>
 @endif
 
 <script>
@@ -508,99 +548,104 @@
         linkElement.target = '_blank'; 
     });
 </script>
-
-@if (Auth::check())  
-@if(isset(auth()->user()->id) && (auth()->user()->id != $listing->user_id)) 
 <script>
-    "use strict";
-    function followers(user_id) {
-        $.ajax({
-            url: "{{ route('followUnfollow') }}",
-            method: "POST",
-            data: {
-                agent_id: user_id,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function (response) {
-                if (response.status == 1) {
-                    $("#followStatus").html('Unfollow');
-                    success("Follow Successfully!");
-                } else {
-                    $("#followStatus").html('Follow');
-                    success("Unfollow Successfully!");
-                }
-            },
-            error: function () {
-                error("An error occurred. Please try again.");
-            }
-        });
+let selectedMenus = [];
+
+function selectRoom(key, id, name, price) {
+    // check if already exists
+    let existing = selectedMenus.find(r => r.id == id);
+    if (!existing) {
+        selectedMenus.push({ id, name, price: parseFloat(price), qty: 1 });
     }
-</script>
-@else
-<script>
-     "use strict";
-    function followers(user_id) {
-        warning("You can't follow yourself");
-    }
-</script>
-@endif
-@else
-<script>
-   "use strict";
-   function followers(listing_id) {
-       warning("Please login first!");
-   }
-</script>
-@endif
+    updateSummary();
+}
 
-
-@if (Auth::check())  
-@if(isset(auth()->user()->id) && (auth()->user()->id != $listing->user_id)) 
-<script>
-     "use strict";
-  function send_message(user_id) {
-    var message = $('#message').val();
-    if (message != "") {
-        $.ajax({
-            url: '{{ route('customerMessage') }}',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: { 
-                agent_id: user_id,
-                message: message
-            },
-            success: function(response) {
-                console.log(response);
-                if (response.status == 'success') {
-                    success("Message sent successfully");
-                    $('#message').val('');
-                } else {
-                    error("Message send failed");
-                }
-            }
-        });
-    } else {
-        warning("Please fill up the field first");
+function changeQty(id, change) {
+    let item = selectedMenus.find(r => r.id == id);
+    if (item) {
+        item.qty = Math.max(1, item.qty + change); // qty not less than 1
+        updateSummary();
     }
 }
-</script>
-@else
-<script>
-     "use strict";
-    function send_message(user_id) {
-        warning("You can't Message yourself");
-    }
-</script>
-@endif
-@else
-<script>
-   "use strict";
-   function send_message(listing_id) {
-       warning("Please login first!");
-   }
-</script>
-@endif
 
+function removeRoom(id) {
+    selectedMenus = selectedMenus.filter(r => r.id != id);
+    updateSummary();
+}
+
+function updateSummary() {
+    let summaryBody = document.getElementById('summaryRooms');
+    let subtotalEl = document.getElementById('summarySubtotal');
+    let taxPercentEl = document.getElementById('summaryTaxPercent');
+    let taxEl = document.getElementById('summaryTax');
+    let grandTotalEl = document.getElementById('summaryGrandTotal');
+    let total_price = document.getElementById('total_price');
+    let menu_summary = document.getElementById('menu_summary');
+    let summaryDiv = document.getElementById('bookingSummary');
+    let taxPersent = parseFloat(document.getElementById('tax_persent')?.value) || 0;
+
+    summaryBody.innerHTML = '';
+    let subtotal = 0;
+    let summary = [];
+
+    if (selectedMenus.length === 0) {
+        summaryDiv.classList.add('d-none');
+        subtotalEl.innerText = "₹0";
+        taxPercentEl.innerText = taxPersent;
+        taxEl.innerText = "₹0";
+        grandTotalEl.innerText = "₹0";
+        if (total_price) total_price.value = 0;
+        if (menu_summary) menu_summary.value = "";
+        return;
+    }
+
+    // loop items
+    selectedMenus.forEach((r, index) => {
+        let itemSubtotal = r.price * r.qty;
+        subtotal += itemSubtotal;
+
+        summary.push(r.qty + " " + r.name);
+
+        summaryBody.innerHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${r.name}</td>
+                <td class="text-end">₹${r.price.toLocaleString()}</td>
+                <td class="text-center">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <button type="button" class="btn btn-sm btn-outline-secondary me-1" onclick="changeQty('${r.id}', -1)">-</button>
+                        <span>${r.qty}</span>
+                        <button type="button" class="btn btn-sm btn-outline-secondary ms-1" onclick="changeQty('${r.id}', 1)">+</button>
+                    </div>
+                </td>
+                <td class="text-end">₹${itemSubtotal.toLocaleString()}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeRoom('${r.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    // calculate tax + grand total
+    let taxAmount = (subtotal * taxPersent) / 100;
+    let grandTotal = subtotal + taxAmount;
+
+    // update summary table
+    subtotalEl.innerText = "₹" + subtotal.toLocaleString();
+    taxPercentEl.innerText = taxPersent;
+    taxEl.innerText = "₹" + taxAmount.toLocaleString();
+    grandTotalEl.innerText = "₹" + grandTotal.toLocaleString();
+
+    // update hidden inputs
+    if (total_price) total_price.value = grandTotal;
+    if (menu_summary) menu_summary.value = summary.join(", ");
+
+    summaryDiv.classList.remove('d-none');
+}
+
+
+</script>
 
 @endpush

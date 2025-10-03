@@ -91,7 +91,9 @@
                         <select name="category" id="category" class="form-control ol-form-control ol-select2" data-select2-id="select2-data-1-2ry6" tabindex="-1" aria-hidden="true">
                             <option value=""> {{get_phrase('Select listing category')}} </option>
                             @foreach ($categories as $category)
+                                @if($category->type == 'sleep')
                                 <option value="{{$category->id}}" {{$category->id == $listing->category?'selected':''}}> {{$category->name}} </option>
+                                @endif
                             @endforeach
                         </select>
                     </div>
@@ -144,11 +146,11 @@
                         </div>
                         <div class="col-sm-6">
                             <div class="mb-3">
-                                <label for="accommodation_type" class="form-label ol-form-label"> {{get_phrase('Accommodation Type')}} *</label>
+                                <label for="accommodation_type" class="form-label ol-form-label"> {{get_phrase('Accommodation Type')}} * </label>
                                 <select name="accommodation_type" id="accommodation_type" class="form-control ol-form-control ol-select2" required data-minimum-results-for-search="Infinity">
                                     <option value=""> {{get_phrase('Select Type')}} </option>
                                     <option value="hostels" {{$listing->accommodation_type == 'hostels'?'selected':''}}> {{get_phrase('Hostels')}} </option>
-                                    <option value="co‑living" {{$listing->accommodation_type == 'top'?'selected':''}}> {{get_phrase('Co‑Living')}} </option>
+                                    <option value="co‑living" {{$listing->accommodation_type == 'co‑living'?'selected':''}}> {{get_phrase('Co‑Living')}} </option>
                                     <option value="full-apartments" {{$listing->accommodation_type == 'full-apartments'?'selected':''}}> {{get_phrase('Full Apartments')}} </option>                                    
                                 </select>
                             </div>
@@ -167,6 +169,14 @@
                             <div class="mb-3">
                                 <label for="dimension" class="form-label ol-form-label"> {{get_phrase('Dimension')}} *</label>
                                 <input type="text" name="dimension" id="dimension" class="form-control ol-form-control" value="{{$listing->dimension}}" placeholder="{{get_phrase('Enter property dimension')}}" >
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="tax_persent" class="form-label ol-form-label">
+                                    {{ get_phrase('Tax in Percent') }} *
+                                </label>
+                                <input type="number" name="tax_persent" id="tax_persent" class="form-control ol-form-control" value="{{$listing->tax_persent}}" placeholder="{{ get_phrase('Enter tax percent') }}" min="1" max="99" step="1"required>
                             </div>
                         </div>
                         
@@ -394,13 +404,12 @@
                                                 </tr>
                                             </thead>
                                         <tbody>
-                                            @php $num = 1 @endphp
                                             @foreach ($appointments as $key => $appointment)    
                                                 <tr class="ca-tr">
                                                     <td ><p class="ca-subtitle-14px ca-text-dark mb-2"> {{++$key}}.</p></td>  
                                                     <td class="min-w-140px">                                                                        
-                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}</p>
-                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{isset($appointment['name']) ? "For :" . $appointment['name'] : ''}}</p>
+                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-2"> {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}</p>
+                                                        <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{!empty($appointment['name']) ? "For :" . $appointment['name'] : ''}}</p>
                                                     </td>
                                                     <td class="min-w-140px">
                                                         <div class="align-items-center gap-2"><p class="badge-dark">{{isset($appointment['customer_phone']) ? $appointment['customer_phone'] : ''}} </p>
@@ -702,10 +711,7 @@ document.getElementById('listing-floor-plan').addEventListener('change', functio
 
     $("#form-action-btn").on('click', function() {
         event.preventDefault(); 
-        var listing_category = $("#category").val();
-        if(!listing_category){
-            warning('Listing category is required');
-        }
+       
         var listing_title = $("#title").val();
         if(!listing_title){
             warning('Listing title is required');
@@ -767,9 +773,7 @@ document.getElementById('listing-floor-plan').addEventListener('change', functio
         if(!listing_dimension){
             warning('Listing dimension is required');
         }
-        if(listing_year && listing_garage && listing_size && listing_bath && listing_bed && listing_price && listing_title && listing_category && listing_country && listing_city && listing_address && listing_post_code && listing_latitude && listing_longitude && listing_visibility && listing_dimension){
-            $("#form-action").trigger('submit');
-        }
+       
 
     })
 </script>

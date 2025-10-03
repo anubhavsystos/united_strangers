@@ -37,6 +37,7 @@ class Room extends Model
             'person'   => $this->person ?? 0,
             'child'    => $this->child ?? 0,
             'price'    => $this->price ?? 0,
+            'room_type'    => $this->room_type ?? 0,
             'image'    => $imageUrls, 
             'features' => $this->features ? $this->features->map(function ($feature) {
                 return [

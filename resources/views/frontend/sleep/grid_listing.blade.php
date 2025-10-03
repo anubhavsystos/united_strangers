@@ -27,7 +27,7 @@
                                 <div class="row row-28">
                                     @foreach ($listings as $listing)
                                         <!-- Single Card -->
-                                        <div class="col-sm-6 map-card">
+                                        <div class="col-sm-4 map-card">
                                             <div class="single-grid-card">
                                                 <div class="grid-slider-area">                                                   
                                                     <a class="w-100 h-100" href="{{route('listing.details',['type'=>$type, 'id'=>$listing['id'], 'slug'=>slugify($listing['title'])])}}"><img class="card-item-image" src="{{ $listing['image_url'] }}"></a>

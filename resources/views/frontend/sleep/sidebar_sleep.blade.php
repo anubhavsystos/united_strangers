@@ -11,7 +11,7 @@ $numbers = ['1', '2', '3', '4', '5','6','7','8'];
 @endphp
 
 <form class="sidebar-accordion-area" id="filter-form" action="{{ route('ListingsFilter') }}" method="get">
-    <div class="sidebar-title mb-24 d-flex align-items-center justify-content-between flex-wrap">
+    <div class="sidebar-title mb-2 d-flex align-items-center justify-content-between flex-wrap">
         <h3 class="title">{{get_phrase('Filters')}}</h3>
         <a href="javascript:;" onclick="resetForm(event)" class="clear d-none">{{get_phrase('Clear')}}</a>
     </div>

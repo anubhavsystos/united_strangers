@@ -47,7 +47,8 @@
           <path d="M8 5v14l11-7z" />
         </svg>
       </button>
-    </section>     
+    </section>   
+  @if(count($sleeplistings) != 0)  
     <section class="px-4 md:px-10 py-12 bg-gray-50">
       <div class="flex justify-between items-center mb-8">
         <div>
@@ -56,8 +57,6 @@
         </div>
         <a href="{{ route('listing.view', ['type' => 'sleep', 'view' => 'grid']) }}" class="text-sm underline flex items-center gap-1"> See All <span> → </span> </a>
       </div>
-
-      <!-- Slider Container -->
       <div class="relative">
         <div id="sleep-slider" class="flex overflow-x-auto scroll-smooth snap-x gap-6 pb-6">
           @foreach($sleeplistings as $item)
@@ -117,7 +116,8 @@
           &#8594; </button>
       </div>
     </section>
-
+  @endif
+  @if(count($worklistings) != 0)
     <section class="px-4 md:px-10 py-12 bg-gray-50">
       <div class="flex justify-between items-center mb-8">
         <div>
@@ -215,7 +215,9 @@
         </button>
       </div>
     </section>
+  @endif
 
+  @if(count($playlistings) != 0)
     <section class="px-4 md:px-10 py-12 bg-gray-50">
       <div class="flex justify-between items-center mb-8">
         <div>
@@ -268,7 +270,7 @@
         </button>
       </div>
     </section> 
-
+  @endif
 
 @if(count($offers) != 0)
   <section class="px-4 md:px-10 py-12 bg-gray-50">
@@ -313,7 +315,7 @@
       </button>
     </div>
   </section>
-  @endif
+@endif
 
 @if(count($events) != 0)
     <section class="bg-[#222] text-white px-4 md:px-12 py-12">
@@ -353,28 +355,29 @@
       </div>
     </section>
 @endif
+
 @if(!empty($blogs))
-    <section class="px-4 md:px-10 py-12 bg-gray-50">
-      <div class="flex justify-between items-center mb-8">
-        <div> <h2 class="text-5xl font-black uppercase" style="font-family: 'CHOXR', sans-serif;"> Blog</h2></div>        
+  <section class="px-4 md:px-10 py-12 bg-gray-50">
+    <div class="flex justify-between items-center mb-8">
+      <div> <h2 class="text-5xl font-black uppercase" style="font-family: 'CHOXR', sans-serif;"> Blog</h2></div>        
+    </div>
+    <div class="relative">
+      <div id="blog-slider" class="flex overflow-x-auto scroll-smooth snap-x gap-6 pb-6">
+        @foreach($blogs as $blogsitem)
+        <a href="{{isset($blogsitem['details_url']) ? $blogsitem['details_url'] : 'javascript:void(0);' }}" targat="_blank" >
+          <div class="min-w-[300px] max-w-sm flex-shrink-0 snap-center">
+            <img src="{{$blogsitem['image']}}" alt="Card 4" class="w-full h-64 object-cover rounded">
+            <p class="text-xs mt-2 text-gray-500">{{$blogsitem['date']}}</p>
+            <h3 class="text-lg font-extrabold mt-1">{{$blogsitem['title']}}</h3>
+            <p class="text-sm mt-1 text-gray-700"> {!!$blogsitem['description']!!}</p>
+          </div>
+        </a>
+        @endforeach 
       </div>
-      <div class="relative">
-        <div id="blog-slider" class="flex overflow-x-auto scroll-smooth snap-x gap-6 pb-6">
-          @foreach($blogs as $blogsitem)
-          <a href="{{isset($blogsitem['details_url']) ? $blogsitem['details_url'] : 'javascript:void(0);' }}" targat="_blank" >
-            <div class="min-w-[300px] max-w-sm flex-shrink-0 snap-center">
-              <img src="{{$blogsitem['image']}}" alt="Card 4" class="w-full h-64 object-cover rounded">
-              <p class="text-xs mt-2 text-gray-500">{{$blogsitem['date']}}</p>
-              <h3 class="text-lg font-extrabold mt-1">{{$blogsitem['title']}}</h3>
-              <p class="text-sm mt-1 text-gray-700"> {!!$blogsitem['description']!!}</p>
-            </div>
-          </a>
-          @endforeach 
-        </div>
-        <button data-dir="left" class="slider-btn hidden md:flex items-center justify-center absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border border-gray-400 rounded-full w-12 h-12 shadow-md z-10"> &#8592;</button>
-        <button data-dir="right" class="slider-btn hidden md:flex items-center justify-center absolute right-0 top-1/2 transform -translate-y-1/2 bg-white border border-gray-400 rounded-full w-12 h-12 shadow-md z-10">&#8594;</button>
-      </div>
-    </section>
+      <button data-dir="left" class="slider-btn hidden md:flex items-center justify-center absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border border-gray-400 rounded-full w-12 h-12 shadow-md z-10"> &#8592;</button>
+      <button data-dir="right" class="slider-btn hidden md:flex items-center justify-center absolute right-0 top-1/2 transform -translate-y-1/2 bg-white border border-gray-400 rounded-full w-12 h-12 shadow-md z-10">&#8594;</button>
+    </div>
+  </section>
 @endif  
 
 <script>

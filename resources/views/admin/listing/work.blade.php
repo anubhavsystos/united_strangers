@@ -103,6 +103,14 @@
                         <input type="text" name="sub_dimension" id="sub_dimension" class="form-control ol-form-control" placeholder="{{get_phrase('Enter property sub dimension')}}" >
                     </div>
                 </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="tax_persent" class="form-label ol-form-label">
+                            {{ get_phrase('Tax in Percent') }} *
+                        </label>
+                        <input type="number" name="tax_persent" id="tax_persent" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter tax percent') }}" min="1" max="99" step="1"required>
+                    </div>
+                </div>
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label for="year" class="form-label ol-form-label"> {{get_phrase('Description')}} </label>
@@ -305,4 +313,11 @@
         }
 
     })
+</script>
+<script>
+    document.getElementById('tax_persent').addEventListener('input', function () {
+        let val = parseInt(this.value) || '';
+        if (val < 1) this.value = 1;
+        if (val > 99) this.value = 99;
+    });
 </script>

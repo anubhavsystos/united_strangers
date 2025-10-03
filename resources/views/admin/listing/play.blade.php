@@ -42,7 +42,7 @@
                         <input type="number" name="tables" id="tables" class="form-control ol-form-control" placeholder="{{get_phrase('Enter Number of Table')}}" >
                     </div>
                 </div>            
-                <div class="col-sm-12">
+                <div class="col-sm-6">
                     <div class="mb-3">
                         <label for="is_popular" class="form-label ol-form-label"> {{get_phrase('Type')}} *</label>
                         <select name="is_popular" id="is_popular"  required class="form-control ol-form-control ol-select22 ol-select2" required data-minimum-results-for-search="Infinity">
@@ -50,6 +50,14 @@
                             <option value="featured"> {{get_phrase('Featured')}} </option>
                             <option value="trending"> {{get_phrase('Trending')}} </option>  
                         </select>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="tax_persent" class="form-label ol-form-label">
+                            {{ get_phrase('Tax in Percent') }} *
+                        </label>
+                        <input type="number" name="tax_persent" id="tax_persent" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter tax percent') }}" min="1" max="99" step="1"required>
                     </div>
                 </div>
                 <div class="col-sm-12">
@@ -224,4 +232,11 @@
         }
 
     })
+</script>
+<script>
+    document.getElementById('tax_persent').addEventListener('input', function () {
+        let val = parseInt(this.value) || '';
+        if (val < 1) this.value = 1;
+        if (val > 99) this.value = 99;
+    });
 </script>

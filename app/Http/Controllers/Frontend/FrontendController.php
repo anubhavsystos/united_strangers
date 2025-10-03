@@ -59,6 +59,7 @@ class FrontendController extends Controller
         $this->blog = $blog;
         $this->room = $room;
         $this->review = $review;
+        $this->menu = $menu;
     }
 
 
@@ -266,6 +267,12 @@ class FrontendController extends Controller
         $page_data['rooms'] = $this->room->where('listing_id', $id)->get()->map(function ($item) {
             return $item->roomFormattedArray();
         }); 
+        $page_data['menus'] = $this->menu->where('listing_id', $id)->get();
+        $today = now()->toDateString();
+
+        $page_data['offers'] = $this->offer->where('segment_id',$id)->where('segment_type',$type)->whereDate('to_date', '<=', $today)->whereDate('from_date', '>=', $today)->get()->map(function ($item) {
+            return $item->offerformatted();
+        });
 
         $page_data['type'] = $type;
         $page_data['listing_id'] = $id;
@@ -475,52 +482,26 @@ class FrontendController extends Controller
 
 
     public function customerBookAppointment(Request $request){
-
-        $request->validate([
-            'date' => 'required|date_format:Y-m-d H:i:s',
-            'name' => 'required',
-            'phone' => 'required',
-            'email' => 'required|email',
-        ]);
-
-        $data = $request->all();
-        if (!Auth::check()) {
-            Session::flash('warning', get_phrase('Please Login First!'));
-            return redirect()->back();
+        $request['date'] = date("Y-m-d", strtotime($request['date']));
+        $request['in_time'] = date("H:i:s", strtotime($request['in_time']));
+        $request['out_time'] = date("H:i:s", strtotime($request['out_time']));
+        $request['customer_id'] = auth()->user()->id ?? 1;
+       
+        if (is_array($request->room_id)) {
+            $request['room_id'] = json_encode($request->room_id); 
         }
-        if (auth()->user()->id == $data['agent_id']) {
-            Session::flash('warning', get_phrase("You can't book your own business!"));
-            return redirect()->back();
+        if (is_array($request->menu_id)) {
+            $request['menu_id'] = json_encode($request->menu_id); 
         }
-    
-        $appointment_date_time = Carbon::createFromFormat('Y-m-d H:i:s', $data['date']);
-        $appointment = new Appointment();
-        $appointment->date = sanitize($appointment_date_time->format('Y-m-d')); 
-        $appointment->time = sanitize($appointment_date_time->format('H:i:s')); 
-        $appointment->listing_type = sanitize($data['listing_type']);
-        $appointment->listing_id = sanitize($data['listing_id']);
-        $appointment->agent_id = sanitize($data['agent_id']);
-        $appointment->name = sanitize($data['name']);
-        $appointment->phone = sanitize($data['phone']);
-        $appointment->email = sanitize($data['email']);
-        $appointment->message =sanitize($data['message'] ?? 0);
+        if (is_array($request->menu_qty)) {
+            $request['menu_qty'] = json_encode($request->menu_qty);
+        }
+        if (is_array($request->menu_summary)) {
+            $request['menu_summary'] = implode(', ', $request->menu_summary); 
+        }
         
-        $appointment->status = ($data['listing_type'] == 'play') ? 1 : 0;
-
-        $appointment->customer_id = auth()->user()->id;
-
-        $additionalInfo = [
-            'adults' => $data['adults'] ?? 0,
-            'children' => $data['children'] ?? 0
-        ];
-        $appointment->aditional_information = json_encode($additionalInfo);
-        $appointment->save();
-        $payment_method = "paypal";
-        // return redirect()->route('payment.create', [
-        //     'identifier' => $payment_method,
-        //     'appointment_id' => $appointment->id
-        // ]);
-    
+        $appointment = $this->appointment->create($request->except('_token'));
+        
         Session::flash('success', get_phrase('Appointment placed successfully!'));
         return redirect()->back();
     }
@@ -856,11 +837,31 @@ class FrontendController extends Controller
         return redirect()->back();
     }
 
-
-
-
+    public function getAvailableRooms(Request $request){
+        $listing_id = $request->input('listing_id');
+        $date       = $request->input('date');
+        $in_time    = $request->input('in_time');
+        $out_time   = $request->input('out_time');
     
+        $bookedRoomIds = $this->appointment->where('listing_type', 'sleep')->where('listing_id', $listing_id)->where('date', $date)
+        ->where(function ($query) use ($in_time, $out_time) {
+            $query->where('in_time', '<', $out_time)->where('out_time', '>', $in_time);
+        })->pluck('room_id') 
+        ->map(function ($item) {
+            return json_decode($item, true); 
+        })->flatten()->unique()->values()
+        ->toArray();
+        $rooms = $this->room
+            ->where('listing_id', $listing_id)
+            ->whereNotIn('id', $bookedRoomIds)
+            ->get()
+            ->map(function ($item) {
+                return $item->roomFormattedArray();
+            });
 
- 
+        return response()->json([
+            'rooms' => $rooms
+        ]);
+    }
 
 }

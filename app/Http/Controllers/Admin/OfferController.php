@@ -31,7 +31,7 @@ class OfferController extends Controller
 
     public function index(){
         try{           
-            $offers = $this->offer->get()->map(function ($item) {
+            $offers = $this->offer->orderBy('created_at', 'desc')->get()->map(function ($item) {
                 return $item->offerformatted();
             }); 
             return view('admin.offer.list',compact('offers'));

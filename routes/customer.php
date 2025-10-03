@@ -31,5 +31,10 @@ Route::controller(CustomerController::class)->middleware('auth', 'customer')->gr
 
     Route::get('/customer/appointment/status/{id}',  [AgentController::class, 'appointment_delete'])->name('customer.appointment.delete');
     Route::get('/customer/appointment/details/{id}/{type}',  [AgentController::class, 'appointment_view_details'])->name('customer.appointment.view_details');
+    
+    Route::post('/customer/pay', [CustomerController::class, 'pay'])->name('customer.pay');
+    Route::get('/customer/thankyou', [CustomerController::class, 'thankyou'])->name('customer.thankyou');
+    Route::get('/customer/visit/{id}', [CustomerController::class, 'visitProperty'])->name('customer.visitProperty');
+    Route::post('/customer/appointments/cancel/{id}', [CustomerController::class, 'cancelAppointment'])->name('customer.cancelappointment');
 
 });

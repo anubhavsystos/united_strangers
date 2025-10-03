@@ -75,16 +75,20 @@ document.addEventListener('DOMContentLoaded', function () {
             events: "{{ route('appointments.fetch') }}" 
                      + "?segment_id=" + segment_id 
                      + "&segment_type=" + segment_type,
+
+            // <-- Use eventContent to render HTML in event title
+            eventContent: function(arg) {
+                return { html: arg.event.title }; // this allows <br> to work
+            },
+
             dateClick: function(info) {
-                // set selected date in all modals (if they exist)
                 document.querySelectorAll('.appointmentDate').forEach(el => el.value = info.dateStr);
 
-                // choose modal by segment_type
                 let modalId = '';
                 if (segment_type === 'sleep') modalId = 'appointmentModalSleep';
                 else if (segment_type === 'work') modalId = 'appointmentModalWork';
                 else if (segment_type === 'play') modalId = 'appointmentModalPlay';
-                else modalId = 'appointmentModal'; // fallback
+                else modalId = 'appointmentModal'; 
 
                 const modalEl = document.getElementById(modalId);
                 if (modalEl) {
@@ -109,5 +113,6 @@ document.addEventListener('DOMContentLoaded', function () {
         initCalendarOnce();
     }
 });
+
 
 </script>

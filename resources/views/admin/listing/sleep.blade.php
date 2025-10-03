@@ -86,6 +86,16 @@
                         <input type="text" name="dimension" id="dimension" class="form-control ol-form-control" placeholder="{{get_phrase('Enter property dimension')}}" >
                     </div>
                 </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="tax_persent" class="form-label ol-form-label">
+                            {{ get_phrase('Tax in Percent') }} *
+                        </label>
+                        <input type="number" name="tax_persent" id="tax_persent" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter tax percent') }}" min="1" max="99" step="1"required>
+                    </div>
+                </div>
+
+    
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label for="description" class="form-label ol-form-label"> {{get_phrase('Description')}} </label>
@@ -267,13 +277,17 @@
         if(!listing_visibility){
             warning('Listing visibility is required');
         }
-        var listing_dimension = $("#dimension").val();
-        if(!listing_dimension){
-            warning('Listing dimension is required');
-        }
+      
         if(listing_listing_icon_image && listing_size && listing_bath && listing_bed && listing_price && listing_title && listing_category && listing_country && listing_city && listing_address && listing_post_code && listing_latitude && listing_longitude && listing_visibility && listing_dimension){
             $("#form-action").trigger('submit');
         }
 
     })
+</script>
+<script>
+    document.getElementById('tax_persent').addEventListener('input', function () {
+        let val = parseInt(this.value) || '';
+        if (val < 1) this.value = 1;
+        if (val > 99) this.value = 99;
+    });
 </script>

@@ -76,6 +76,7 @@ Route::any('/customer/message', [FrontendController::class, 'customerMessage'])-
 
 // Appoinment
 Route::post('/customer/bookAppointment', [FrontendController::class, 'customerBookAppointment'])->name('customerBookAppointment');
+Route::get('/getavailablerooms', [FrontendController::class, 'getAvailableRooms'])->name('getAvailableRooms');
 
 
 // Beauty Filter

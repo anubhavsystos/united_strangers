@@ -2,6 +2,13 @@
 @extends('layouts.frontend')
 @section('title', get_phrase('Real Estate Listing Details'))
 @push('css')
+ <link rel="stylesheet" href="{{ asset('assets/frontend/css/mapbox-gl.css') }}">
+    <script src="{{ asset('assets/frontend/js/mapbox-gl.js') }}"></script>
+    <link rel="stylesheet" href="{{ asset('assets/frontend/css/magnific-popup.css') }}">
+    <script src="{{ asset('assets/frontend/js/jquery.magnific-popup.min.js') }}"></script>
+
+
+
     <link rel="stylesheet" href="{{ asset('assets/frontend/css/plyr.css') }}">
     <script src="{{ asset('assets/frontend/js/plyr.js') }}"></script>
     <link rel="stylesheet" href="{{ asset('assets/frontend/css/venobox.min.css') }}">
@@ -180,6 +187,102 @@
                      @endif
                   {{-- Shop Addon --}}
                     <!-- Details Address -->
+                      @php $plus = 1 @endphp
+                    <div class="row row-28 filter_rooms_row">
+                        @foreach (($rooms ?? []) as $key => $room)
+                            <div class="col-sm-12">
+                                <input class="form-check-input d-none" name="room[]" 
+                                    type="checkbox" 
+                                    value="{{ $room['id'] ?? '' }}"
+                                    id="flckDefault{{ $key }}"
+                                    @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+
+                                <label class="form-check-label w-100" 
+                                    onclick="selectRoom('{{ $key }}', '{{ $room['id'] ?? '' }}', '{{ $room['title'] ?? 'Untitled Room' }}', '{{ $room['price'] ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
+
+                                    <div class="card mb-3 room-checkbox  position-relative">
+                                        {{-- Green Check Overlay --}}
+                                        <div class="room-check position-absolute top-0 end-0 p-2 d-none" id="roomCheck{{ $key }}">
+                                            <i class="fas fa-check-circle text-success fs-4"></i>
+                                        </div>
+
+                                        <div class="row g-0 h-100">
+                                            {{-- Left: Room Image --}}
+                                            <div class="col-md-4">
+                                                @php 
+                                                    $images = $room['image'] ?? []; 
+                                                    $firstImage = $images[0] ?? 'default.jpg';
+                                                @endphp
+                                                <img src="{{ $firstImage }}" 
+                                                    class="img-fluid rounded-start h-40 w-100 object-fit-cover" 
+                                                    alt="Room Image">
+                                            </div>
+
+                                            {{-- Right: Room Info --}}
+                                            <div class="col-md-8 room-body">
+                                                <div class="card-body py-2 px-3 h-100 position-relative d-flex flex-column">
+
+                                                    {{-- Row 1: Title | Price | Persons | Child --}}
+                                                    <div class="d-flex  align-items-center mb-1 flex-wrap">
+                                                        <p class="card-title mb-0 mr-3 fw-bold line-1">{{ $room['title'] ?? 'Untitled Room' }}</p>
+                                                        <p class="mb-0 text-success fw-bold">{{ !empty($room['price']) ? currency($room['price']) : currency(0) }}</p>
+                                                    </div>
+                                                    <div class="d-flex gap-2 fs-12px text-muted mb-1">
+                                                        <span><i class="fas fa-user"></i> {{ $room['person'] ?? 0 }} {{ get_phrase('Persons') }}</span>
+                                                        <span>|</span>
+                                                        <span><i class="fas fa-baby"></i> {{ $room['child'] ?? 0 }} {{ get_phrase('Child') }}</span>
+                                                    </div>
+
+                                                    {{-- Row 2: Room Type --}}
+                                                    @if(!empty($room['room_type']))
+                                                        <p class="mb-1 fs-12px">
+                                                            <strong>{{ get_phrase('Room Type') }}:</strong> {{ $room['room_type'] }}
+                                                        </p>
+                                                    @endif
+
+                                                    {{-- Row 3: Features --}}
+                                                    @if(!empty($room['features']))
+                                                        <div class="d-flex flex-wrap gap-2 mt-2">
+                                                            @foreach ($room['features'] as $fKey => $feature)
+                                                                <div class="text-center" style="width: 80px;">
+                                                                    <img src="{{ asset(!empty($feature['image']) ? '/' . $feature['image'] : '/image/placeholder.png') }}"
+                                                                        alt="{{ $feature['name'] ?? 'Feature' }}"
+                                                                        class="rounded mb-1" style="width:30px;height:30px;">
+                                                                    <span class="fs-11px d-block" style="font-size: 9px;">{{ $feature['name'] ?? '' }}</span>
+                                                                </div>
+                                                            @endforeach
+                                                        </div>
+                                                    @endif
+
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="hoteldetails-location-area mb-50px">
+                        <h2 class="in-title3-24px mb-20px">{{ get_phrase('Location') }}</h2>
+                        <div class="hoteldetails-location-header d-flex align-items-end justify-content-between flex-wrap">
+                            <div class="hoteldetails-location-name">
+                                @php
+                                    $city_name = App\Models\City::where('id', $listing->city)->first()->name;
+                                    $country_name = App\Models\Country::where('id', $listing->country)->first()->name;
+                                @endphp
+                                <h4 class="name">{{ $country_name }}</h4>
+                                <p class="location d-flex align-items-center">
+                                    <img src="{{ asset('assets/frontend/images/icons/location-blue2-20.svg') }}" alt="">
+                                    <span>{{ $listing->address }}, {{ $city_name }}</span>
+                                </p>
+                            </div>
+                            <a href="javascript:;" class="white-btn1" id="dynamicLocation">{{ get_phrase('Get Direction') }}</a>
+                        </div>
+                        <div class="hoteldetails-location-map mb-16">
+                            <div id="map" class="h-297"></div>
+                        </div>
+                    </div>
                     <div class="row row-28 mb-50px">
                         <div class="col-lg-6">
                             <div class="realestate-details-details">
@@ -253,40 +356,74 @@
                                 </ul>
                             </div>
                         </div>
+                      <!--  -->
                     </div>
-            
-           
-
+                    
                 </div>
-                <div class="col-xl-4 col-lg-5">
-                    <div class="realdetails-sidebar">
-                        <h1 class="title mb-20">{{get_phrase('Book a Meeting')}}</h1>
+                 
+                 <div class="col-xl-4 col-lg-5">
+                    <div class="sleepdetails-form-area mb-30px">
+                    <h4 class="sub-title ">{{ get_phrase('Booking') }}</h4>
+                    
+                    <form action="{{ route('customerBookAppointment') }}" method="post">
+                        @csrf
+                        <input type="hidden" name="listing_type" value="work">
+                        <input type="hidden" name="listing_id" value="{{ $listing->id }}">
+                        <input type="hidden" name="customer_id" value="{{ $listing->id }}">
+                        <div id="selectedRoomsContainer"></div>
+                        <div class="sleepdetails-form-inputs mb-16">
+                        <div class="mb-3">
+                            <label class="form-label">Appointment Date</label>
+                            <input type="date" class="appointmentDate form-control mform-control flat-input-picker3 " name="date">
+                        </div>                       
+                        <div class="mb-3">
+                            <label class="form-label">Description</label>
+                            <textarea name="message" id="message" cols="30" rows="3" placeholder="{{ get_phrase('Write your description') }}" class="form-control"></textarea>                        
+                        </div>
                         
-                        @if (addon_status('form_builder') == 1 && get_settings('form_builder') == 1)
-                           @include('frontend.form_builder.form')  
-                        @else
-                        <form action="{{ route('customerBookAppointment') }}" method="post">
-                            @csrf
-                            <input type="hidden" name="listing_type" value="work">
-                            <input type="hidden" name="listing_id" value="{{ $listing->id }}">
-                            <input type="hidden" name="agent_id" value="{{ $listing->user_id }}">
-                            <div class="realdetails-meeting-form">
-                                <div class="mb-20">
-                                    <label for="datetime" class="form-label mform-label mb-14">{{get_phrase('Select Date and Time')}}</label>
-                                    <input type="text" name="date"  placeholder="{{get_phrase('Select date')}}" class="form-control mform-control flat-input-picker3 input-calendar-icon" id="datetime" required />
-                                </div>
-                               
-                                <input type="text" class="form-control mform-control mb-14" name="name" placeholder="Name" required>
-                                <input type="number" class="form-control mform-control mb-14" name="phone" placeholder="Phone" required>
-                                <input type="email" class="form-control mform-control mb-14" name="email" placeholder="Email" required>
-                                <textarea class="form-control mform-control review-textarea mb-14" name="message" placeholder="Message" required></textarea>
-                                <button type="submit" class="submit-fluid-btn">{{get_phrase('Submit Now')}}</button>
+
+                        <div id="bookingSummary" class="card d-none mb-4 mt-3">
+                            <div class="card-header fw-bold">{{ get_phrase('Booking Summary') }}</div>
+                            <div class="card-body p-0">
+                                <table class="table table-sm mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th>#</th>
+                                            <th>{{ get_phrase('Room') }}</th>
+                                            <th class="text-end">{{ get_phrase('Rate') }}</th>
+                                            <th class="text-center">{{ get_phrase('Action') }}</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="summaryRooms"></tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th colspan="2" class="text-end">{{ get_phrase('Subtotal') }}</th>
+                                            <th class="text-end" id="summarySubtotal">₹0</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2" class="text-end">{{ get_phrase('Tax') }} (<span id="summaryTaxPercent">0</span>%)</th>
+                                            <th class="text-end" id="summaryTax">₹0</th>
+                                            <th></th>
+                                        </tr>
+                                        <tr>
+                                            <th colspan="2" class="text-end">{{ get_phrase('Grand Total') }}</th>
+                                            <th class="text-end" id="summaryGrandTotal">₹0</th>
+                                            <th></th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
                             </div>
-                        </form>
-                        @endif
-           
+                        </div>
+                        <input type="hidden" id="tax_persent" value="{{ isset($listing->tax_persent) ? $listing->tax_persent : 0 }}">
+                        <input type="hidden" id="total_price" name="total_price" value="0">
+                        <button type="submit" class="submit-fluid-btn">
+                        {{ get_phrase('Proceed Booking') }}
+                        </button>
+                    </form>
                     </div>
                 </div>
+              
             </div>
         </div>
     </section>
@@ -448,14 +585,14 @@
                                 </g>
                                 <defs>
                                 <filter id="filter0_d_164_10038" x="0.394531" y="0.0107422" width="33.6445" height="33.6445" filterUnits="userSpaceOnUse" color-interpolation-filters="sRGB">
-                                <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
-                                <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
-                                <feOffset dy="4"></feOffset>
-                                <feGaussianBlur stdDeviation="2"></feGaussianBlur>
-                                <feComposite in2="hardAlpha" operator="out"></feComposite>
-                                <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
-                                <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_164_10038"></feBlend>
-                                <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_164_10038" result="shape"></feBlend>
+                                    <feFlood flood-opacity="0" result="BackgroundImageFix"></feFlood>
+                                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"></feColorMatrix>
+                                    <feOffset dy="4"></feOffset>
+                                    <feGaussianBlur stdDeviation="2"></feGaussianBlur>
+                                    <feComposite in2="hardAlpha" operator="out"></feComposite>
+                                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"></feColorMatrix>
+                                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_164_10038"></feBlend>
+                                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_164_10038" result="shape"></feBlend>
                                 </filter>
                                 </defs>
                             </svg>
@@ -465,10 +602,10 @@
                         <li class="alm-hlist-item">
                             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                 <g clip-path="url(#clip0_164_1319)">
-                                 <path d="M15.5299 1.87337H14.7383V1.08171C14.7383 0.871743 14.6549 0.670379 14.5064 0.521913C14.3579 0.373447 14.1566 0.290039 13.9466 0.290039C13.7367 0.290039 13.5353 0.373447 13.3868 0.521913C13.2384 0.670379 13.1549 0.871743 13.1549 1.08171V1.87337H6.82161V1.08171C6.82161 0.871743 6.73821 0.670379 6.58974 0.521913C6.44127 0.373447 6.23991 0.290039 6.02995 0.290039C5.81998 0.290039 5.61862 0.373447 5.47016 0.521913C5.32169 0.670379 5.23828 0.871743 5.23828 1.08171V1.87337H4.44661C3.39719 1.87463 2.3911 2.29207 1.64904 3.03413C0.906979 3.77619 0.489538 4.78228 0.488281 5.83171L0.488281 15.3317C0.489538 16.3811 0.906979 17.3872 1.64904 18.1293C2.3911 18.8713 3.39719 19.2888 4.44661 19.29H15.5299C16.5794 19.2888 17.5855 18.8713 18.3275 18.1293C19.0696 17.3872 19.487 16.3811 19.4883 15.3317V5.83171C19.487 4.78228 19.0696 3.77619 18.3275 3.03413C17.5855 2.29207 16.5794 1.87463 15.5299 1.87337ZM2.07161 5.83171C2.07161 5.20182 2.32184 4.59773 2.76724 4.15233C3.21264 3.70693 3.81673 3.45671 4.44661 3.45671H15.5299C16.1598 3.45671 16.7639 3.70693 17.2093 4.15233C17.6547 4.59773 17.9049 5.20182 17.9049 5.83171V6.62337H2.07161V5.83171ZM15.5299 17.7067H4.44661C3.81673 17.7067 3.21264 17.4565 2.76724 17.0111C2.32184 16.5657 2.07161 15.9616 2.07161 15.3317V8.20671H17.9049V15.3317C17.9049 15.9616 17.6547 16.5657 17.2093 17.0111C16.7639 17.4565 16.1598 17.7067 15.5299 17.7067Z" fill="#9098A4"></path>
-                               <path d="M9.98828 13.3525C10.6441 13.3525 11.1758 12.8209 11.1758 12.165C11.1758 11.5092 10.6441 10.9775 9.98828 10.9775C9.33244 10.9775 8.80078 11.5092 8.80078 12.165C8.80078 12.8209 9.33244 13.3525 9.98828 13.3525Z" fill="#9098A4"></path>
-                               <path d="M6.03027 13.3525C6.68611 13.3525 7.21777 12.8209 7.21777 12.165C7.21777 11.5092 6.68611 10.9775 6.03027 10.9775C5.37444 10.9775 4.84277 11.5092 4.84277 12.165C4.84277 12.8209 5.37444 13.3525 6.03027 13.3525Z" fill="#9098A4"></path>
-                               <path d="M13.9463 13.3525C14.6021 13.3525 15.1338 12.8209 15.1338 12.165C15.1338 11.5092 14.6021 10.9775 13.9463 10.9775C13.2905 10.9775 12.7588 11.5092 12.7588 12.165C12.7588 12.8209 13.2905 13.3525 13.9463 13.3525Z" fill="#9098A4"></path>
+                                <path d="M15.5299 1.87337H14.7383V1.08171C14.7383 0.871743 14.6549 0.670379 14.5064 0.521913C14.3579 0.373447 14.1566 0.290039 13.9466 0.290039C13.7367 0.290039 13.5353 0.373447 13.3868 0.521913C13.2384 0.670379 13.1549 0.871743 13.1549 1.08171V1.87337H6.82161V1.08171C6.82161 0.871743 6.73821 0.670379 6.58974 0.521913C6.44127 0.373447 6.23991 0.290039 6.02995 0.290039C5.81998 0.290039 5.61862 0.373447 5.47016 0.521913C5.32169 0.670379 5.23828 0.871743 5.23828 1.08171V1.87337H4.44661C3.39719 1.87463 2.3911 2.29207 1.64904 3.03413C0.906979 3.77619 0.489538 4.78228 0.488281 5.83171L0.488281 15.3317C0.489538 16.3811 0.906979 17.3872 1.64904 18.1293C2.3911 18.8713 3.39719 19.2888 4.44661 19.29H15.5299C16.5794 19.2888 17.5855 18.8713 18.3275 18.1293C19.0696 17.3872 19.487 16.3811 19.4883 15.3317V5.83171C19.487 4.78228 19.0696 3.77619 18.3275 3.03413C17.5855 2.29207 16.5794 1.87463 15.5299 1.87337ZM2.07161 5.83171C2.07161 5.20182 2.32184 4.59773 2.76724 4.15233C3.21264 3.70693 3.81673 3.45671 4.44661 3.45671H15.5299C16.1598 3.45671 16.7639 3.70693 17.2093 4.15233C17.6547 4.59773 17.9049 5.20182 17.9049 5.83171V6.62337H2.07161V5.83171ZM15.5299 17.7067H4.44661C3.81673 17.7067 3.21264 17.4565 2.76724 17.0111C2.32184 16.5657 2.07161 15.9616 2.07161 15.3317V8.20671H17.9049V15.3317C17.9049 15.9616 17.6547 16.5657 17.2093 17.0111C16.7639 17.4565 16.1598 17.7067 15.5299 17.7067Z" fill="#9098A4"></path>
+                                <path d="M9.98828 13.3525C10.6441 13.3525 11.1758 12.8209 11.1758 12.165C11.1758 11.5092 10.6441 10.9775 9.98828 10.9775C9.33244 10.9775 8.80078 11.5092 8.80078 12.165C8.80078 12.8209 9.33244 13.3525 9.98828 13.3525Z" fill="#9098A4"></path>
+                                <path d="M6.03027 13.3525C6.68611 13.3525 7.21777 12.8209 7.21777 12.165C7.21777 11.5092 6.68611 10.9775 6.03027 10.9775C5.37444 10.9775 4.84277 11.5092 4.84277 12.165C4.84277 12.8209 5.37444 13.3525 6.03027 13.3525Z" fill="#9098A4"></path>
+                                <path d="M13.9463 13.3525C14.6021 13.3525 15.1338 12.8209 15.1338 12.165C15.1338 11.5092 14.6021 10.9775 13.9463 10.9775C13.2905 10.9775 12.7588 11.5092 12.7588 12.165C12.7588 12.8209 13.2905 13.3525 13.9463 13.3525Z" fill="#9098A4"></path>
                                </g>
                                <defs>
                                <clipPath id="clip0_164_1319">
@@ -502,10 +639,6 @@
         </div>
         </div>
     </div>
-    <!-- End Modal Area -->
-
-  
-
 
 @endsection
 @push('js')
@@ -513,85 +646,14 @@
 <script>
     "use strict";
     $('documnet').ready(function(){
-     flatpickr("#datetime", {
-         enableTime: true,
-         dateFormat: "Y-m-d H:i:S", 
-         minDate: "today",
-     });
+        flatpickr("#datetime", {
+            enableTime: true,
+            dateFormat: "Y-m-d H:i:S", 
+            minDate: "today",
+        });
     });
 
  </script>
-
-<script>
-    "use strict";
-        $(document).ready(function() {
-            $('#shareButton').on('click', function() {
-                var currentPageUrl = window.location.href;
-                $(this).toggleClass('active');
-                navigator.clipboard.writeText(currentPageUrl).then(function() {
-                    success('Successfully copied this link!');
-                }).catch(function(error) {
-                    error('Failed to copy the link!');
-                });
-            });
-        });
-</script>
-
-@if (Auth::check())
- <script>
-    "use strict";
-function updateWishlist(button, listingId) {
-    const bookmarkButton = $(button);
-    const isActive = bookmarkButton.hasClass('active');
-    bookmarkButton.toggleClass('active'); 
-    const newTooltipText = isActive ? 'Add to Wishlist' : 'Remove from Wishlist';
-    bookmarkButton.attr('data-bs-title', newTooltipText);
-
-    const tooltipInstance = bootstrap.Tooltip.getInstance(button);
-    if (tooltipInstance) tooltipInstance.dispose(); 
-    new bootstrap.Tooltip(button); 
-
-    $.ajax({
-        url: '{{ route("wishlist.update") }}', 
-        method: 'POST', 
-        data: {
-            listing_id: listingId,
-            type: 'work', 
-            user_id: {{ auth()->check() ? auth()->id() : 'null' }}, 
-            _token: '{{ csrf_token() }}',
-        },
-        success: function (response) {
-            if (response.status === 'success') {
-                success(response.message);
-            } 
-            else if (response.status === 'error') {
-                bookmarkButton.toggleClass('active');
-                const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                bookmarkButton.attr('data-bs-title', revertTooltipText);
-                const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                if (revertTooltipInstance) revertTooltipInstance.dispose();
-                new bootstrap.Tooltip(button);
-            }
-        },
-        error: function (xhr) {
-            bookmarkButton.toggleClass('active');
-            const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-            bookmarkButton.attr('data-bs-title', revertTooltipText);
-            const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-            if (revertTooltipInstance) revertTooltipInstance.dispose();
-            new bootstrap.Tooltip(button);
-        },
-    });
-}
-        </script>
-        @else
-        <script>
-            "use strict";
-            function updateWishlist(listing_id) {
-                warning("Please login first!");
-            }
-        </script>
-@endif
 
 <script>
    "use strict";
@@ -616,168 +678,159 @@ function toggleDescription() {
 }
 
    </script>
-
 <script>
-    "use strict";
-    document.addEventListener('DOMContentLoaded', function () {
-        var latitude = "{{ $listing->Latitude }}";
-        var longitude = "{{ $listing->Longitude }}";
-        var googleMapsUrl = 'https://www.google.com/maps?q=' + latitude + ',' + longitude;
-        var linkElement = document.getElementById('dynamicLocation');
-        linkElement.href = googleMapsUrl;
-        linkElement.target = '_blank'; 
-    });
-</script>
-
-
-@if (Auth::check())
-<script>
- "use strict";
- function PopuralupdateWishlist(button, listingId) {
-    const bookmarkButton = $(button);
-    const isActive = bookmarkButton.hasClass('active');
-    bookmarkButton.toggleClass('active'); 
-    const newTooltipText = isActive ? 'Add to Wishlist' : 'Remove from Wishlist';
-    bookmarkButton.attr('data-bs-title', newTooltipText);
-
-    const tooltipInstance = bootstrap.Tooltip.getInstance(button);
-    if (tooltipInstance) tooltipInstance.dispose(); 
-    new bootstrap.Tooltip(button); 
-
-    $.ajax({
-        url: '{{ route("wishlist.update") }}', 
-        method: 'POST', 
-        data: {
-            listing_id: listingId,
-            type: 'work', 
-            user_id: {{ auth()->check() ? auth()->id() : 'null' }}, 
-            _token: '{{ csrf_token() }}',
-        },
-        success: function (response) {
-            if (response.status === 'success') {
-                success(response.message);
-            } 
-            else if (response.status === 'error') {
-                bookmarkButton.toggleClass('active');
-                const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                bookmarkButton.attr('data-bs-title', revertTooltipText);
-                const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                if (revertTooltipInstance) revertTooltipInstance.dispose();
-                new bootstrap.Tooltip(button);
-            }
-        },
-        error: function (xhr) {
-            bookmarkButton.toggleClass('active');
-            const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-            bookmarkButton.attr('data-bs-title', revertTooltipText);
-            const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-            if (revertTooltipInstance) revertTooltipInstance.dispose();
-            new bootstrap.Tooltip(button);
-        },
-    });
-}
-        </script>
-        @else
-        <script>
-            "use strict";
-            function PopuralupdateWishlist(listing_id) {
-                warning("Please login first!");
-            }
-        </script>
-@endif
-
-
-@if (Auth::check())  
-@if(isset(auth()->user()->id) && (auth()->user()->id != $listing->user_id)) 
-<script>
-    "use strict";
-    function followers(user_id) {
-        $.ajax({
-            url: "{{ route('followUnfollow') }}",
-            method: "POST",
-            data: {
-                agent_id: user_id,
-                _token: "{{ csrf_token() }}"
-            },
-            success: function (response) {
-                if (response.status == 1) {
-                    $("#followStatus").html('Unfollow');
-                    success("Follow Successfully!");
-                } else {
-                    $("#followStatus").html('Follow');
-                    success("Unfollow Successfully!");
-                }
-            },
-            error: function () {
-                error("An error occurred. Please try again.");
-            }
+        "use strict";
+        document.addEventListener('DOMContentLoaded', function() {
+            var latitude = "{{ $listing->Latitude }}";
+            var longitude = "{{ $listing->Longitude }}";
+            var googleMapsUrl = 'https://www.google.com/maps?q=' + latitude + ',' + longitude;
+            var linkElement = document.getElementById('dynamicLocation');
+            linkElement.href = googleMapsUrl;
+            linkElement.target = '_blank';
         });
-    }
-</script>
-@else
-<script>
-     "use strict";
-    function followers(user_id) {
-        warning("You can't follow yourself");
-    }
-</script>
-@endif
-@else
-<script>
-   "use strict";
-   function followers(listing_id) {
-       warning("Please login first!");
-   }
-</script>
-@endif
-
-
-@if (Auth::check())  
-@if(isset(auth()->user()->id) && (auth()->user()->id != $listing->user_id)) 
-<script>
-     "use strict";
-  function send_message(user_id) {
-    var message = $('#message').val();
-    if (message != "") {
-        $.ajax({
-            url: '{{ route('customerMessage') }}',
-            headers: {
-                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-            },
-            data: { 
-                agent_id: user_id,
-                message: message
-            },
-            success: function(response) {
-                console.log(response);
-                if (response.status == 'success') {
-                    success("Message sent successfully");
-                    $('#message').val('');
-                } else {
-                    error("Message send failed");
-                }
-            }
+    </script>
+    <script>
+        "use strict";
+        mapboxgl.accessToken = '{{ get_settings('map_access_token') }}';
+        const latitude = {{ $listing->Latitude }};
+        const longitude = {{ $listing->Longitude }};
+        const listingName = "{{ $listing->title }}";
+        const map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/streets-v11',
+            center: [longitude, latitude],
+            zoom: 1
         });
-    } else {
-        warning("Please fill up the field first");
-    }
+        const popup = new mapboxgl.Popup({
+                offset: 25,
+                closeButton: false,
+                closeOnClick: false
+            })
+            .setText(listingName)
+            .setLngLat([longitude, latitude])
+            .addTo(map);
+        new mapboxgl.Marker()
+            .setLngLat([longitude, latitude])
+            .addTo(map);
+        const nav = new mapboxgl.NavigationControl();
+        map.addControl(nav, 'top-right');
+    </script>
+ 
+<script>
+let selectedRooms = [];
+
+function selectRoom(key, roomId, roomName, price) {
+    @if(auth()->check())
+        let checkbox = document.getElementById('flckDefault' + key);
+        checkbox.checked = !checkbox.checked;
+
+        let checkIcon = document.getElementById('roomCheck' + key);
+
+        if (checkbox.checked) {
+            checkIcon.classList.remove('d-none');
+            addRoom(roomId, roomName, price);
+        } else {
+            checkIcon.classList.add('d-none');
+            removeRoom(roomId);
+        }
+
+        updateSummary();
+    @else
+        window.location.href = "{{ route('login') }}";
+    @endif
 }
-</script>
-@else
-<script>
-     "use strict";
-    function send_message(user_id) {
-        warning("You can't Message yourself");
+
+function addRoom(roomId, roomName, price) {
+    if (selectedRooms.find(r => r.id == roomId)) return; // avoid duplicate
+    selectedRooms.push({id: roomId, name: roomName, price: parseFloat(price)});
+
+    // Add hidden input
+    let container = document.getElementById('selectedRoomsContainer');
+    let input = document.createElement('input');
+    input.type = 'hidden';
+    input.name = 'room_id[]';
+    input.value = roomId;
+    input.id = 'roomHidden' + roomId;
+    container.appendChild(input);
+}
+
+function removeRoom(roomId) {
+    selectedRooms = selectedRooms.filter(r => r.id != roomId);
+
+    // Remove hidden input
+    let input = document.getElementById('roomHidden' + roomId);
+    if (input) input.remove();
+
+    // Remove green check on card
+    let checkIcon = document.getElementById('roomCheck' + roomId);
+    if (checkIcon) checkIcon.classList.add('d-none');
+
+    // Uncheck checkbox if exists
+    let checkbox = document.getElementById('flckDefault' + roomId);
+    if (checkbox) checkbox.checked = false;
+
+    updateSummary();
+}
+
+function updateSummary() {
+    let summaryBody = document.getElementById('summaryRooms');
+    let subtotalEl = document.getElementById('summarySubtotal');
+    let taxPercentEl = document.getElementById('summaryTaxPercent');
+    let taxEl = document.getElementById('summaryTax');
+    let grandTotalEl = document.getElementById('summaryGrandTotal');
+    let total_price = document.getElementById('total_price');
+    let summaryDiv = document.getElementById('bookingSummary');
+    let taxPersent = parseFloat(document.getElementById('tax_persent')?.value) || 0;
+
+    summaryBody.innerHTML = '';
+    let subtotal = 0;
+
+    if (selectedRooms.length === 0) {
+        summaryDiv.classList.add('d-none');
+        subtotalEl.innerText = "₹0";
+        taxPercentEl.innerText = taxPersent;
+        taxEl.innerText = "₹0";
+        grandTotalEl.innerText = "₹0";
+        if (total_price) total_price.value = 0;
+        return;
     }
+
+    // loop through selected rooms
+    selectedRooms.forEach((r, index) => {
+        subtotal += r.price;
+        summaryBody.innerHTML += `
+            <tr>
+                <td>${index + 1}</td>
+                <td>${r.name}</td>
+                <td class="text-end">₹${r.price.toLocaleString()}</td>
+                <td class="text-center">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeRoom('${r.id}')">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        `;
+    });
+
+    // calculate
+    let taxAmount = (subtotal * taxPersent) / 100;
+    let grandTotal = subtotal + taxAmount;
+
+    // update footer values
+    subtotalEl.innerText = "₹" + subtotal.toLocaleString();
+    taxPercentEl.innerText = taxPersent;
+    taxEl.innerText = "₹" + taxAmount.toLocaleString();
+    grandTotalEl.innerText = "₹" + grandTotal.toLocaleString();
+
+    // hidden input for saving
+    if (total_price) total_price.value = grandTotal;
+
+    summaryDiv.classList.remove('d-none');
+}
+
+
+
 </script>
-@endif
-@else
-<script>
-   "use strict";
-   function send_message(listing_id) {
-       warning("Please login first!");
-   }
-</script>
-@endif
+
 
 @endpush

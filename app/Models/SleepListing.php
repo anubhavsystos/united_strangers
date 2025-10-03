@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-
+use App\Models\Amenities;
 class SleepListing extends Model
 {
     use HasFactory;
@@ -43,8 +43,10 @@ class SleepListing extends Model
         $features = [];
 
         if ($this->feature) {
-            $featureIds = json_decode($this->feature);
-            $features = App\Models\Amenities::whereIn('id', $featureIds)->pluck('name')->toArray();
+            $featureIds = json_decode($this->feature, true) ?? [];
+            if (!empty($featureIds)) {
+                $features = Amenities::whereIn('id', $featureIds)->pluck('name')->toArray();
+            }
         }
 
         $reviews = $this->reviews->where('user_id', '!=', $this->user_id)->whereNull('reply_id');

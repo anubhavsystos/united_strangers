@@ -77,8 +77,8 @@ class ListingController extends Controller
         $data['category'] = sanitize($request->category);
         $data['description'] = $request->description;
         $data['visibility'] = sanitize($request->visibility);
-        $data['type'] = $type;
-        
+        $data['tax_persent'] = sanitize($request->tax_persent);
+        $data['type'] = $type;        
         $data['meta_title'] = sanitize($request->meta_title);
         $data['meta_keyword'] = sanitize($request->keyword);
         $data['meta_description'] = sanitize($request->meta_description);
@@ -178,6 +178,7 @@ class ListingController extends Controller
     public function listing_update(Request $request, $type, $id){
         
         $data['title'] = sanitize($request->title);
+        $data['tax_persent'] = sanitize($request->tax_persent);
         $data['category'] = sanitize($request->category);
         $data['description'] = sanitize($request->description);
         $data['visibility'] = sanitize($request->visibility);
@@ -216,6 +217,7 @@ class ListingController extends Controller
             $data['bed'] = sanitize($request->bed);
             $data['bath'] = sanitize($request->bath);
             $data['size'] = sanitize($request->size);
+            $data['accommodation_type'] = sanitize($request->accommodation_type);
             $data['dimension'] = sanitize($request->dimension);
             $data['feature'] = json_encode($request->feature)??[];
             $data['room'] = json_encode($request->room)??[];

@@ -69,7 +69,9 @@
                             <select name="category" id="category" class="form-control ol-form-control ol-select2" data-select2-id="select2-data-1-2ry6" tabindex="-1" aria-hidden="true">
                                 <option value=""> {{ get_phrase('Select listing category') }} </option>
                                 @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}" {{ $category->id == $listing->category ? 'selected' : '' }}> {{ $category->name }} </option>
+                                    @if($category->type == 'work')
+                                        <option value="{{$category->id}}" {{$category->id == $listing->category?'selected':''}}> {{$category->name}} </option>
+                                    @endif
                                 @endforeach
                             </select>
                         </div>
@@ -92,6 +94,14 @@
                                         <option value="featured" {{ $listing->is_popular == 'featured' ? 'selected' : '' }}> {{ get_phrase('Featured') }} </option>
                                         <option value="trending" {{ $listing->is_popular == 'trending' ? 'selected' : '' }}> {{ get_phrase('Trending') }} </option>
                                     </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="mb-3">
+                                    <label for="tax_persent" class="form-label ol-form-label">
+                                        {{ get_phrase('Tax in Percent') }} *
+                                    </label>
+                                    <input type="number" name="tax_persent" id="tax_persent" class="form-control ol-form-control" value="{{$listing->tax_persent}}" placeholder="{{ get_phrase('Enter tax percent') }}" min="1" max="99" step="1"required>
                                 </div>
                             </div>
                             <div class="col-sm-12">
@@ -353,13 +363,12 @@
                                                     </tr>
                                                 </thead>
                                             <tbody>
-                                                @php $num = 1 @endphp
                                                 @foreach ($appointments as $key => $appointment)    
                                                     <tr class="ca-tr">
                                                         <td ><p class="ca-subtitle-14px ca-text-dark mb-2"> {{++$key}}.</p></td>  
                                                         <td class="min-w-140px">                                                                        
-                                                            <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}</p>
-                                                            <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{isset($appointment['name']) ? "For :" . $appointment['name'] : ''}}</p>
+                                                            <p class="ca-subtitle-14px ca-text-dark mb-2 line-2"> {{isset($appointment['customer_name']) ? $appointment['customer_name'] : ''}}</p>
+                                                            <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{!empty($appointment['name']) ? "For :" . $appointment['name'] : ''}}</p>
                                                         </td>
                                                         <td class="min-w-140px">
                                                             <div class="align-items-center gap-2"><p class="badge-dark">{{isset($appointment['customer_phone']) ? $appointment['customer_phone'] : ''}} </p>
@@ -482,16 +491,6 @@
                     <div class="mb-3">
                         <label class="form-label">Appointment Date</label>
                         <input type="date" class=" appointmentDate form-control mform-control flat-input-picker3 input-calendar-icon"  id="appointmentDate" name="date" >
-                    </div>             
-                    <div class="mb-3 row">
-                        <div class="col">
-                            <label class="form-label">Check In Time</label>
-                            <input type="time" class="form-control" name="in_time" required>
-                        </div>
-                        <div class="col">
-                            <label class="form-label">Check Out Time</label>
-                            <input type="time" class="form-control" name="out_time" required>
-                        </div>
                     </div>
                     <div class="mb-3 row">
                         <div class="col">

@@ -14,7 +14,7 @@
 </style>
 <body>
 
-   <header class="{{ request()->is('work') ? '' : 'header-section' }} ">
+   <header class="{{ request()->is('work') ? '' : 'header-section' }} mb-2">
         <div class="container">
             <div class="row">
                 <div class="col-12">

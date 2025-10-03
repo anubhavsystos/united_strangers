@@ -14,103 +14,160 @@ use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
-    public function wishlist() 
-    {
-        $page_data['wishlists'] = Wishlist::where('user_id', user('id'))->paginate(10);
-        $page_data['active'] = 'wishlist';
-        return view('user.customer.wishlist', $page_data);
+    protected $appointment; protected $message; protected $thread; protected $pricing; protected $wishlist; protected $user;
+
+    public function __construct( Appointment $appointment, Message $message, Message_thread $thread, Pricing $pricing, Wishlist $wishlist, User $user) {
+        $this->appointment = $appointment ?? new Appointment();
+        $this->message     = $message ?? new Message();
+        $this->thread      = $thread ?? new Message_thread();
+        $this->pricing     = $pricing ?? new Pricing();
+        $this->wishlist    = $wishlist ?? new Wishlist();
+        $this->user        = $user ?? new User();
     }
 
-    public function appointment() 
+
+    public function appointment()
     {
         $page_data['active'] = 'userAppointment';
-        $page_data['appointments'] = Appointment::where('customer_id', user('id'))->orderBy('created_at', 'desc')->paginate(10);
+ 
+        $appointments = $this->appointment->orderBy('date', 'desc')->where("customer_id", user('id'))->paginate(10);
+
+        $formattedAppointments = $appointments->getCollection()->map(function ($item) {
+            return $item->appointmentCustomerFormatted(); 
+        });
+        $appointments->setCollection($formattedAppointments);
+        $page_data['appointments'] = $appointments;
+        // return $page_data['appointments'];
+
+
         return view('user.customer.appointment.index', $page_data);
     }
 
-    public function become_an_agent()
+    // Example for DTP style query (your given snippet)
+    public function appointmentByType($id, $type)
     {
-        $page_data['packages'] = Pricing::get();
-        $page_data['active'] = 'become_an_agent';
-        return view('user.customer.become_an_agent', $page_data);
+        $page_data['appointments'] = $this->appointment
+            ->where("listing_type", $type)
+            ->where("listing_id", $id)
+            ->orderBy('date', 'desc')
+            ->get()
+            ->map(function ($item) use ($type) {
+                return $item->appointmentFormatted($type);
+            });
+
+        return view('user.customer.appointment.index', $page_data);
     }
 
-    function generateUniqueCode($length = 16) {
-        // Generate random bytes
-        $bytes = random_bytes($length / 2);
-        // Convert to hexadecimal representation
-        return bin2hex($bytes);
-    }
-
-    function user_messages($prefix = "", $id = "", $code = ""){
-
+   
+    public function user_messages($prefix = "", $id = "", $code = "")
+    {
         $page_data['active'] = 'message';
+
         if ($id) {
-            if($code){
-                $threads = Message_thread::where('message_thread_code', $code);
-                $page_data['messages'] = Message::where('message_thread_code', $code)->get();
-            }else{
-                if(user('is_agent')){
-                    $threads = Message_thread::where('sender', user('id'))->Where('receiver', $id);
-                }else{
-                    $threads = Message_thread::where('sender', $id)->Where('receiver', user('id'));
+            if ($code) {
+                $threads = $this->thread->where('message_thread_code', $code);
+                $page_data['messages'] = $this->message->where('message_thread_code', $code)->get();
+            } else {
+                if (user('is_agent')) {
+                    $threads = $this->thread->where('sender', user('id'))->where('receiver', $id);
+                } else {
+                    $threads = $this->thread->where('sender', $id)->where('receiver', user('id'));
                 }
+
                 $thread_code = $this->generateUniqueCode();
-                if(!$threads->first()){
-                
-                    $thread['message_thread_code'] =  $thread_code;
-                    $thread['sender'] = user('id');
-                    $thread['receiver'] = $id;
-                    $thread['created_at'] = Carbon::now();
-                    $thread['updated_at'] = Carbon::now();
-                    Message_thread::insert($thread);
+                if (!$threads->first()) {
+                    $thread = [
+                        'message_thread_code' => $thread_code,
+                        'sender' => user('id'),
+                        'receiver' => $id,
+                        'created_at' => Carbon::now(),
+                        'updated_at' => Carbon::now()
+                    ];
+                    $this->thread->insert($thread);
                 }
-                $threads = Message_thread::where('message_thread_code', $thread_code);
-                $page_data['messages'] = Message::where('message_thread_code', $thread_code)->get();
+
+                $threads = $this->thread->where('message_thread_code', $thread_code);
+                $page_data['messages'] = $this->message->where('message_thread_code', $thread_code)->get();
             }
-            $page_data['thread_details'] = $threads->first();  
-            $page_data['code'] = ($code == '' && !$code) ? $thread_details->message_thread_code : $code;
-        }else{
+
+            $thread_details = $threads->first();
+            $page_data['thread_details'] = $thread_details;
+            $page_data['code'] = ($code == '' && !$code) ? ($thread_details->message_thread_code ?? '') : $code;
+        } else {
             $page_data['code'] = '';
         }
-        $page_data['all_threads'] = Message_thread::where('sender', user('id'))->orWhere('receiver', user('id'))->get();
+
+        $page_data['all_threads'] = $this->thread
+            ->where('sender', user('id'))
+            ->orWhere('receiver', user('id'))
+            ->get();
+
         return view('user.message.index', $page_data);
     }
-    public function send_message(Request $request, $prefix, $code) {
-        $mes['message_thread_code'] = $code;
-        $mes['message'] = sanitize($request->message);
-        $mes['sender'] = user('id');
-        $mes['read_status'] = 0;
-        $mes['created_at'] = Carbon::now();
-        $mes['updated_at'] = Carbon::now();
-        Message::insert($mes);
+
+    public function send_message(Request $request, $prefix, $code)
+    {
+        $mes = [
+            'message_thread_code' => $code,
+            'message' => sanitize($request->message),
+            'sender' => user('id'),
+            'read_status' => 0,
+            'created_at' => Carbon::now(),
+            'updated_at' => Carbon::now()
+        ];
+
+        $this->message->insert($mes);
         return redirect()->back();
     }
 
-    public function remove_wishlist($id) {
-        Wishlist::where('id', $id)->delete();
-        return redirect()->back()->with('success', 'Wishlist delete successfully');
+    public function pay(Request $request){
+        $appointment = $this->appointment->find($request->appointment_id);
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Appointment not found');
+        }
+
+
+        $appointment->status = 1; 
+        $appointment->save();
+
+        return redirect()->route('customer.thankyou');       
     }
 
-    public function following_agent() {
-        $page_data['active'] = 'following';
-        return view('user.customer.following_agent', $page_data);
+    public function thankyou()
+    {
+        return view('user.customer.thankyou');
     }
 
-    function following_agent_remove($id) {
-        // Decode the current list of following agents
-        $user_details = json_decode(user('following_agent'), true);
-        // Filter out the specified ID
-        $newArray = array_filter($user_details, function($value) use ($id) {
-            return $value !== $id;
-        });
-        // Re-index the array
-        $newArray = array_values($newArray);
-        // Save the updated list back to the user's data
-        $data['following_agent'] = json_encode($newArray);
-        User::where('id', user('id'))->update($data);
-        return redirect()->back()->with('success', 'Remove successfully');
+    public function visitProperty($id)
+    {
+        $appointment = $this->appointment->find($id);
+
+        if (!$appointment) {
+            return redirect()->back()->with('error', 'Property not found');
+        }
+         $appointment->status = 1; 
+        $appointment->save();
+
+
+        return redirect()->route('customer.appointment');
     }
     
-}
+    public function cancelAppointment($id)
+    {
+        $appointment = Appointment::find($id);
+        
+        if (!$appointment || $appointment->customer_id != user('id')) {
+            return redirect()->back()->with('error', 'Appointment not found.');
+        }
 
+        if ($appointment->status == 0) {
+            $appointment->status = 3; 
+            $appointment->save();
+            return redirect()->back()->with('success', 'Appointment cancelled successfully.');
+        }
+
+        return redirect()->back()->with('error', 'Cannot cancel this appointment.');
+    }
+
+
+}
