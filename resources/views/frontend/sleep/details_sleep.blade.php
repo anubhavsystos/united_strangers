@@ -106,7 +106,7 @@
                             </li>
                         </ul>
                     </div>
-                    
+                   
                     <div class="at-details-description mb-6">
                         <h4 class="title mb-6">{{ get_phrase('Description') }}</h4>
                         <p class="info mb-6">
@@ -233,6 +233,10 @@
                             <div id="map" class="h-297"></div>
                         </div>
                     </div>
+                    <div class="hoteldetails-location-area mb-50px">
+                        <h2 class="in-title3-24px mb-20px">{{ get_phrase('Location Nearby') }}</h2>                       
+                        @include('frontend.work.nearby')
+                    </div>
                 </div>
                 <div class="col-xl-4 col-lg-5">
                     <div class="sleepdetails-form-area mb-30px">
@@ -247,6 +251,18 @@
                         <div class="mb-3">
                             <label class="form-label">Appointment Date</label>
                             <input type="date" class="appointmentDate form-control mform-control flat-input-picker3 " name="date">
+                        </div>
+                        <div class="mb-3 row">
+                            <label class="form-label">Booking For</label>
+                            <div class="col">
+                                <label class="form-label ">From Date</label>
+                                <input type="date" class="appointmentDate form-control" name="from_date" required>
+                            </div>
+                            <div class="col">
+                                <label class="form-label">To Date </label>
+                                <input type="date" class=" appointmentDate form-control mform-control flat-input-picker3 "  id="to_date" name="to_date" >
+                            </div>
+                            
                         </div>
                         <div class="mb-3 row">
                             <div class="col">
@@ -273,7 +289,7 @@
                             <label class="form-label">Description</label>
                             <textarea name="message" id="message" cols="30" rows="3" placeholder="{{ get_phrase('Write your description') }}" class="form-control"></textarea>                        
                         </div>                        
-
+ 
                         <div id="bookingSummary" class="card d-none mb-4 mt-3">
                             <div class="card-header fw-bold">{{ get_phrase('Booking Summary') }}</div>
                                 <div class="card-body p-0">

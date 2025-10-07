@@ -56,7 +56,8 @@ class OfferController extends Controller
                 array_push($listing_image, $imageName);
             }
         }
-        $request['image'] = json_encode($listing_image);        
+        $request['image'] = json_encode($listing_image); 
+        $request['user_id'] = auth()->user()->id;        
         $offer = $this->offer->create($request->except(['_token', 'listing_image']));
         return redirect()->route('admin.offers')->with('success', 'Offer created successfully.');        
     }

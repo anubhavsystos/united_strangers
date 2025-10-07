@@ -8,21 +8,6 @@
     }
 </style>
 
-@php
-    $nearbyLocations = App\Models\NearByLocation::where('listing_id', $listing->id)->get();
-@endphp
-
-@php
-    $coordinates = $nearbyLocations->map(function ($location) {
-        return [
-            'latitude' => $location->latitude,
-            'longitude' => $location->longitude,
-            'name' => $location->name,
-            'type' => $location->type,
-        ];
-    });
-@endphp
-
 <div class="realdetails-nearby-area mb-50px">
     <h2 class="in-title3-24px mb-20">{{ get_phrase('Nearby') }}</h2>
     <div class="realdetails-nearby-grid">

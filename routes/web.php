@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\NewsletterController;
 use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\OfferController;
 use App\Http\Controllers\Admin\EventController;
+use App\Http\Controllers\Admin\AuditReportController;
 use App\Http\Controllers\Frontend\LanguageController;
 use App\Http\Controllers\Admin\SubscriptionController;
 use App\Http\Controllers\Agent\AgentController;
@@ -152,7 +153,7 @@ Route::prefix('{prefix}')->middleware(['auth', 'anyAuth'])->group(function () {
     // Route::get('/account', [ProfileController::class, 'user_account'])->name('user.account');
   
     // NearBy Location  Admin
-    Route::get('/listing-add-nearBy/{id}', [ListingController::class, 'listing_nearBY'])->name('add-listing-nearBy');
+    Route::get('/listing-add-nearBy/{id}/{type}', [ListingController::class, 'listing_nearBY'])->name('add-listing-nearBy');
 
     Route::post('listing/nearby/location/save', [ListingController::class, 'saveNearByLocation'])->name('saveNearByLocation');
     Route::get('listing/nearby/location/edit/{id}/{page}', [ListingController::class, 'edit_listing_nearBY'])->name('editNearByLocation');
@@ -385,8 +386,10 @@ Route::prefix('admin')->middleware(['auth', 'admin'])->group(function () {
     Route::get('/events/edit/{id}', [EventController::class, 'event_edit'])->name('admin.event.edit');
     Route::post('/events/update/{id}', [EventController::class, 'event_update'])->name('admin.event.update');
     Route::get('/events/delete/{id}', [EventController::class, 'event_delete'])->name('admin.event.delete');
-     Route::get('/events-image-delete/{id}/{image}', [EventController::class, 'event_image_delete'])->name('admin.events.image.delete');
+    Route::get('/events-image-delete/{id}/{image}', [EventController::class, 'event_image_delete'])->name('admin.events.image.delete');
 
+    // AuditReportController
+    Route::get('/auditreports',[AuditReportController::class, 'index'])->name('admin.auditreports');
 });
 
 Route::prefix('user')->middleware(['auth'])->group(function () {

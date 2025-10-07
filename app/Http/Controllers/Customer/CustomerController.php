@@ -30,12 +30,14 @@ class CustomerController extends Controller
     {
         $page_data['active'] = 'userAppointment';
  
-        $appointments = $this->appointment->orderBy('date', 'desc')->where("customer_id", user('id'))->paginate(10);
-
-        $formattedAppointments = $appointments->getCollection()->map(function ($item) {
+        $appointments = $this->appointment->orderBy('date', 'desc')->where("customer_id", user('id'))->get()->map(function ($item) {
             return $item->appointmentCustomerFormatted(); 
         });
-        $appointments->setCollection($formattedAppointments);
+
+        // $formattedAppointments = $appointments->getCollection()->map(function ($item) {
+        //     return $item->appointmentCustomerFormatted(); 
+        // });
+        // $appointments->setCollection($formattedAppointments);
         $page_data['appointments'] = $appointments;
         // return $page_data['appointments'];
 

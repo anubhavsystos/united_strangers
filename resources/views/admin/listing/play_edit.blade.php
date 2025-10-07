@@ -43,7 +43,10 @@
                 </li>
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="open-time-tab" data-bs-toggle="tab" data-bs-target="#open-time" type="button" role="tab" aria-controls="open-time" aria-selected="false"> {{ get_phrase('Opening Time') }} </button>
-                </li>                
+                </li>   
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="Nearby-tab" data-bs-toggle="tab" data-bs-target="#Nearby" type="button" role="tab" aria-controls="Nearby" aria-selected="false"> {{ get_phrase('Nearby') }} </button>
+                </li>             
                 <li class="nav-item" role="presentation">
                     <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false"> {{ get_phrase('Seo') }} </button>
                 </li>
@@ -194,8 +197,8 @@
                     </div>
                     <div class="tab-pane fade show {{ $tab == 'menu' ? 'active' : '' }}" id="menu" role="tabpanel" aria-labelledby="menu-tab">
                         <div class="d-flex align-items-center justify-content-between mb-2">
-                            <h5 class="fs-16px title mb-3"> {{ get_phrase('Add some menu for play') }} </h5>
-                            <a href="javascript:void(0)" onclick="modal('modal-md', '{{ route('admin.add.listing.menu', ['prefix' => 'admin', 'id' => $listing->id]) }}', '{{ get_phrase('Add New Menu') }}')" class="btn ol-btn-primary "> {{ get_phrase('Add menu') }} </a>
+                            <h5 class="fs-16px title mb-3"> {{ get_phrase('Add Some Menu') }} </h5>
+                            <a href="javascript:void(0)" onclick="modal('modal-md', '{{ route('admin.add.listing.menu', ['prefix' => 'admin', 'id' => $listing->id]) }}', '{{ get_phrase('Add New Menu') }}')" class="btn ol-btn-primary "> {{ get_phrase('Add Menu') }} </a>
                         </div>                        
                         <div class="row">
                             @foreach ($menus as $key => $menu)
@@ -273,7 +276,130 @@
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="tab-pane fade" id="Nearby" role="tabpanel" aria-labelledby="Nearby-tab">
+                        <div class="row mb-3">
+                            <div class="d-flex justify-content-between align-items-center flex-wrap g-12 bd-b-1 pb-30">
+                                <div class="tableTitle-3">
+                                    <h4 class="fz-18-m-black">{{ get_phrase('Nearby Location') }}</h4>
+                                </div>
+                                <a href="javascript:;" onclick="modal('modal-lg', '{{ route('add-listing-nearBy', ['prefix' => 'admin', 'id' => $listing->id, 'type' => 'play']) }}', '{{ get_phrase('Add NearBy Location') }}')" class="btn ol-btn-primary ">{{ get_phrase('Add Nearby Location') }}</a>
+                            </div>
+                        </div>
+                        <ul class="nav nav-tabs eNav-Tabs-custom nearby-tab" id="myTab" role="tablist">
+                            <!-- School -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link active" id="cSchool-tab" data-bs-toggle="tab" data-bs-target="#cSchool" type="button" role="tab" aria-controls="cSchool" aria-selected="true">
+                                    {{ get_phrase('School') }}
+                                    <span></span>
+                                </button>
+                            </li>
+                            <!-- Hospital -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="cHospital-tab" data-bs-toggle="tab" data-bs-target="#cHospital" type="button" role="tab" aria-controls="cHospital" aria-selected="false">
+                                    {{ get_phrase('Hospital') }}
+                                    <span></span>
+                                </button>
+                            </li>
+                            <!-- Shopping Center -->
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="cShoppingCenter-tab" data-bs-toggle="tab" data-bs-target="#cShoppingCenter" type="button" role="tab" aria-controls="cShoppingCenter" aria-selected="false">
+                                    {{ get_phrase('Shopping Center') }}
+                                    <span></span>
+                                </button>
+                            </li>
+                        </ul>
+                        <div class="tab-content eNav-Tabs-content" id="myTabContent">
+                            <!-- School -->
+                            <div class="tab-pane fade show active" id="cSchool" role="tabpanel" aria-labelledby="cSchool-tab">
+                                <!-- Table -->
+                                <div class="table-responsive">
+                                    <table class="table eTable eTable-2 table-icon table-p0 mt-2">
+                                        <tbody>
+                                            @foreach ($nearbylocation as $nearby)
+                                                @if ($nearby->nearby_id == 0)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="dl_property_type d-flex flex-column g-8">
+                                                                <p class="form-label cap-form-label">
+                                                                    {{ $nearby->name }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="nearBtn  justify-content-end d-flex gap-3">
+                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
+                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Hospital -->
+                            <div class="tab-pane fade" id="cHospital" role="tabpanel" aria-labelledby="cHospital-tab">
+                                <!-- Table -->
+                                <div class="table-responsive">
+                                    <table class="table eTable eTable-2 table-icon table-p0 mt-2">
+                                        <tbody>
+                                            @foreach ($nearbylocation as $nearby)
+                                                @if ($nearby->nearby_id == 1)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="dl_property_type d-flex flex-column g-8">
+                                                                <p class="form-label cap-form-label">
+                                                                    {{ $nearby->name }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
 
+                                                            <div class="nearBtn d-flex justify-content-end gap-3">
+                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
+
+                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            <!-- Shopping Center -->
+                            <div class="tab-pane fade" id="cShoppingCenter" role="tabpanel" aria-labelledby="cShoppingCenter-tab">
+                                <!-- Table -->
+                                <div class="table-responsive">
+                                    <table class="table eTable eTable-2 table-icon table-p0 mt-2">
+                                        <tbody>
+                                            @foreach ($nearbylocation as $nearby)
+                                                @if ($nearby->nearby_id == 2)
+                                                    <tr>
+                                                        <td>
+                                                            <div class="dl_property_type d-flex flex-column g-8">
+                                                                <p class="form-label cap-form-label">
+                                                                    {{ $nearby->name }}
+                                                                </p>
+                                                            </div>
+                                                        </td>
+                                                        <td>
+                                                            <div class="nearBtn d-flex justify-content-end gap-3 ">
+                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
+                                                                <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
+                                                            </div>
+                                                        </td>
+                                                    </tr>
+                                                @endif
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
                         <div class="mb-3">

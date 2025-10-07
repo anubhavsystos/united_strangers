@@ -12,19 +12,19 @@
     $segment_type  = "sleep";
     $segment_id = $listing->id;
 @endphp
-    <style>
-.object-fit-cover {
-    object-fit: cover;
-    width: 100%;
-    height: 100%;
-    min-height: 150px;
-}
-.line-1 {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 140px;
-}
+<style>
+    .object-fit-cover {
+        object-fit: cover;
+        width: 100%;
+        height: 100%;
+        min-height: 150px;
+    }
+    .line-1 {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 140px;
+    }
 </style>
 <div class="ol-card">
     <div class="ol-card-body p-3 d-flex align-items-center justify-content-between">
@@ -56,6 +56,9 @@
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="calander-tab" data-bs-toggle="tab" data-bs-target="#calander" type="button" role="tab" aria-controls="calander" aria-selected="false"> {{ get_phrase('Calender') }} </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="Nearby-tab" data-bs-toggle="tab" data-bs-target="#Nearby" type="button" role="tab" aria-controls="Nearby" aria-selected="false"> {{ get_phrase('Nearby') }} </button>
             </li>
             <li class="nav-item" role="presentation">
               <button class="nav-link" id="seo-tab" data-bs-toggle="tab" data-bs-target="#seo" type="button" role="tab" aria-controls="seo" aria-selected="false"> {{get_phrase('Seo')}} </button>
@@ -284,84 +287,73 @@
                     </div>                    
                     <div class="row">
                         @if(count($rooms)!= 0 )
-                            @foreach ($rooms as $key => $room)
-                               <div class="col-sm-6"> 
-                                    <input class="form-check-input d-none" name="room[]" type="checkbox" value="{{ $room->id }}" id="flckDefault{{ $key }}" @if($listing->room && $listing->room != 'null' && in_array($room->id, json_decode($listing->room))) checked @endif >
+                           @foreach ($rooms as $key => $room)
+                                <div class="col-sm-6"> 
+                                    <input class="form-check-input d-none" 
+                                        name="room[]" 
+                                        type="checkbox" 
+                                        value="{{ $room['id'] }}" 
+                                        id="flckDefault{{ $key }}" 
+                                        @if($listing->room && $listing->room != 'null' && in_array($room['id'], json_decode($listing->room))) checked @endif>
+
                                     <label class="form-check-label w-100" onclick="room_select('{{ $key }}')" for="flckDefault{{ $key }}">
                                         <div class="card mb-3 eRoom eRoom2 room-checkbox h-100">
-                                            <div class="row g-0 h-100">
-                                                
-                                                {{-- Room Image --}}
+                                            <div class="row g-0 h-100">                                                
                                                 <div class="col-md-4">
-                                                    <img src="{{ get_all_image('room-images/' . (json_decode($room->image)[0] ?? 'default.jpg')) }}" 
+                                                    <img src="{{ $room['image'][0] ?? asset('default.jpg') }}" 
                                                         class="img-fluid rounded-start h-100 object-fit-cover" 
                                                         alt="Room Image">
                                                 </div>
-                                                
                                                 <div class="col-md-8 room-body">
                                                     <div class="card-body py-2 px-2 h-100 position-relative d-flex flex-column">
-
-                                                        {{-- Title + Actions in one line --}}
                                                         <div class="d-flex justify-content-between align-items-start mb-1">
-                                                            <p class="card-title mb-0 fw-bold line-1"> {{ $room->title }} </p>
+                                                            <p class="card-title mb-0 fw-bold line-1">{{ $room['title'] }}</p>
                                                             <div class="ms-auto">
                                                                 <a data-bs-toggle="tooltip" 
-                                                                    data-bs-title="{{ get_phrase('Edit') }}" 
-                                                                    href="javascript:void(0);" 
-                                                                    onclick="modal('modal-xl', '{{ route('admin.add.listing.room',['prefix'=>'admin','id'=>$listing->id,'room_id'=>$room->id,'page'=>'edit']) }}', '{{ get_phrase('Update New Room') }}')" 
-                                                                    class="p-1"> 
+                                                                data-bs-title="{{ get_phrase('Edit') }}" 
+                                                                href="javascript:void(0);" 
+                                                                onclick="modal('modal-xl', '{{ route('admin.add.listing.room',['prefix'=>'admin','id'=>$listing->id,'room_id'=>$room['id'],'page'=>'edit']) }}', '{{ get_phrase('Update New Room') }}')" 
+                                                                class="p-1"> 
                                                                     <i class="fas fa-edit"></i> 
                                                                 </a>
                                                                 <a data-bs-toggle="tooltip" 
-                                                                    data-bs-title="{{ get_phrase('Delete') }}" 
-                                                                    href="javascript:void(0);" 
-                                                                    onclick="delete_modal('{{ route('admin.delete.listing.room',['prefix'=>'admin','id'=>$room->id,'listing_id'=>$listing->id]) }}')" 
-                                                                    class="p-1 text-danger"> 
+                                                                data-bs-title="{{ get_phrase('Delete') }}" 
+                                                                href="javascript:void(0);" 
+                                                                onclick="delete_modal('{{ route('admin.delete.listing.room',['prefix'=>'admin','id'=>$room['id'],'listing_id'=>$listing->id]) }}')" 
+                                                                class="p-1 text-danger"> 
                                                                     <i class="fas fa-trash-alt"></i> 
                                                                 </a>
                                                             </div>
                                                         </div>
-
-                                                        {{-- Price --}}
-                                                        <p class="card-text fs-12px text-success fw-bold"> {{ currency($room->price) }} </p>
-                                                        
-                                                        {{-- Persons & Children --}}
-                                                        <p class="mb-1 fs-12px">
-                                                            <i class="fas fa-user"></i> {{ $room->person ?? 0 }} {{ get_phrase('Persons') }}
-                                                            | <i class="fas fa-baby"></i> {{ $room->child ?? 0 }} {{ get_phrase('Child') }}
+                                                        <p class="card-text fs-12px text-success fw-bold">
+                                                            {{ currency($room['price']) }}
                                                         </p>
-
-                                                        {{-- Features --}}
-                                                        @php
-                                                            $featureNames = $room->features->pluck('name')->toArray() ?? [];
-                                                        @endphp
-                                                        @if(!empty($featureNames))
+                                                        <p class="mb-1 fs-12px">
+                                                            <i class="fas fa-user"></i> {{ $room['person'] ?? 0 }} {{ get_phrase('Persons') }}
+                                                            | <i class="fas fa-baby"></i> {{ $room['child'] ?? 0 }} {{ get_phrase('Child') }}
+                                                        </p>
+                                                        @if(!empty($room['features']))
                                                             <p class="mb-1 fs-12px">
-                                                                <strong>{{ get_phrase('Features') }}:</strong> {{ implode(', ', $featureNames) }}
+                                                                <strong>{{ get_phrase('Features') }}:</strong>
+                                                                {{ implode(', ', array_column($room['features'], 'name')) }}
                                                             </p>
                                                         @endif
-
-                                                        {{-- Room Types --}}
-                                                        @php
-                                                            $roomTypes = [];
-                                                            if (!empty($room->room_type)) {
-                                                                if (is_array($room->room_type)) {
-                                                                    $roomTypes = $room->room_type;
-                                                                } elseif (is_string($room->room_type)) {
-                                                                    $decoded = json_decode($room->room_type, true);
-                                                                    $roomTypes = is_array($decoded) ? $decoded : array_map('trim', explode(',', $room->room_type));
-                                                                }
-                                                            }
-                                                        @endphp
-                                                        @if(!empty($roomTypes))
+                                                        @if(!empty($room['room_type']))
                                                             <p class="mb-1 fs-12px">
-                                                                <strong>{{ get_phrase('Room Type') }}:</strong> {{ implode(', ', $roomTypes) }}
+                                                                <strong>{{ get_phrase('Room Type') }}:</strong> {{ is_array($room['room_type']) ? implode(', ', $room['room_type']) : $room['room_type'] }}
                                                             </p>
                                                         @endif
-
-                                                        {{-- Green check icon when selected --}}
+                                                        @if($room['occupied_room'])
+                                                            <p class="text-danger fs-12px mb-1">
+                                                                <i class="fas fa-ban"></i> Occupied: {{ $room['occupied_date'] }}
+                                                            </p>
+                                                        @else
+                                                            <p class="text-success fs-12px mb-1">
+                                                                <i class="fas fa-check-circle"></i> Available
+                                                            </p>
+                                                        @endif
                                                         <div class="checked 
-                                                            @if($listing->room && $listing->room != 'null' && in_array($room->id, json_decode($listing->room))) 
+                                                            @if($listing->room && $listing->room != 'null' && in_array($room['id'], json_decode($listing->room))) 
                                                             @else d-none 
                                                             @endif" 
                                                             id="room-checked{{ $key }}">
@@ -374,6 +366,7 @@
                                     </label>
                                 </div>
                             @endforeach
+
                         @endif 
                     </div>
                 </div>
@@ -477,7 +470,131 @@
                         </div>
                     </div>
                 </div>
+                <div class="tab-pane fade" id="Nearby" role="tabpanel" aria-labelledby="Nearby-tab">
+                    <div class="row mb-3">
+                        <div class="d-flex justify-content-between align-items-center flex-wrap g-12 bd-b-1 pb-30">
+                            <div class="tableTitle-3">
+                                <h4 class="fz-18-m-black">{{ get_phrase('Nearby Location') }}</h4>
+                            </div>
+                            <a href="javascript:;" onclick="modal('modal-lg', '{{ route('add-listing-nearBy', ['prefix' => 'admin', 'id' => $listing->id, 'type' => 'sleep']) }}', '{{ get_phrase('Add NearBy Location') }}')" class="btn ol-btn-primary ">{{ get_phrase('Add Nearby Location') }}</a>
+                        </div>
+                    </div>
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs eNav-Tabs-custom nearby-tab" id="myTab" role="tablist">
+                        <!-- School -->
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="cSchool-tab" data-bs-toggle="tab" data-bs-target="#cSchool" type="button" role="tab" aria-controls="cSchool" aria-selected="true">
+                                {{ get_phrase('School') }}
+                                <span></span>
+                            </button>
+                        </li>
+                        <!-- Hospital -->
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="cHospital-tab" data-bs-toggle="tab" data-bs-target="#cHospital" type="button" role="tab" aria-controls="cHospital" aria-selected="false">
+                                {{ get_phrase('Hospital') }}
+                                <span></span>
+                            </button>
+                        </li>
+                        <!-- Shopping Center -->
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="cShoppingCenter-tab" data-bs-toggle="tab" data-bs-target="#cShoppingCenter" type="button" role="tab" aria-controls="cShoppingCenter" aria-selected="false">
+                                {{ get_phrase('Shopping Center') }}
+                                <span></span>
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content eNav-Tabs-content" id="myTabContent">
+                        <!-- School -->
+                        <div class="tab-pane fade show active" id="cSchool" role="tabpanel" aria-labelledby="cSchool-tab">
+                            <!-- Table -->
+                            <div class="table-responsive">
+                                <table class="table eTable eTable-2 table-icon table-p0 mt-2">
+                                    <tbody>
+                                        @foreach ($nearbylocation as $nearby)
+                                            @if ($nearby->nearby_id == 0)
+                                                <tr>
+                                                    <td>
+                                                        <div class="dl_property_type d-flex flex-column g-8">
+                                                            <p class="form-label cap-form-label">
+                                                                {{ $nearby->name }}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="nearBtn  justify-content-end d-flex gap-3">
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Hospital -->
+                        <div class="tab-pane fade" id="cHospital" role="tabpanel" aria-labelledby="cHospital-tab">
+                            <!-- Table -->
+                            <div class="table-responsive">
+                                <table class="table eTable eTable-2 table-icon table-p0 mt-2">
+                                    <tbody>
+                                        @foreach ($nearbylocation as $nearby)
+                                            @if ($nearby->nearby_id == 1)
+                                                <tr>
+                                                    <td>
+                                                        <div class="dl_property_type d-flex flex-column g-8">
+                                                            <p class="form-label cap-form-label">
+                                                                {{ $nearby->name }}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
 
+                                                        <div class="nearBtn d-flex justify-content-end gap-3">
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
+
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <!-- Shopping Center -->
+                        <div class="tab-pane fade" id="cShoppingCenter" role="tabpanel" aria-labelledby="cShoppingCenter-tab">
+                            <!-- Table -->
+                            <div class="table-responsive">
+                                <table class="table eTable eTable-2 table-icon table-p0 mt-2">
+                                    <tbody>
+                                        @foreach ($nearbylocation as $nearby)
+                                            @if ($nearby->nearby_id == 2)
+                                                <tr>
+                                                    <td>
+                                                        <div class="dl_property_type d-flex flex-column g-8">
+                                                            <p class="form-label cap-form-label">
+                                                                {{ $nearby->name }}
+                                                            </p>
+                                                        </div>
+                                                    </td>
+                                                    <td>
+                                                        <div class="nearBtn d-flex justify-content-end gap-3 ">
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('Edit') }}" href="javascript:void(0);" onclick="modal('modal-xl', '{{ route('editNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id, 'page' => 'edit']) }}', '{{ get_phrase('Update') }}')" class="p-1"> <i class="fas fa-edit"></i> </a>
+                                                            <a data-bs-toggle="tooltip" data-bs-title="{{ get_phrase('delete') }}" href="javascript:void(0);" onclick="delete_modal('{{ route('deleteNearByLocation', ['prefix' => 'admin', 'id' => $nearby->id]) }}')" class="p-1"> <i class="fas fa-trash"></i> </a>
+                                                        </div>
+                                                    </td>
+                                                </tr>
+                                            @endif
+                                        @endforeach
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div class="tab-pane fade" id="seo" role="tabpanel" aria-labelledby="seo-tab">
                     <div class="mb-3">
                         <label for="meta_title" class="form-label ol-form-label"> {{get_phrase('Meta Title')}}</label>
@@ -617,19 +734,54 @@
                 <input type="number" class="form-control" name="phone" required>
             </div>
             <div class="mb-3">
-              <label class="form-label">Select Room</label>
-              <select class="form-select" name="room_id" required>
-                <option value="">-- Select Room --</option>
-                @foreach($rooms as $room)
-                  <option value="{{ $room->id }}">
-                    {{ $room->title }} ({{ currency($room->price) }})
-                  </option>
-                @endforeach
-              </select>
+                <label class="form-label">Select Rooms</label>
+                <div id="roomsList" class="row g-2">
+                    @foreach($rooms as $room)
+                        @php
+                            $price = $room['dis_price'] ?? $room['price'] ?? 0;                           
+                            $checked = !empty($listing->room) && in_array($room['id'], json_decode($listing->room, true) ?? []);
+                        @endphp
+
+                        <div class="col-12 col-md-6">
+                            <div class="form-check">
+                                <input class="form-check-input room-checkbox" type="checkbox" name="room_id[]" id="room_{{ $room['id'] }}" value="{{ $room['id'] }}" data-price="{{ $price }}"{{ $checked ? 'checked' : '' }}>
+                                <label class="form-check-label" for="room_{{ $room['id'] }}">
+                                    {{ $room['title'] }} ({{ currency($price) }})
+                                </label>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
             </div>
+
+            <div id="roomSummary" class="card d-none mb-3">
+                <div class="card-body">
+                    <p class="mb-1">Selected: <span id="selectedRoomNames">None</span></p>
+                    <p class="mb-1">Subtotal: <strong id="roomSubtotal">₹0</strong></p>
+                    <p class="mb-1">Tax (<span id="roomTaxPercent">0</span>%): <strong id="roomTax">₹0</strong></p>
+                    <p class="mb-0">Grand Total: <strong id="roomGrandTotal">₹0</strong></p>
+                </div>
+            </div>
+
+            <input type="hidden" id="tax_persent" value="{{ isset($listing->tax_persent) ? $listing->tax_persent : 0 }}">
+            <input type="hidden" id="total_price" name="total_price" value="0">
+
+
             <div class="mb-3">
                 <label class="form-label">Appointment Date</label>
                 <input type="date" class=" appointmentDate form-control mform-control flat-input-picker3 input-calendar-icon"  id="appointmentDate" name="date" >
+            </div>
+
+            <div class="mb-3 row">
+                <label class="form-label">Booking For</label>
+                <div class="col">
+                    <label class="form-label">From Date</label>
+                    <input type="date" class="appointmentDate form-control" name="from_date" required>
+                </div>
+                <div class="col">
+                    <label class="form-label">To Date </label>
+                   <input type="date" class=" appointmentDate form-control mform-control flat-input-picker3 input-calendar-icon"  id="to_date" name="to_date" >
+                </div>                
             </div>
              
             <div class="mb-3 row">
@@ -838,4 +990,67 @@ document.getElementById('listing-floor-plan').addEventListener('change', functio
         }
     }); 
 </script>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const checkboxes = document.querySelectorAll('.room-checkbox');
+    const subtotalEl = document.getElementById('roomSubtotal');
+    const taxPercentEl = document.getElementById('roomTaxPercent');
+    const taxEl = document.getElementById('roomTax');
+    const grandEl = document.getElementById('roomGrandTotal');
+    const selectedNamesEl = document.getElementById('selectedRoomNames');
+    const summaryCard = document.getElementById('roomSummary');
+    const taxInput = document.getElementById('tax_persent');
+    const totalPriceInput = document.getElementById('total_price');
+
+    const taxPercent = parseFloat(taxInput?.value) || 0;
+    taxPercentEl.innerText = taxPercent;
+
+    function formatRupee(value) {
+        return '₹' + Number(value).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function updateRoomSummary() {
+        let subtotal = 0;
+        let names = [];
+
+        checkboxes.forEach(cb => {
+            if (cb.checked) {
+                let price = parseFloat(cb.dataset.price) || 0;
+                subtotal += price;
+                const label = document.querySelector(`label[for="${cb.id}"]`);
+                names.push(label ? label.textContent.trim() : cb.value);
+            }
+        });
+
+        if (names.length === 0) {
+            summaryCard.classList.add('d-none');
+            subtotalEl.innerText = formatRupee(0);
+            taxEl.innerText = formatRupee(0);
+            grandEl.innerText = formatRupee(0);
+            selectedNamesEl.innerText = 'None';
+            if (totalPriceInput) totalPriceInput.value = 0;
+            return;
+        }
+
+        const taxAmt = (subtotal * taxPercent) / 100;
+        const grandTotal = subtotal + taxAmt;
+
+        subtotalEl.innerText = formatRupee(subtotal);
+        taxEl.innerText = formatRupee(taxAmt);
+        grandEl.innerText = formatRupee(grandTotal);
+        selectedNamesEl.innerText = names.join(', ');
+
+        if (totalPriceInput) totalPriceInput.value = Number(grandTotal).toFixed(2);
+
+        summaryCard.classList.remove('d-none');
+    }
+
+    checkboxes.forEach(cb => {
+        cb.addEventListener('change', updateRoomSummary);
+    });
+
+    updateRoomSummary();
+});
+</script>
+
 @endsection

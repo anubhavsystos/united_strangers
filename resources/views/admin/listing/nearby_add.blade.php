@@ -14,10 +14,10 @@
          <div class="row justify-content-between align-items-center mb-2">
             <label for="nearby_id" class="col-sm-3 pe-0 form-label cap-form-label">{{ get_phrase('Add a Nearby Location') }}</label>
             <div class="col-sm-9">
-                <select class="form-select eForm-select form-control cap-form-control" id="nearby_id" name="nearby_id" data-placeholder="Type to search...">
-                    <option value="0">{{get_phrase('School')}}</option>
-                    <option value="1">{{get_phrase('Hospital')}}</option>
-                    <option value="2">{{get_phrase('Shopping center')}}</option>
+                <select class="form-select eForm-select form-control cap-form-control" id="nearby_id" name="nearby_type" data-placeholder="Type to search...">
+                    <option value="school">{{get_phrase('School')}}</option>
+                    <option value="hospital">{{get_phrase('Hospital')}}</option>
+                    <option value="shopping_center">{{get_phrase('Shopping center')}}</option>
                 </select>
             </div>
         </div>
@@ -29,7 +29,7 @@
             </div>
         </div>
         <input type="hidden"  id="nearby_listing_id" name="nearby_listing_id" value="{{$id}}"/>
-        <input type="hidden"  id="listing_type" name="listing_type" value="work"/>
+        <input type="hidden"  id="listing_type" name="listing_type" value="{{$type}}"/>
         <!-- Latitude -->
         <div class="row justify-content-between align-items-center mb-2">
             <label for="nearby-latitude" class="col-sm-3 pe-0 form-label cap-form-label">{{ get_phrase('Latitude') }}</label>

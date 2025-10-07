@@ -263,6 +263,10 @@
                     </div>
                 </div>
         </div>
+        <div class="hoteldetails-location-area mb-50px">
+                <h2 class="in-title3-24px mb-20px">{{ get_phrase('Location Nearby') }}</h2>                       
+                @include('frontend.work.nearby')
+            </div>
     </div>
 </section>
 <!-- End Main Content Area -->

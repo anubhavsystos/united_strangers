@@ -90,14 +90,14 @@
                         <input type="text" name="title" id="title" value="{{ isset($event) ? $event->title : old('title') }}" required class="form-control ol-form-control" placeholder="{{get_phrase('Enter event title')}}" >
                     </div>
                     <div class="mb-3">
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <label for="title" class="form-label ol-form-label"> {{get_phrase('To Date')}} *</label>
-                                <input type="date" name="to_date" required id="title" class="form-control ol-form-control" value="{{ isset($event) ? $event->to_date : old('to_date') }}" placeholder="{{get_phrase('To Date')}}" >
-                            </div>
+                        <div class="row">                            
                             <div class="col-sm-6">
                                 <label for="title" class="form-label ol-form-label"> {{get_phrase('From Date')}} *</label>
                                 <input type="date" name="from_date"  required id="title" class="form-control ol-form-control" value="{{ isset($event) ? $event->from_date : old('from_date') }}" placeholder="{{get_phrase('From Date')}}" >
+                            </div>
+                            <div class="col-sm-6">
+                                <label for="title" class="form-label ol-form-label"> {{get_phrase('To Date')}} *</label>
+                                <input type="date" name="to_date" required id="title" class="form-control ol-form-control" value="{{ isset($event) ? $event->to_date : old('to_date') }}" placeholder="{{get_phrase('To Date')}}" >
                             </div>
                         </div>
                     </div>

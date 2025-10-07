@@ -357,11 +357,9 @@
                             </div>
                         </div>
                       <!--  -->
-                    </div>
-                    
-                </div>
-                 
-                 <div class="col-xl-4 col-lg-5">
+                    </div>                    
+                </div>                 
+                <div class="col-xl-4 col-lg-5">
                     <div class="sleepdetails-form-area mb-30px">
                     <h4 class="sub-title ">{{ get_phrase('Booking') }}</h4>
                     
@@ -423,7 +421,11 @@
                     </form>
                     </div>
                 </div>
-              
+                              
+            </div>
+            <div class="hoteldetails-location-area mb-50px">
+                <h2 class="in-title3-24px mb-20px">{{ get_phrase('Location Nearby') }}</h2>                       
+                @include('frontend.work.nearby')
             </div>
         </div>
     </section>

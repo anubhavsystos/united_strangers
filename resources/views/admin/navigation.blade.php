@@ -28,7 +28,7 @@
                 </svg>
                 </span>
                 <div class="text">
-                    <span> {{get_phrase('Dashboard')}} </span>
+                    <span> {{get_phrase('Dashboard')}} {{user('type') }} </span>
                 </div>
                 </a>
             </li>
@@ -79,6 +79,7 @@
                     <li class="sidebar-second-li {{request()->is('admin/categories/play')?'active':''}}"><a href="{{ route('admin.categories',['type'=>'play'])}}"> {{get_phrase('Play')}} </a></li>
                 </ul>
             </li>
+            @if(user('type') == 'admin')
             <li class="sidebar-first-li {{request()->is('admin/cities*')?'active':''}}">
                 <a href="{{ route('admin.cities')}}">
                     <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -95,7 +96,8 @@
                         <span> {{get_phrase('Listing Cities')}} </span>
                     </div>
                 </a>
-            </li>   
+            </li>
+            @endif
             <li class="sidebar-first-li {{request()->is('admin/offers*')?'active':''}}">
                 <a href="{{ route('admin.offers')}}">
                     <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -130,7 +132,25 @@
                     </div>
                 </a>
             </li>
-           
+            <li class="sidebar-first-li {{request()->is('admin/auditreports*')?'active':''}}">
+                <a href="{{ route('admin.auditreports')}}">
+                    <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M10.8327 18.9584H4.16602C2.14935 18.9584 1.04102 17.8501 1.04102 15.8334V9.16675C1.04102 7.15008 2.14935 6.04175 4.16602 6.04175H8.33268C8.67435 6.04175 8.95768 6.32508 8.95768 6.66675V15.8334C8.95768 17.1501 9.51602 17.7084 10.8327 17.7084C11.1744 17.7084 11.4577 17.9917 11.4577 18.3334C11.4577 18.6751 11.1744 18.9584 10.8327 18.9584ZM4.16602 7.29175C2.84935 7.29175 2.29102 7.85008 2.29102 9.16675V15.8334C2.29102 17.1501 2.84935 17.7084 4.16602 17.7084H8.16601C7.86601 17.2167 7.70768 16.5917 7.70768 15.8334V7.29175H4.16602Z" fill="#99A1B7"/>
+                        <path d="M8.33268 7.29159H4.16602C3.82435 7.29159 3.54102 7.00825 3.54102 6.66659V4.99992C3.54102 3.73325 4.56602 2.70825 5.83268 2.70825H8.42434C8.616 2.70825 8.79936 2.7999 8.91603 2.9499C9.03269 3.10823 9.07434 3.30825 9.02434 3.49159C8.97434 3.67492 8.95768 3.88325 8.95768 4.16659V6.66659C8.95768 7.00825 8.67435 7.29159 8.33268 7.29159ZM4.79102 6.04159H7.70768V4.16659C7.70768 4.09159 7.70768 4.02492 7.70768 3.95825H5.83268C5.25768 3.95825 4.79102 4.42492 4.79102 4.99992V6.04159Z" fill="#99A1B7"/>
+                        <path d="M11.666 11.4584C11.3243 11.4584 11.041 11.1751 11.041 10.8334V6.66675C11.041 6.32508 11.3243 6.04175 11.666 6.04175C12.0077 6.04175 12.291 6.32508 12.291 6.66675V10.8334C12.291 11.1751 12.0077 11.4584 11.666 11.4584Z" fill="#99A1B7"/>
+                        <path d="M15 11.4584C14.6583 11.4584 14.375 11.1751 14.375 10.8334V6.66675C14.375 6.32508 14.6583 6.04175 15 6.04175C15.3417 6.04175 15.625 6.32508 15.625 6.66675V10.8334C15.625 11.1751 15.3417 11.4584 15 11.4584Z" fill="#99A1B7"/>
+                        <path d="M14.9993 18.9584H11.666C11.3243 18.9584 11.041 18.6751 11.041 18.3334V15.0001C11.041 14.2001 11.6993 13.5417 12.4993 13.5417H14.166C14.966 13.5417 15.6243 14.2001 15.6243 15.0001V18.3334C15.6243 18.6751 15.341 18.9584 14.9993 18.9584ZM12.291 17.7084H14.3743V15.0001C14.3743 14.8834 14.2827 14.7917 14.166 14.7917H12.4993C12.3827 14.7917 12.291 14.8834 12.291 15.0001V17.7084Z" fill="#99A1B7"/>
+                        <path d="M5 14.7916C4.65833 14.7916 4.375 14.5083 4.375 14.1666V10.8333C4.375 10.4916 4.65833 10.2083 5 10.2083C5.34167 10.2083 5.625 10.4916 5.625 10.8333V14.1666C5.625 14.5083 5.34167 14.7916 5 14.7916Z" fill="#99A1B7"/>
+                        <path d="M15.834 18.9584H10.834C8.81732 18.9584 7.70898 17.8501 7.70898 15.8334V4.16675C7.70898 2.15008 8.81732 1.04175 10.834 1.04175H15.834C17.8507 1.04175 18.959 2.15008 18.959 4.16675V15.8334C18.959 17.8501 17.8507 18.9584 15.834 18.9584ZM10.834 2.29175C9.51732 2.29175 8.95898 2.85008 8.95898 4.16675V15.8334C8.95898 17.1501 9.51732 17.7084 10.834 17.7084H15.834C17.1507 17.7084 17.709 17.1501 17.709 15.8334V4.16675C17.709 2.85008 17.1507 2.29175 15.834 2.29175H10.834Z" fill="#99A1B7"/>
+                        </svg>
+                        </span>
+                    <div class="text">
+                        <span> {{get_phrase('Audit Reports')}} </span>
+                    </div>
+                </a>
+            </li>
+            
+            @if(user('type') == 'admin')
             <li class="sidebar-first-li first-li-have-sub {{request()->is('admin/user*') || request()->is('admin/edit-user*') || request()->is('admin/contact') ?'active':''}}">
                 <a href="javascript:void(0);">
                     <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -166,7 +186,7 @@
                     </li>                    
                 </ul>
             </li>
-      
+            @endif
           
             <li class="sidebar-first-li first-li-have-sub {{request()->is('admin/blogs/all') || request()->is('admin/blogs/pending') || request()->is('admin/blog-category') || request()->is('admin/blog-create')?'active':''}}">
                 <a href="javascript:void(0);">
@@ -207,6 +227,7 @@
                     <li class="sidebar-second-li {{request()->is('admin/newsletters/subscribers')?'active':''}}"><a href="{{route('admin.newsletters.subscribers')}}"> {{get_phrase('Subscribed User')}} </a></li>
                 </ul>
             </li>
+             @if(user('type') == 'admin')
             <li class="sidebar-first-li first-li-have-sub {{request()->is('admin/system-setting') || request()->is('admin/language-setting') || request()->is('admin/email-settings') || request()->is('admin/frontend-setting') || request()->is('admin/language-phrase*') || request()->is('admin/payment-edit*') || request()->is('admin/payment-gateways*') || request()->is('admin/live-chat/tawk-settings*') || request()->is('admin/form-builder*') || $current_route == 'admin.seo.settings' || $current_route == 'admin.about' ?'active':''}}">
                 <a href="javascript:void(0);">
                    <span><svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -219,44 +240,12 @@
                     </div>
                 </a>
                 <ul class="first-sub-menu">        
-                    <li class="sidebar-second-li {{request()->is('admin/frontend-setting')?'active':''}}"><a href="{{ route('admin.website.settings')}}"> {{get_phrase('Frontend Settings')}} </a></li>
-                    <!-- <li class="sidebar-second-li {{request()->is('admin/system-setting')?'active':''}}"><a href="{{ route('admin.system.setting')}}"> {{get_phrase(' System Settings')}} </a></li>                     -->
-                    
-                    
+                    <li class="sidebar-second-li {{request()->is('admin/frontend-setting')?'active':''}}"><a href="{{ route('admin.website.settings')}}"> {{get_phrase('Frontend Settings')}} </a></li>                    
                     <li class="sidebar-second-li {{request()->is('admin/payment-gateways') || request()->is('admin/payment-edit*')?'active':''}}"><a href="{{route('admin.payment.setting')}}"> {{get_phrase('Payment Settings')}} </a></li>
-                    <li class="sidebar-second-li {{ $current_route == 'admin.seo.settings' ? 'active' : '' }}"><a href="{{ route('admin.seo.settings') }}">{{ get_phrase('SEO Settings') }}</a></li>                    
-                   
+                    <li class="sidebar-second-li {{ $current_route == 'admin.seo.settings' ? 'active' : '' }}"><a href="{{ route('admin.seo.settings') }}">{{ get_phrase('SEO Settings') }}</a></li>                   
                 </ul>
             </li>
-            <!-- <li class="sidebar-first-li first-li-have-sub {{request()->is('admin/amenities*')?'active':''}}">
-                <a href="javascript:void(0);">
-                    <span>
-                        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M6.66602 4.79175C6.32435 4.79175 6.04102 4.50841 6.04102 4.16675V1.66675C6.04102 1.32508 6.32435 1.04175 6.66602 1.04175C7.00768 1.04175 7.29102 1.32508 7.29102 1.66675V4.16675C7.29102 4.50841 7.00768 4.79175 6.66602 4.79175Z" fill="#99A1B7"/>
-                            <path d="M13.334 4.79175C12.9923 4.79175 12.709 4.50841 12.709 4.16675V1.66675C12.709 1.32508 12.9923 1.04175 13.334 1.04175C13.6757 1.04175 13.959 1.32508 13.959 1.66675V4.16675C13.959 4.50841 13.6757 4.79175 13.334 4.79175Z" fill="#99A1B7"/>
-                            <path d="M12.2333 18.9584H6.66667C3.625 18.9584 1.875 17.2084 1.875 14.1667V7.08341C1.875 4.04175 3.625 2.29175 6.66667 2.29175H13.3333C16.375 2.29175 18.125 4.04175 18.125 7.08341V11.3584C18.125 11.6001 17.9833 11.8167 17.775 11.9251C17.5583 12.0251 17.3 12.0001 17.1167 11.8501C15.8 10.8001 13.775 10.8001 12.4583 11.8751C11.5583 12.5834 11.05 13.6418 11.05 14.8001C11.05 15.4834 11.2333 16.1501 11.5917 16.7251C11.8667 17.1751 12.2083 17.5501 12.6083 17.8334C12.825 17.9918 12.925 18.2751 12.8417 18.5334C12.7417 18.7834 12.5083 18.9584 12.2333 18.9584ZM6.66667 3.54175C4.28333 3.54175 3.125 4.70008 3.125 7.08341V14.1667C3.125 16.5501 4.28333 17.7084 6.66667 17.7084H10.7417C10.6583 17.6001 10.5833 17.4834 10.5167 17.3668C10.0417 16.6001 9.79167 15.7084 9.79167 14.7917C9.79167 13.2501 10.475 11.8334 11.675 10.8918C13.1 9.73342 15.2083 9.4834 16.875 10.2501V7.08341C16.875 4.70008 15.7167 3.54175 13.3333 3.54175H6.66667V3.54175Z" fill="#99A1B7"/>
-                            <path d="M10.834 9.79175H5.83398C5.49232 9.79175 5.20898 9.50841 5.20898 9.16675C5.20898 8.82508 5.49232 8.54175 5.83398 8.54175H10.834C11.1757 8.54175 11.459 8.82508 11.459 9.16675C11.459 9.50841 11.1757 9.79175 10.834 9.79175Z" fill="#99A1B7"/>
-                            <path d="M8.01731 13.9583H5.83398C5.49232 13.9583 5.20898 13.6749 5.20898 13.3333C5.20898 12.9916 5.49232 12.7083 5.83398 12.7083H8.01731C8.35898 12.7083 8.64231 12.9916 8.64231 13.3333C8.64231 13.6749 8.36731 13.9583 8.01731 13.9583Z" fill="#99A1B7"/>
-                            <path d="M14.791 19.7916C13.7243 19.7916 12.716 19.4583 11.866 18.8416C11.3327 18.4583 10.8743 17.9583 10.516 17.3667C10.041 16.6 9.79102 15.7083 9.79102 14.7916C9.79102 13.25 10.4744 11.8333 11.6744 10.8917C13.4077 9.48332 16.141 9.47496 17.891 10.8666C19.0993 11.8166 19.791 13.25 19.791 14.7916C19.791 15.7083 19.541 16.6 19.066 17.3667C18.7994 17.825 18.4577 18.225 18.066 18.55C17.1743 19.35 16.0077 19.7916 14.791 19.7916ZM14.791 11.0416C13.941 11.0416 13.1077 11.3333 12.4494 11.8666C11.5494 12.575 11.041 13.6333 11.041 14.7916C11.041 15.475 11.2243 16.1416 11.5827 16.7166C11.8577 17.1666 12.1993 17.5417 12.5993 17.825C13.241 18.2917 13.9993 18.5416 14.791 18.5416C15.716 18.5416 16.566 18.2166 17.2494 17.6083C17.5494 17.3583 17.791 17.0667 17.991 16.725C18.3493 16.1417 18.541 15.475 18.541 14.7916C18.541 13.6333 18.0244 12.5666 17.116 11.85C16.4494 11.3166 15.6493 11.0416 14.791 11.0416Z" fill="#99A1B7"/>
-                            <path d="M14.7923 17.4999C14.4507 17.4999 14.1673 17.2166 14.1673 16.8749C14.1673 16.0749 13.509 15.4166 12.709 15.4166C12.3673 15.4166 12.084 15.1333 12.084 14.7916C12.084 14.4499 12.3673 14.1666 12.709 14.1666C13.509 14.1666 14.1673 13.5083 14.1673 12.7083C14.1673 12.3666 14.4507 12.0833 14.7923 12.0833C15.134 12.0833 15.4173 12.3666 15.4173 12.7083C15.4173 13.5083 16.0757 14.1666 16.8757 14.1666C17.2173 14.1666 17.5007 14.4499 17.5007 14.7916C17.5007 15.1333 17.2173 15.4166 16.8757 15.4166C16.0757 15.4166 15.4173 16.0749 15.4173 16.8749C15.4173 17.2166 15.134 17.4999 14.7923 17.4999ZM14.434 14.7916C14.559 14.8999 14.684 15.0166 14.7923 15.1499C14.9007 15.0249 15.0173 14.8999 15.1506 14.7916C15.0256 14.6833 14.9007 14.5666 14.7923 14.4333C14.684 14.5666 14.5673 14.6833 14.434 14.7916Z" fill="#99A1B7"/>
-                        </svg>                            
-                    </span>
-                    <div class="text">
-                        <span> {{get_phrase('Listing Amenities')}} </span>
-                    </div>
-                </a>
-                <ul class="first-sub-menu">
-                    <li class="sidebar-second-li {{request()->is('admin/amenities-item/car*')?'active':''}}"><a href="{{ route('admin.amenities.item',['prefix'=> 'admin','type'=>'car','item'=>'model'])}}"> {{get_phrase('Car')}} </a></li>
-
-                    <li class="sidebar-second-li {{request()->is('admin/amenities-item/beauty*')?'active':''}}"><a href="{{ route('admin.amenities.item',['prefix'=> 'admin','type'=>'beauty', 'item'=>'team'])}}"> {{get_phrase('Beauty')}} </a></li>
-
-                    <li class="sidebar-second-li {{request()->is('admin/amenities/real-estate') || request()->is('admin/amenities-item/real-estate/feature')?'active':''}}"><a href="{{ route('admin.amenities.item',['prefix'=> 'admin','type'=>'real-estate','item'=>'feature'])}}"> {{get_phrase('Real Estate')}} </a></li>
-
-                    <li class="sidebar-second-li {{request()->is('admin/amenities/hotel') || request()->is('admin/amenities-item/hotel*')?'active':''}}"><a href="{{ route('admin.amenities.item',['prefix'=> 'admin','type'=>'hotel', 'item'=>'feature'])}}"> {{get_phrase('Hotel')}} </a></li>
-
-                    <li class="sidebar-second-li {{request()->is('admin/amenities/restaurant') || request()->is('admin/amenities-item/restaurant*')?'active':''}}"><a href="{{ route('admin.amenities.item',['prefix'=> 'admin','type'=>'restaurant','item'=>'feature'])}}"> {{get_phrase('Restaurant')}} </a></li>
-                </ul>
-            </li> -->
+            @endif
             <li class="sidebar-first-li {{request()->is('admin/profile')?'active':''}}"><a href="{{ route('admin.profile')}}">
                <span>
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">

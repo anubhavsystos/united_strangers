@@ -27,6 +27,7 @@ use App\Models\Contact;
 use App\Models\Offer;
 use App\Models\Event;
 use App\Models\Room;
+use App\Models\NearbyLocation;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Brian2694\Toastr\Facades\Toastr;
@@ -37,7 +38,7 @@ class FrontendController extends Controller
     protected $blog;
     protected $blog_category;
 
-   public function __construct(SleepListing $sleepListing,WorkListing $workListing,PlayListing $playListing,User $user,Message_thread $messageThread,Message $message,Review $review,Wishlist $wishlist,City $city,Country $country,Menu $menu,Appointment $appointment,Amenities $amenities,Newsletter $newsletter,Newsletter_subscriber $newsletterSubscriber,ClaimedListing $claimedListing,ReportedListing $reportedListing,Contact $contact,Pricing $pricing,Category $category,Offer $offer, Event $event, Blog $blog,Room $room) {
+   public function __construct(SleepListing $sleepListing,WorkListing $workListing,PlayListing $playListing,User $user,Message_thread $messageThread,Message $message,Review $review,Wishlist $wishlist,City $city,Country $country,Menu $menu,Appointment $appointment,Amenities $amenities,Newsletter $newsletter,Newsletter_subscriber $newsletterSubscriber,ClaimedListing $claimedListing,ReportedListing $reportedListing,Contact $contact,Pricing $pricing,Category $category,Offer $offer, Event $event, Blog $blog,Room $room,NearbyLocation $nearbylocation) {
         $this->sleepListing = $sleepListing;
         $this->workListing = $workListing;
         $this->playListing = $playListing;
@@ -60,6 +61,7 @@ class FrontendController extends Controller
         $this->room = $room;
         $this->review = $review;
         $this->menu = $menu;
+        $this->nearbylocation = $nearbylocation;
     }
 
 
@@ -162,7 +164,6 @@ class FrontendController extends Controller
         return view('frontend.details', compact('sleepListing_data','workListing_data','playListing_data'));
             
     }
-
     public function show_products_segment(Request $request)
     {
         $type = $request->type;
@@ -263,6 +264,22 @@ class FrontendController extends Controller
             $page_data['listing'] = $this->playListing->where('id', $id)->first();
             $page_data['directory'] = 'play';
         }
+        $nearbyLocations = $this->nearbylocation
+        ->where('listing_id', $id)
+        ->where('listing_type', $type)
+        ->get();
+
+        $coordinates = $nearbyLocations->map(function ($location) {
+            return [
+                'latitude' => $location->latitude,
+                'longitude'=> $location->longitude,
+                'name'     => $location->name,
+                'type'     => $location->type,
+            ];
+        });
+
+        $page_data['nearbyLocations'] = $nearbyLocations;
+        $page_data['coordinates'] = $coordinates;
 
         $page_data['rooms'] = $this->room->where('listing_id', $id)->get()->map(function ($item) {
             return $item->roomFormattedArray();
@@ -306,9 +323,6 @@ class FrontendController extends Controller
         return view('frontend.blogs', $page_data);
     }
 
-
-
-    // Reviews System 
     public function ListingReviews(Request $request, $listing_id)
     {
         if (!Auth::check()) {
@@ -316,13 +330,11 @@ class FrontendController extends Controller
             return redirect()->route('login');
         }
         
-        // Validate input
         $request->validate([
             'rating' => 'required|integer', 
             'review' => 'required|string',
         ]);
 
-        // Create new review
         $review = new Review;
         $review->rating = $request->rating; 
         $review->review = sanitize($request->review);
@@ -843,14 +855,15 @@ class FrontendController extends Controller
         $in_time    = $request->input('in_time');
         $out_time   = $request->input('out_time');
     
-        $bookedRoomIds = $this->appointment->where('listing_type', 'sleep')->where('listing_id', $listing_id)->where('date', $date)
-        ->where(function ($query) use ($in_time, $out_time) {
-            $query->where('in_time', '<', $out_time)->where('out_time', '>', $in_time);
-        })->pluck('room_id') 
-        ->map(function ($item) {
-            return json_decode($item, true); 
-        })->flatten()->unique()->values()
-        ->toArray();
+        $bookedRoomIds = $this->appointment->where('listing_type', 'sleep')->where('listing_id', $listing_id)
+            ->whereDate('from_date', '<=', $date)
+            ->whereDate('to_date', '>=', $date)
+            ->where(function ($query) use ($in_time, $out_time) {
+                $query->where('in_time', '<', $out_time)->where('out_time', '>', $in_time);
+            })->pluck('room_id') 
+            ->map(function ($item) {
+                return json_decode($item, true); 
+            })->flatten()->unique()->values()->toArray();
         $rooms = $this->room
             ->where('listing_id', $listing_id)
             ->whereNotIn('id', $bookedRoomIds)

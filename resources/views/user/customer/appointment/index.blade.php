@@ -2,6 +2,11 @@
 @push('title', get_phrase('Customer Appointment'))
 @push('meta')@endpush
 @section('frontend_layout')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css">
+
+<script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+
 <style>
     .table > tbody.ca-tbody {
 	vertical-align: inherit;
@@ -58,22 +63,24 @@
                     </div>
 
 
-                    <div class="ca-content-card table-responsive pb-1">                        
-                        <table class="table ca-table ca-table-width">
+                    <div class="ca-content-card table-responsive mt-2 pb-1">                        
+                        <table id="appointments-table" class="table ca-table ca-table-width">
                             <thead class="ca-thead">                              
                                 <tr class="ca-tr">
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Id')}}</th>                                                                
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Customer')}}</th>
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Contact')}}</th>
                                     
-                                    <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Menu Name')}}</th>
+                                    <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Listing Name')}}</th>                                                                                             
+                                    <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Segment type')}}</th> 
+                                    <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Property')}}</th>
+
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Total Price')}}</th>
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Person')}}</th>
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Booking Date')}}</th>
 
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Details')}}</th>                                                             
-                                    <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>                                                                
-                                    <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Segment type')}}</th>                                                                
+                                    <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>                                                                      
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Payment')}}</th>                                                                
                                 </tr>
                             </thead>
@@ -89,33 +96,50 @@
                                             <div class="align-items-center gap-2"><p >{{isset($appointment['customer_phone']) ? $appointment['customer_phone'] : ''}} </p>
                                             <p class="ca-subtitle-14px ca-text-dark mb-2 line-1"> {{isset($appointment['phone']) ?  $appointment['phone'] : ''}}</p></div>
                                         </td>
+                                         <td class="min-w-140px">
+                                            <div class="d-flex align-items-center gap-2"><p class="badge-dark">{{isset($appointment['title']) ? $appointment['title'] : ''}} </p></div>
+                                        </td>
                                         <td class="min-w-140px">
-                                            @php 
-                                                $menuSummary = is_array($appointment['menu_summary']) 
-                                                    ? $appointment['menu_summary'] 
-                                                    : explode(',', $appointment['menu_summary']);
+                                            <div class="d-flex align-items-center gap-2"><p class="badge-dark">{{isset($appointment['listing_type']) ? $appointment['listing_type'] : ''}} </p></div>
+                                        </td> 
+                                        <td class="min-w-140px">
+                                            @php
+                                                $property = [];
+                                                if (!empty($appointment['room_name'])) {
+                                                    $roomNames = is_array($appointment['room_name'])
+                                                        ? $appointment['room_name']
+                                                        : explode(',', $appointment['room_name']);
+                                                    $property = array_merge($property, $roomNames);
+                                                }
+
+                                                if (!empty($appointment['menu_summary'])) {
+                                                    $menuItems = is_array($appointment['menu_summary'])
+                                                        ? $appointment['menu_summary']
+                                                        : explode(',', $appointment['menu_summary']);
+                                                    $property = array_merge($property, $menuItems);
+                                                }
+                                                $property = array_filter(array_map('trim', $property));
                                             @endphp
 
                                             <div class="d-flex flex-column">
-                                                @foreach(array_slice($menuSummary, 0, 2) as $item)
-                                                    <p class="badge-dark mb-1">{{ trim($item) }}</p>
+                                                @foreach(array_slice($property, 0, 2) as $item)
+                                                    <p class="badge-dark mb-1">{{ $item }}</p>
                                                 @endforeach
 
-                                                @if(count($menuSummary) > 2)
-                                                    <a href="javascript:void(0);" 
+                                                @if(count($property) > 2)
+                                                    <a href="javascript:void(0);"
                                                     onclick="this.nextElementSibling.classList.toggle('d-none'); this.classList.add('d-none')">
                                                     ... Show more
                                                     </a>
 
                                                     <div class="d-none">
-                                                        @foreach(array_slice($menuSummary, 2) as $item)
-                                                            <p class="badge-dark mb-1">{{ trim($item) }}</p>
+                                                        @foreach(array_slice($property, 2) as $item)
+                                                            <p class="badge-dark mb-1">{{ $item }}</p>
                                                         @endforeach
                                                     </div>
                                                 @endif
                                             </div>
-                                        </td>
-
+                                        </td>                                         
                                         <td class="min-w-140px">
                                             <div class="d-flex align-items-center gap-2"><p class="badge-dark">{{isset($appointment['total_price']) ? $appointment['total_price'] : ''}} </p></div>
                                         </td>
@@ -128,8 +152,7 @@
                                             <div class="d-flex align-items-center gap-2"><p class="badge-dark">{{isset($appointment['date']) ? $appointment['date'] : ''}} </p></div>
                                         </td>
                                         <td class="min-w-110px">
-                                            <div class="d-flex gap-1 align-items-center">
-                                                <img src="{{ asset('assets/frontend/images/icons/clock-gray-12.svg') }}" alt="icon">
+                                            <div class="d-flex gap-1 align-items-center">                                                
                                                 <p class="in-subtitle-14px">{{!empty($appointment['in_time']) ? $appointment['in_time'] : ''}} - {{!empty($appointment['out_time']) ? $appointment['out_time'] : ''}}</p>
                                             </div>                                                                    
                                             <div class="eMessage">
@@ -155,9 +178,7 @@
                                                 <p class="badge-warning-light">{{get_phrase('Not start yet')}}</p>
                                             @endif
                                         </td>
-                                        <td class="min-w-140px">
-                                            <div class="d-flex align-items-center gap-2"><p class="badge-dark">{{isset($appointment['listing_type']) ? $appointment['listing_type'] : ''}} </p></div>
-                                        </td>                                                                   
+                                                                                                        
                                        <td class="min-w-140px">
                                             @if($appointment['status'] == 1)
                                                 <button type="button" class="btn btn-success button_font" disabled>
@@ -195,13 +216,7 @@
                                     </tr>
                                 @endforeach
                             </tbody>
-                        </table>
-                        <div class="mt-20px d-flex align-items-center gap-3 justify-content-between flex-wrap ePagination mb-3">
-                            <p class="in-subtitle-12px">{{get_phrase('Showing').'  to '.count($appointments).' '.get_phrase('of').' '.count($appointments).' '.get_phrase('results')}} </p>
-                            <div class="d-flex align-items-center gap-1 flex-wrap ">
-                                {{$appointments->links()}}
-                            </div>
-                        </div>
+                        </table>                    
                     </div>
                 </div>
             </div>
@@ -370,7 +385,27 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 });
 </script>
+<script>
+$(document).ready(function() {
+    $('#appointments-table').DataTable({
+        "paging": true,          
+        "lengthChange": true,    
+        "searching": true,       
+        "ordering": true,        
+        "info": true,            
+        "autoWidth": false,
+        "pageLength": 10,        
+        "language": {
+            "search": "Search:",
+            "lengthMenu": "Show _MENU_ entries",
+            "info": "Showing _START_ to _END_ of _TOTAL_ appointments",
+            "paginate": {
+                "previous": "Prev",
+                "next": "Next"
+            }
+        }
+    });
+});
+</script>
 
-
-
-        @endsection
+@endsection

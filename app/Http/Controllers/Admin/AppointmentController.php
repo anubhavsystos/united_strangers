@@ -44,10 +44,10 @@ class AppointmentController extends Controller
 
 
    public function appointment_store(Request $request){
-        $request['date'] = date("Y-m-d", strtotime($request['date']));
-        $request['in_time'] = date("H:i:s", strtotime($request['in_time']));
-        $request['out_time'] = date("H:i:s", strtotime($request['out_time']));
-        $request['customer_id'] = auth()->user()->id ?? 1;
+        $request['date'] = $request['date'] ?? date("Y-m-d", strtotime($request['date']));
+        $request['to_date'] = $request['to_date'] ?? date("H:i:s", strtotime($request['to_date']));
+        $request['from_date'] = $request['from_date'] ?? date("H:i:s", strtotime($request['from_date']));
+        $request['customer_id'] =  auth()->user()->id ?? 1;
        
         if (is_array($request->room_id)) {
             $request['room_id'] = json_encode($request->room_id); 

@@ -38,7 +38,7 @@ class ListingController extends Controller
         $this->menu = $menu;
         $this->claimedListing = $claimedListing;
         $this->reportedListing = $reportedListing;
-        $this->nearByLocation = $nearByLocation;
+        $this->nearbylocation = $nearByLocation;
         $this->appointment = $appointment;
         $this->amenities = $amenities;
         $this->city = $city;
@@ -167,7 +167,10 @@ class ListingController extends Controller
         });   
         $page_data['tab'] = $tab;
         $page_data['type'] = $type;
-        $page_data['rooms'] = $this->room->where('listing_id', $id)->where('segment_type', $type)->get(); 
+        $page_data['rooms'] = $this->room->where('listing_id', $id)->where('segment_type', $type)->get()->map(function ($item) use ($type) {
+            return $item->roomFormattedArray($type);
+        });   
+        $page_data['nearbylocation'] = $this->nearbylocation->where('listing_id', $id)->where('listing_type', $type)->get(); 
         $page_data['features'] = $this->amenities->get(); 
         $page_data['city'] = $this->city->get();
         $page_data['country'] = $this->country->get();
@@ -897,9 +900,10 @@ class ListingController extends Controller
 
     // Listing NearBy
   
-    public function listing_nearBY($prefix, $id){
+    public function listing_nearBY($prefix, $id,$type){
         $page_data['id'] = $id;
         $page_data['page'] = 'add';
+        $page_data['type'] = $type;
         return view('admin.listing.nearby_add', $page_data);
     }
 
@@ -907,16 +911,24 @@ class ListingController extends Controller
     public function saveNearByLocation(Request $request)
     {
         $data= $request->all();
-
-
-        $listing= $this->workListing->find($data['nearby_listing_id']);
-        $nearby=json_decode($listing->near_by,true);
-        $type=$nearby[$data['nearby_id']];
+        // return $data;
+        $type = $request->listing_type;        
+        if($type == 'sleep'){
+            $listing= $this->sleepListing->find($data['nearby_listing_id']);       
+        }
+        if($type =='work'){
+            $listing= $this->workListing->find($data['nearby_listing_id']); 
+        }
+        if($type == 'play'){
+             $listing= $this->playListing->find($data['nearby_listing_id']);
+        }
+        // return $nearby=json_decode($listing->near_by,true);
+        $type= $data['nearby_type'];
 
         $insertNearbyLocation = new NearByLocation();
         $insertNearbyLocation->name=$data['nearbyname'];
         $insertNearbyLocation->type=$type;
-        $insertNearbyLocation->nearby_id=$data['nearby_id'];
+        // $insertNearbyLocation->nearby_id=$data['nearby_id'];
         $insertNearbyLocation->listing_type=$data['listing_type'];
         $insertNearbyLocation->latitude=$data['nearby-latitude'];
         $insertNearbyLocation->longitude=$data['nearby-longitude'];

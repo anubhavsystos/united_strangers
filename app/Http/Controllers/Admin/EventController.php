@@ -57,6 +57,7 @@ class EventController extends Controller
             }
         }
         $request['image'] = json_encode($listing_image);        
+        $request['user_id'] = auth()->user()->id;        
         $event = $this->event->create($request->except(['_token', 'listing_image']));
         return redirect()->route('admin.event')->with('success', 'event created successfully.');        
     }

@@ -7,7 +7,7 @@
             </button>
             <h1 class="page-title ms-2 fs-18px d-flex flex-column row-gap-0">
                 <span> United Strangers </span>
-                <p class="text-12px fw-400 d-none d-lg-none d-xl-inline-block mt-1">{{ get_phrase('Admin Panel') }}</p>
+                <p class="text-12px fw-400 d-none d-lg-none d-xl-inline-block mt-1">{{ ucfirst(user('type') ?? '') }} {{ get_phrase('Panel') }}</p>
             </h1>
         </div>
     </div>
@@ -26,7 +26,7 @@
                     </div>
                     <div>
                         <h6 class="title fs-12px mb-2px"> {{user('name')}} </h6>
-                        <p class="sub-title fs-12px"> {{get_phrase('Admin')}} </p>
+                        <p class="sub-title fs-12px"> {{ ucfirst(user('type') ?? '') }} </p>
                     </div>
                 </div>
                 <ul class="mb-12px">
