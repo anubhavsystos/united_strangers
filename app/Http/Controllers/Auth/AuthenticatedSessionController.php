@@ -19,8 +19,11 @@ use Illuminate\Support\Facades\Hash;
 
 class AuthenticatedSessionController extends Controller
 {
-    public function create(): View
+    public function create(Request $request): View
     {
+        if ($request->has('redirect')) {
+            session(['url.intended' => $request->redirect]);
+        }
         return view('auth.login');
     }
 
@@ -36,7 +39,8 @@ class AuthenticatedSessionController extends Controller
         if (user('role') == 1) {
             return redirect()->route('admin.dashboard');
         } else {
-            return redirect()->route('customer.appointment');
+            return redirect()->intended();
+            // return redirect()->route('customer.appointment');
         }
     }
 

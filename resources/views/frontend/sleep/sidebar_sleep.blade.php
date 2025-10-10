@@ -3,7 +3,7 @@
 $min_price =  App\Models\SleepListing::min('price') ?? 0;
 $max_price =  App\Models\SleepListing::max('price') ?? 0;
 $cities = App\Models\SleepListing::select('city')->groupBy('city')->get();
-$countries = App\Models\SleepListing::select('country')->groupBy('country')->get();
+$countries = App\Models\SleepListing::where('visibility', 'visible')->select('country')->groupBy('country')->get();
 isset($searched_bedroom) ? '' : ($searched_bedroom = []);
 isset($searched_bathroom) ? '' : ($searched_bathroom = []);
 isset($status_type) ? '' : ($status_type = []);
@@ -12,7 +12,7 @@ $numbers = ['1', '2', '3', '4', '5','6','7','8'];
 
 <form class="sidebar-accordion-area" id="filter-form" action="{{ route('ListingsFilter') }}" method="get">
     <div class="sidebar-title mb-2 d-flex align-items-center justify-content-between flex-wrap">
-        <h3 class="title">{{get_phrase('Filters')}}</h3>
+        <h3 class="title">{{get_phrase('Sleep Filters')}}</h3>
         <a href="javascript:;" onclick="resetForm(event)" class="clear d-none">{{get_phrase('Clear')}}</a>
     </div>
     <input type="hidden" name="type" value="sleep">
@@ -20,7 +20,7 @@ $numbers = ['1', '2', '3', '4', '5','6','7','8'];
     <ul class="sidebar-accordion">
         <li class="sidebar-accordion-li">
             <a href="javascript:void(0);">
-                <span>{{  get_phrase('sleep Category') }}</span>
+                <span>{{  get_phrase('Category') }}</span>
                 <img src="{{asset('assets/frontend/images/icons/angle-down-black-20.svg')}}" alt="">
             </a>
             <ul class="sidebar-accordion-menu nBlock" id="categoryList" >
@@ -76,36 +76,63 @@ $numbers = ['1', '2', '3', '4', '5','6','7','8'];
             </a>
             <ul class="sidebar-accordion-menu">
                 @php
-                    $statusCounts = DB::table('sleep_listings')
-                        ->select('is_popular', DB::raw('COUNT(*) as total'))
-                        ->groupBy('is_popular')
-                        ->get()
-                        ->keyBy('is_popular');
-                @endphp
-            
-                <!-- Sell Filter -->
+                  $statusCounts = DB::table('sleep_listings')->select('is_popular', DB::raw('COUNT(*) as total'))->where('visibility', '=', 'visible')->groupBy('is_popular')->orderBy('is_popular')->get()->keyBy('is_popular');
+                @endphp            
                 <li>
                     <a href="{{ route('ListingsFilter') }}?type=sleep&view={{ $view }}&status=top" 
                        class="filter {{ (request()->get('is_popular') == 'top') ? 'active' : '' }}">
                         <label class="form-check-label d-flex justify-content-between">
-                            <input class="d-none" type="radio" name="is_popular" value="top" @if ($status_type == 'top') checked @endif>
+                            <input class="d-none" type="radio" name="is_popular" value="top" >
                             <span>{{ get_phrase('Top') }}</span>
                             <span class="total">({{ $statusCounts['top']->total ?? 0 }})</span>
                         </label>
                     </a>
                 </li>
-            
-                <!-- Rent Filter -->
                 <li>
                     <a href="{{ route('ListingsFilter') }}?type=sleep&view={{ $view }}&status=popular" 
                        class="filter {{ (request()->get('is_popular') == 'popular') ? 'active' : '' }}">
                         <label class="form-check-label d-flex justify-content-between">
-                            <input class="d-none" type="radio" name="is_popular" value="popular"  @if ($status_type == 'popular') checked @endif>
+                            <input class="d-none" type="radio" name="is_popular" value="popular" >
                             <span>{{ get_phrase('Popular') }}</span>
                             <span class="total">({{ $statusCounts['popular']->total ?? 0 }})</span>
                         </label>
                     </a>
                 </li>
+            </ul>
+        </li>
+        <li class="sidebar-accordion-li">
+            <a href="javascript:void(0);">
+                <span>{{get_phrase('Accommodation Type')}}</span>
+                <img src="{{asset('assets/frontend/images/icons/angle-down-black-20.svg')}}" alt="">
+            </a>                         
+            <ul class="sidebar-accordion-menu">
+                <li>
+                    <a href="{{ route('ListingsFilter') }}?type=sleep&view={{ $view }}&accommodation_type=hostels"
+                    class="filter {{ request()->get('accommodation_type') == 'hostels' ? 'active' : '' }}">
+                        <label class="form-check-label d-flex justify-content-between">
+                            <input class="d-none" type="radio" name="accommodation_type" value="hostels">
+                            <span>{{ get_phrase('Hostels') }}</span>
+                        </label>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('ListingsFilter') }}?type=sleep&view={{ $view }}&accommodation_type=co_living"
+                    class="filter {{ request()->get('accommodation_type') == 'co_living' ? 'active' : '' }}">
+                        <label class="form-check-label d-flex justify-content-between">
+                            <input class="d-none" type="radio" name="accommodation_type" value="co_living">
+                            <span>{{ get_phrase('Co-living') }}</span>
+                        </label>
+                    </a>
+                </li>
+                <li>
+                    <a href="{{ route('ListingsFilter') }}?type=sleep&view={{ $view }}&accommodation_type=full_apartments"
+                    class="filter {{ request()->get('accommodation_type') == 'full_apartments' ? 'active' : '' }}">
+                        <label class="form-check-label d-flex justify-content-between">
+                            <input class="d-none" type="radio" name="accommodation_type" value="full_apartments">
+                            <span>{{ get_phrase('Full Apartments') }}</span>                           
+                        </label>
+                    </a>
+                </li>            
             </ul>
         </li>
         <li class="sidebar-accordion-li">

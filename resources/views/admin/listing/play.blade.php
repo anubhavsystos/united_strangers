@@ -60,6 +60,30 @@
                         <input type="number" name="tax_persent" id="tax_persent" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter tax percent') }}" min="1" max="99" step="1"required>
                     </div>
                 </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="wallet_price" class="form-label ol-form-label">
+                            {{ get_phrase('Wallet') }} 
+                        </label>
+                        <input type="number" name="wallet_price" id="wallet_price" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter Wallet Price') }}" >
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="coins_price" class="form-label ol-form-label">
+                            {{ get_phrase('Coin') }} 
+                        </label>
+                        <input type="number" name="coins_price" id="coins_price" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter coin') }}" >
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="rewards_price" class="form-label ol-form-label">
+                            {{ get_phrase('Rewards') }} 
+                        </label>
+                        <input type="number" name="rewards_price" id="rewards_price" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter Rewards') }}" >
+                    </div>
+                </div>
                 <div class="col-sm-12">
                     <div class="mb-3">
                         <label for="description" class="form-label ol-form-label"> {{get_phrase('Description')}} </label>
@@ -93,9 +117,9 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <label for="engine_size" class="form-label ol-form-label"> {{get_phrase('Country')}} *</label>
+                        <label for="engine_size" class="form-label ol-form-label"> {{get_phrase('State')}} *</label>
                         <select name="country" id="country" class="form-control ol-form-control ol-select22 ol-select2">
-                            <option value=""> {{get_phrase('Select listing country')}} </option>
+                            <option value=""> {{get_phrase('Select Listing State')}} </option>
                             @foreach (App\Models\Country::get() as $country)
                                 <option value="{{$country->id}}"> {{get_phrase($country->name)}} </option>
                             @endforeach

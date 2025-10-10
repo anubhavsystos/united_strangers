@@ -74,8 +74,8 @@
                     </div>
                 </a>
                 <ul class="first-sub-menu">                    
-                    <li class="sidebar-second-li {{request()->is('admin/categories/work')?'active':''}}"><a href="{{ route('admin.categories',['type'=>'work'])}}"> {{get_phrase('Work')}} </a></li>
                     <li class="sidebar-second-li {{request()->is('admin/categories/sleep')?'active':''}}"><a href="{{ route('admin.categories',['type'=>'sleep'])}}"> {{get_phrase('Sleep')}} </a></li>
+                    <li class="sidebar-second-li {{request()->is('admin/categories/work')?'active':''}}"><a href="{{ route('admin.categories',['type'=>'work'])}}"> {{get_phrase('Work')}} </a></li>
                     <li class="sidebar-second-li {{request()->is('admin/categories/play')?'active':''}}"><a href="{{ route('admin.categories',['type'=>'play'])}}"> {{get_phrase('Play')}} </a></li>
                 </ul>
             </li>

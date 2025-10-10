@@ -157,3 +157,14 @@
         $("#category").val(offer_category);
     });
 </script>
+
+
+<script>
+document.querySelectorAll('.in_persent').forEach(function(input) {
+    input.addEventListener('input', function() {
+        let val = parseInt(this.value) || '';
+        if (val < 1) this.value = 1;
+        if (val > 99) this.value = 99;
+    });
+});
+</script>

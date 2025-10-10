@@ -35,7 +35,7 @@
                 <div class="col-sm-6">
                     <div class="mb-3">
                         <label for="type" class="form-label ol-form-label"> {{get_phrase('event Segment')}} </label>
-                        <select name="segment_type" id="offer-type"  class="form-control ol-select2 ol-form-control" data-minimum-results-for-search="Infinity" >
+                        <select name="segment_type" id="event-type"  class="form-control ol-select2 ol-form-control" data-minimum-results-for-search="Infinity" >
                         <option value="">{{ get_phrase('Select event type') }}</option>
                         <option value="work" {{ (isset($event) && $event->segment_type == 'work') ? 'selected' : '' }}>
                             {{ get_phrase('Work event') }}
@@ -54,7 +54,7 @@
                         <label for="event-category" class="form-label ol-form-label"> {{get_phrase('event on')}} </label>
                          <div class="col-sm-12">
                             <div class="mb-3">                               
-                                <select name="segment_id" id="offer-category" class="form-control ol-form-control ol-select22 ol-select2" >
+                                <select name="segment_id" id="event-category" class="form-control ol-form-control ol-select22 ol-select2" >
                                     <option value=""> {{get_phrase('Select event Segment')}} </option>  
                                     @if(!empty($segmentName))                                 
                                         <option value="" selected> {{isset($segmentName) ? $segmentName : ''}} </option>     
@@ -102,7 +102,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label for="visibility" class="form-label ol-form-label"> {{get_phrase('Visibility')}} *</label>
                                 <select name="visibility" id="visibility" class="form-control ol-form-control">
@@ -116,6 +116,12 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="event_persent" class="form-label ol-form-label">{{ get_phrase('Price') }}*</label>
+                                <input type="number" name="price" id="event_persent" class="form-control  ol-form-control" placeholder="{{ get_phrase('Enter Price') }}" min="1" max="99" step="1"required>
+                            </div>
+                        </div>  
                     
                         <div class="col-sm-12">
                             <div class="mb-3">

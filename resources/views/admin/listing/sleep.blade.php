@@ -94,6 +94,30 @@
                         <input type="number" name="tax_persent" id="tax_persent" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter tax percent') }}" min="1" max="99" step="1"required>
                     </div>
                 </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="wallet_price" class="form-label ol-form-label">
+                            {{ get_phrase('Wallet') }} 
+                        </label>
+                        <input type="number" name="wallet_price" id="wallet_price" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter Wallet Price') }}" >
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="coins_price" class="form-label ol-form-label">
+                            {{ get_phrase('Coin') }} 
+                        </label>
+                        <input type="number" name="coins_price" id="coins_price" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter coin') }}" >
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="mb-3">
+                        <label for="rewards_price" class="form-label ol-form-label">
+                            {{ get_phrase('Rewards') }} 
+                        </label>
+                        <input type="number" name="rewards_price" id="rewards_price" class="form-control ol-form-control" placeholder="{{ get_phrase('Enter Rewards') }}" >
+                    </div>
+                </div>
 
     
                 <div class="col-sm-12">
@@ -127,9 +151,9 @@
             <div class="row">
                 <div class="col-sm-6">
                     <div class="mb-3">
-                        <label for="engine_size" class="form-label ol-form-label"> {{get_phrase('Country')}} *</label>
+                        <label for="engine_size" class="form-label ol-form-label"> {{get_phrase('State')}} *</label>
                         <select name="country" id="country" class="form-control ol-form-control ol-select22 ol-select2">
-                            <option value=""> {{get_phrase('Select listing country')}} </option>
+                            <option value=""> {{get_phrase('Select Listing State')}} </option>
                             @foreach (App\Models\Country::get() as $country)
                                 <option value="{{$country->id}}"> {{get_phrase($country->name)}} </option>
                             @endforeach
@@ -218,72 +242,47 @@
 </form>
 @include('admin.listing.listing_script')
 <script>
-    "use strict";
-    $("#form-action-btn").on('click', function() {
-        event.preventDefault(); 
-        var listing_category = $("#category").val();
-        if(!listing_category){
-            warning('Listing category is required');
-        }
-        var listing_title = $("#title").val();
-        if(!listing_title){
-            warning('Listing title is required');
-        }
-        var listing_price = $("#price").val();
-        if(!listing_price){
-            warning('Listing price is required');
-        }
-        var listing_bed = $("#bed").val();
-        if(!listing_bed){
-            warning('Listing bed is required');
-        }
-        var listing_bath = $("#bath").val();
-        if(!listing_bath){
-            warning('Listing bath is required');
-        }
-        var listing_size = $("#size").val();
-        if(!listing_size){
-            warning('Listing size is required');
-        }
-        var listing_listing_icon_image = $("#listing-icon-image").val();
-        if(!listing_listing_icon_image){
-            warning('Listing image is required');
-        }
-        var listing_country = $("#country").val();
-        if(!listing_country){
-            warning('Listing country is required');
-        }
-        var listing_city = $("#city").val();
-        if(!listing_city){
-            warning('Listing city is required');
-        }
-        var listing_address = $("#list_address").val();
-        if(!listing_address){
-            warning('Listing address is required');
-        }
-        var listing_post_code = $("#post_code").val();
-        if(!listing_post_code){
-            warning('Listing post code is required');
-        }
-        var listing_latitude = $("#latitude").val();
-        if(!listing_latitude){
-            warning('Listing latitude is required');
-        }
-        var listing_longitude = $("#longitude").val();
-        if(!listing_longitude){
-            warning('Listing longitude is required');
-        }
-        var listing_visibility = $("#visibility").val();
-        if(!listing_visibility){
-            warning('Listing visibility is required');
-        }
-      
-        if(listing_listing_icon_image && listing_size && listing_bath && listing_bed && listing_price && listing_title && listing_category && listing_country && listing_city && listing_address && listing_post_code && listing_latitude && listing_longitude && listing_visibility && listing_dimension){
-            $("#form-action").trigger('submit');
-        }
+"use strict";
+$("#form-action-btn").on('click', function(event) {
+    event.preventDefault(); 
 
-    })
+    var listing_category = $("#category").val();
+    var listing_title = $("#title").val();
+    var listing_price = $("#price").val();
+    var listing_bed = $("#bed").val();
+    var listing_bath = $("#bath").val();
+    var listing_size = $("#size").val();
+    var listing_listing_icon_image = $("#listing-icon-image").val();
+    var listing_country = $("#country").val();
+    var listing_city = $("#city").val();
+    var listing_address = $("#list_address").val();
+    var listing_post_code = $("#post_code").val();
+    var listing_latitude = $("#latitude").val();
+    var listing_longitude = $("#longitude").val();
+    var listing_visibility = $("#visibility").val();
+    var listing_dimension = $("#dimension").val();
+
+    // validation messages
+    if(!listing_category) return warning('Listing category is required');
+    if(!listing_title) return warning('Listing title is required');
+    if(!listing_price) return warning('Listing price is required');
+    if(!listing_bed) return warning('Listing bed is required');
+    if(!listing_bath) return warning('Listing bath is required');
+    if(!listing_size) return warning('Listing size is required');
+    if(!listing_listing_icon_image) return warning('Listing image is required');
+    if(!listing_country) return warning('Listing country is required');
+    if(!listing_city) return warning('Listing city is required');
+    if(!listing_address) return warning('Listing address is required');
+    if(!listing_post_code) return warning('Listing post code is required');
+    if(!listing_latitude) return warning('Listing latitude is required');
+    if(!listing_longitude) return warning('Listing longitude is required');
+    if(!listing_visibility) return warning('Listing visibility is required');
+    if(!listing_dimension) return warning('Listing dimension is required');
+
+    $("#form-action").trigger('submit');
+});
 </script>
+
 <script>
     document.getElementById('tax_persent').addEventListener('input', function () {
         let val = parseInt(this.value) || '';

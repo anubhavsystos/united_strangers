@@ -66,6 +66,7 @@ class Offer extends Model
             'id' => $this->id ?? '',            
             'image' => get_all_image('offer-images/' . $images ),
             'title' => $this->title ?? '',
+            'offer_persent' => $this->offer_persent ?? '',
             'to_date' => !empty($this->to_date) ? date('M d, Y', strtotime($this->to_date)) : '',
             'from_date' => !empty($this->from_date) ? date('M d, Y', strtotime($this->from_date)) : '',
             'visibility' => $this->visibility ?? '',

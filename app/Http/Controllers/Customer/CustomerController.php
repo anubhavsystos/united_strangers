@@ -34,15 +34,16 @@ class CustomerController extends Controller
             return $item->appointmentCustomerFormatted(); 
         });
 
-        // $formattedAppointments = $appointments->getCollection()->map(function ($item) {
-        //     return $item->appointmentCustomerFormatted(); 
-        // });
-        // $appointments->setCollection($formattedAppointments);
         $page_data['appointments'] = $appointments;
-        // return $page_data['appointments'];
-
-
         return view('user.customer.appointment.index', $page_data);
+    }
+
+    public function wallet()
+    {
+        $page_data['active'] = 'userWallet'; 
+        // $page_data['appointments'] = $appointments;
+        // return $page_data['appointments'];
+        return view('user.customer.wallet', $page_data);
     }
 
     // Example for DTP style query (your given snippet)

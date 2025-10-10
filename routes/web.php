@@ -78,11 +78,11 @@ Route::any('/customer/message', [FrontendController::class, 'customerMessage'])-
 // Appoinment
 Route::post('/customer/bookAppointment', [FrontendController::class, 'customerBookAppointment'])->name('customerBookAppointment');
 Route::get('/getavailablerooms', [FrontendController::class, 'getAvailableRooms'])->name('getAvailableRooms');
+Route::get('/appointments/scan/{token}', [FrontendController::class, 'scan'])->name('appointments.scan');
 
 
 // Beauty Filter
 Route::get('/listings-filter', [FrontendController::class, 'ListingsFilter'])->name('ListingsFilter');
-
 
 // Newsletter Subscriber  Frontend
 Route::post('newsletter/subscribe', [FrontendController::class, 'newslater_subscribe'])->name('newsletter.subscribe');
@@ -404,7 +404,6 @@ Route::get('/clear-cache', function () {
     Artisan::call('config:clear');
     Artisan::call('route:clear');
     Artisan::call('view:clear');
-
     return 'Application cache cleared';
 });
 

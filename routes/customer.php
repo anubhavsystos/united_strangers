@@ -21,6 +21,8 @@ Route::prefix('{prefix}')->controller(CustomerController::class)->middleware('au
 
 Route::controller(CustomerController::class)->middleware('auth', 'customer')->group(function () {
     Route::get('/customer/wishlist', 'wishlist')->name('customer.wishlist');
+    Route::get('/customer/wallet', 'wallet')->name('customer.wallet');
+    Route::get('/customer/convert_coins_to_wallet', 'convert_coins_to_wallet')->name('user.convert_coins_to_wallet');
     Route::get('/customer/remove/wishlist/{id}', 'remove_wishlist')->name('customer.remove.wishlist');
     Route::get('/customer/appointment', 'appointment')->name('customer.appointment');
     Route::get('/customer/become-an-agent', 'become_an_agent')->name('customer.become_an_agent');

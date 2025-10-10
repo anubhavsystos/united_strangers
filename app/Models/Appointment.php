@@ -141,7 +141,8 @@ class Appointment extends Model
 
         return [
             'id'                => $this->id ?? '',
-            'title'             => $this->id ?? '',
+            'title'             => $this->title ?? '',
+            'qr_code'           => $this->qr_code ?? '',
             'image'             => isset($this->user->image) ? get_all_image('users/' . $this->user->image) : '',
             'customer_name'     => $this->user->name ?? '',
             'customer_email'    => $this->user->email ?? '',

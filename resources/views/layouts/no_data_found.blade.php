@@ -6,7 +6,7 @@
                     <div class="ol-card-body p-4">
                         <div class="card-centered-section">
                             <div class="card-middle-banner">
-                                <img src="{{asset('assets/backend/images/no-file-search.svg')}}" alt="">
+                                <img src="{{asset('assets/frontend/images/empty-folder 1.svg')}}" alt="">
                             </div>
                             <p class="title2 fs-20px text-center"> {{get_phrase('No data found')}} </p>
                         </div>

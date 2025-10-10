@@ -8,11 +8,13 @@
         "php": "^8.2",
         "barryvdh/laravel-dompdf": "^3.0",
         "brian2694/laravel-toastr": "^5.59",
+        "endroid/qr-code": "^5.0",
         "laravel/framework": "^11.0",
         "laravel/socialite": "^5.23",
         "laravel/tinker": "^2.9",
         "mews/purifier": "^3.4",
         "razorpay/razorpay": "^2.9",
+        "simplesoftwareio/simple-qrcode": "^4.2",
         "stripe/stripe-php": "^16.4"
     },
     "require-dev": {

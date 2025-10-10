@@ -102,7 +102,7 @@
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-sm-12">
+                        <div class="col-sm-6">
                             <div class="mb-3">
                                 <label for="visibility" class="form-label ol-form-label"> {{get_phrase('Visibility')}} *</label>
                                 <select name="visibility" id="visibility" class="form-control ol-form-control">
@@ -116,7 +116,12 @@
                                 </select>
                             </div>
                         </div>
-                    
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="offer_persent" class="form-label ol-form-label">{{ get_phrase('Offer in Percent') }}*</label>
+                                <input type="number" name="offer_persent" id="offer_persent" class="form-control in_persent ol-form-control" placeholder="{{ get_phrase('Enter Offer Persent') }}" min="1" max="99" step="1"required>
+                            </div>
+                        </div>                    
                         <div class="col-sm-12">
                             <div class="mb-3">
                                 <label for="description" class="form-label ol-form-label"> {{get_phrase('Description')}} </label>
@@ -166,7 +171,6 @@
                         </div>
                         <div class="col-sm-10">
                                 <div class="d-flex flex-wrap" id="image-container">
-                                    <!-- Image previews will be dynamically added here -->
                                     @if(!empty($offer->image))
                                         @foreach (json_decode($offer->image) as $key => $image)
                                             <div class="possition_relative" id="image-icon{{ $key }}">

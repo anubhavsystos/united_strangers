@@ -13,6 +13,7 @@ class SleepListing extends Model
      *
      * @var array
      */
+    protected $guarded = [];
 
     public function countryDetail() {
         return $this->belongsTo(Country::class, 'country');
@@ -65,6 +66,7 @@ class SleepListing extends Model
             'rating' => $average_rating,
             'features' => $features,
             'price' => $this->price,
+            'is_popular' => $this->is_popular,
             'created_at' => $this->created_at,
             'is_in_wishlist' => check_wishlist_status($this->id, 'sleep'),
             'details_url' => route('listing.details', [

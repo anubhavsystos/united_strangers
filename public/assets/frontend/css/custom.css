@@ -508,7 +508,7 @@
 .sleepdetails-form-area,
 .beauty-details-sidebar,
 .restdetails-sidebar {
-	position: sticky;
+	/* position: sticky; */
 	top: 10px;
 	right: 0;
 }

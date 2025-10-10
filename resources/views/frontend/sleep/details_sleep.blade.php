@@ -1,3 +1,4 @@
+
 @extends('layouts.frontend')
 @section('title', get_phrase('Sleep Listing Details'))
 @push('css')
@@ -118,7 +119,67 @@
                                 <span>{{ get_phrase('Read More') }}</span>                                
                             </a>
                         @endif
-                    </div>                  
+                    </div>    
+                       <!-- offer -->
+                @if(count($offers) != 0)
+                <div class="restdetails-menu-wrap mb-50px">
+                    <h2 class="in-title3-24px mb-5">{{get_phrase('offer')}}</h2>
+                    <div class="restdetails-menu-items">                        
+                        @foreach (($offers ?? []) as $key => $offer)                      
+                        <input class="form-check-input d-none" name="room[]"  type="checkbox"  value="{{ $room['id'] ?? '' }}" id="flckDefault{{ $key }}"
+                        @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+                        <div class="restdetails-menu-item d-flex" onclick="selectOffer('{{ $key }}', '{{ $offer['id'] ?? '' }}', '{{ $offer['title'] ?? 'Untitled Room' }}', '{{ $offer['offer_persent'] ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
+                            <div class="img">
+                                <img src="{{ $offer['image'] }}" alt="">
+                            </div>
+                            <div class="restdetails-menu-details">
+                                <h5 class="name">{{$offer['title']}}</h5>
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($offer['offer_persent']))
+                                        <p class="new-price">{{ $offer['offer_persent'] }} %</p>
+                                    @endif
+                                </div> 
+                            </div>
+                        </div>
+                         @endforeach
+                        <!-- offer Item -->  
+                    </div>
+                </div>
+                @endif
+
+                <!-- event -->
+                @if(count($events) != 0)
+                <div class="restdetails-menu-wrap mb-50px">
+                    <h2 class="in-title3-24px mb-5">{{get_phrase('event')}}</h2>
+                    <div class="restdetails-menu-items">                        
+                        @foreach (($events ?? []) as $key => $event)                      
+                        <input class="form-check-input d-none" name="room[]"  type="checkbox"  value="{{ $room['id'] ?? '' }}" id="flckDefault{{ $key }}"
+                        @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+                        <div class="restdetails-menu-item d-flex" onclick="selectEvent('{{ $key }}', '{{ $event['id'] ?? '' }}', '{{ $event['title'] ?? 'Untitled Room' }}', '{{ $event['price'] ?? 0 }}', '{{ $event['to_date'] ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
+                            <div class="img">
+                                <img src="{{ $event['image'] }}" alt="">
+                            </div>
+                            <div class="restdetails-menu-details">
+                                <h5 class="name">{{$event['title']}}</h5>
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($event['price']))
+                                        <p class="new-price">{{ currency($event['price']) }} </p>
+                                    @endif
+                                </div> 
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($event['to_date']))
+                                        <p class="new-price">{{ $event['to_date'] }} </p>
+                                    @endif
+                                </div> 
+                            </div>
+                        </div>
+                         @endforeach
+                        <!-- event Item -->  
+                    </div>
+                </div>
+                @endif              
                     <div class="row mb-3">
                         <div class="col-md-3">
                             <label for="filter_date"> Date</label>
@@ -195,7 +256,7 @@
                                                     @if(!empty($room['features']))
                                                         <div class="d-flex flex-wrap gap-2 mt-2">
                                                             @foreach ($room['features'] as $fKey => $feature)
-                                                                <div class="text-center" style="width: 80px;">
+                                                                <div class="d-flex flex-column align-items-center justify-content-center" style="width: 80px;">
                                                                     <img src="{{ asset(!empty($feature['image']) ? '/' . $feature['image'] : '/image/placeholder.png') }}"
                                                                         alt="{{ $feature['name'] ?? 'Feature' }}"
                                                                         class="rounded mb-1" style="width:30px;height:30px;">
@@ -233,10 +294,12 @@
                             <div id="map" class="h-297"></div>
                         </div>
                     </div>
+                    @if(isset($nearbyLocations))
                     <div class="hoteldetails-location-area mb-50px">
                         <h2 class="in-title3-24px mb-20px">{{ get_phrase('Location Nearby') }}</h2>                       
                         @include('frontend.work.nearby')
                     </div>
+                    @endif
                 </div>
                 <div class="col-xl-4 col-lg-5">
                     <div class="sleepdetails-form-area mb-30px">
@@ -246,6 +309,9 @@
                         <input type="hidden" name="listing_type" value="sleep">
                         <input type="hidden" name="listing_id" value="{{ $listing->id }}">
                         <input type="hidden" name="customer_id" value="{{ $listing->id }}">
+                        <input type="hidden" name="title" value="{{ $listing->title }}">
+                        <input type="hidden" id="offers_ids" name="offers_ids">
+                        <input type="hidden" id="offer_percent" name="offer_percent">
                         <div id="selectedRoomsContainer"></div>
                         <div class="sleepdetails-form-inputs mb-16">
                         <div class="mb-3">
@@ -408,50 +474,7 @@
             </div>
         </div>
     </section>
-      @if(count($offers) != 0)
-  <section class="px-4 md:px-10 py-12 bg-gray-50">
-    <div class="flex justify-between items-center mb-8">
-      <div>
-        <h2 class="text-5xl font-black uppercase" style="font-family: 'CHOXR', sans-serif;">Offers </h2>
-        <p class="text-sm text-gray-600 mt-2"> Available at most United Strangerss. </p>
-      </div>      
-    </div>
-    <div class="relative">
-      <div id="offer-slider" class="flex overflow-x-auto scroll-smooth snap-x gap-6 pb-6">
-          @foreach($offers as $offersitem)
-          <a href="{{isset($offersitem['details_url']) ? $offersitem['details_url'] : 'javascript:void(0);' }}" targat="_blank" >
-        <div class="min-w-[280px] max-w-sm bg-white rounded-md snap-start shadow-md">
-          <img src="{{$offersitem['image']}}" alt="Offer 1" class="w-full h-full object-cover rounded-t-md">
-          <div class="p-4">
-            <h3 class="text-lg md:text-xl font-bold mb-1 leading-tight" style="font-family: 'ANTON';">{{$offersitem['title']}}</h3>
-            <p class="text-sm text-gray-700 mb-4">{{ $offersitem['from_date'] }} to {{ $offersitem['to_date'] }}</p>
-            <p class="text-sm text-gray-700 mb-4">
-                <span id="desc-short-{{ $offersitem['id'] }}">
-                    {{ $offersitem['description'] }}
-                </span>
-                <span id="desc-full-{{ $offersitem['id'] }}" style="display: none;">
-                    {{ $offersitem['full_desc'] }}
-                </span>
-
-                @if($offersitem['read_more'])
-                    <a href="javascript:void(0);"  id="toggle-{{ $offersitem['id'] }}"  class="text-blue-600 font-semibold" onclick="toggleDesc({{ $offersitem['id'] }})"> Read more </a>
-                @endif
-            </p>
-          </div>
-          </a>
-        </div>
-          @endforeach        
-      </div>
-      <!-- Arrows -->
-      <button data-dir="left" class="slider-btn hidden md:flex items-center justify-center absolute left-0 top-1/2 transform -translate-y-1/2 bg-white border border-gray-400 rounded-full w-12 h-12 shadow-md z-10">
-        &#8592;
-      </button>
-      <button data-dir="right" class="slider-btn hidden md:flex items-center justify-center absolute right-0 top-1/2 transform -translate-y-1/2 bg-white border border-gray-400 rounded-full w-12 h-12 shadow-md z-10">
-        &#8594;
-      </button>
-    </div>
-  </section>
-@endif
+    
  
 @endsection
 @push('js')
@@ -509,6 +532,7 @@
 
 <script>
 let selectedRooms = [];
+let selectedOffers = [];
 
 function selectRoom(key, roomId, roomName, price) {
     @if(auth()->check())
@@ -527,8 +551,20 @@ function selectRoom(key, roomId, roomName, price) {
 
         updateSummary();
     @else
-        window.location.href = "{{ route('login') }}";
+        window.location.href = "{{ route('login') }}?redirect=" + encodeURIComponent(window.location.href);
     @endif
+}
+
+function selectOffer(key, id, title, percent) {
+    // Allow only one active offer at a time (if needed)
+    selectedOffers = [{ id: id, percent: parseFloat(percent) || 0 }];
+
+    // Update hidden fields
+    document.getElementById('offers_ids').value = id;
+    document.getElementById('offer_percent').value = percent;
+
+    // Refresh total calculation
+    updateSummary();
 }
 
 function addRoom(roomId, roomName, price) {
@@ -556,7 +592,6 @@ function removeRoom(roomId) {
 
     updateSummary();
 }
-
 function updateSummary() {
     let summaryBody = document.getElementById('summaryRooms');
     let summarySubtotal = document.getElementById('summarySubtotal');
@@ -578,6 +613,7 @@ function updateSummary() {
         return;
     }
 
+    // Calculate subtotal
     selectedRooms.forEach((r, index) => {
         subtotal += r.price;
         summaryBody.innerHTML += `
@@ -599,6 +635,24 @@ function updateSummary() {
     let taxAmount = Math.round((subtotal * taxPercent) / 100);
     let total = subtotal + taxAmount;
 
+    // --- 🟢 Apply Offer Discount if selected ---
+    let offerPercent = 0;
+    if (selectedOffers.length > 0) {
+        offerPercent = parseFloat(selectedOffers[0].percent) || 0;
+        let discount = Math.round((total * offerPercent) / 100);
+        total -= discount;
+    }
+
+    // Update hidden inputs for backend
+    let offers_ids_input = document.getElementById('offers_ids');
+    let offer_percent_input = document.getElementById('offer_percent');
+    if (offers_ids_input && selectedOffers[0]) {
+        offers_ids_input.value = selectedOffers[0].id;
+    }
+    if (offer_percent_input) {
+        offer_percent_input.value = offerPercent;
+    }
+
     // Update display
     summarySubtotal.innerText = "₹" + subtotal.toLocaleString();
     summaryTax.innerText = "₹" + taxAmount.toLocaleString();
@@ -610,6 +664,7 @@ function updateSummary() {
 
     summaryDiv.classList.remove('d-none');
 }
+
 
 </script>
 <script>

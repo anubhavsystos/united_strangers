@@ -29,6 +29,7 @@
                     <th> {{get_phrase('Title')}} </th>
                     <th> {{get_phrase('To Date')}} </th>                    
                     <th> {{get_phrase('From Date')}} </th>                    
+                    <th> {{get_phrase('Price')}} </th>                    
                     <th> {{get_phrase('Description')}} </th>                    
                     <th> {{get_phrase('event Segment')}} </th>                    
                     <th> {{get_phrase('event On')}} </th>
@@ -46,6 +47,7 @@
                     <td> {{ $event['title'] ?? '' }}</td>                  
                     <td>{{ isset($event['to_date']) ? \Carbon\Carbon::parse($event['to_date'])->format('d M Y') : '' }}</td>
                     <td>{{ isset($event['from_date']) ? \Carbon\Carbon::parse($event['from_date'])->format('d M Y') : '' }}</td>
+                    <td>{{ currency($event['price']) ?? '' }}</td>
                     <td> {{ \Illuminate\Support\Str::limit($event['description'] ?? '', 10, '...') }}</td>
                     <td>{{ $event['segment_type'] ?? '' }}</td>
                     <td>{{ $event['visibility'] ?? '' }}</td>

@@ -425,11 +425,7 @@
                                         </button>
                                     </li>
                                 </ul>
-                                @php
-                                $nearBYLocation = App\Models\NearByLocation::where('listing_id', $listing->id)
-                                    ->where('listing_type', 'work')
-                                    ->get();
-                                @endphp
+                                
                                 <div class="tab-content eNav-Tabs-content" id="myTabContent">
                                     <!-- School -->
                                     <div class="tab-pane fade show active" id="cSchool" role="tabpanel" aria-labelledby="cSchool-tab">
@@ -437,7 +433,7 @@
                                         <div class="table-responsive">
                                             <table class="table eTable eTable-2 table-icon table-p0 mt-2">
                                                 <tbody>
-                                                    @foreach($nearBYLocation as $nearby)
+                                                    @foreach($nearbylocation as $nearby)
                                                         @if($nearby->nearby_id == 0) 
                                                             <tr>
                                                                 <td>

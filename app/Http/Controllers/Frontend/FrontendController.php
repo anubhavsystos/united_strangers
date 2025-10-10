@@ -33,6 +33,15 @@ use Illuminate\Support\Facades\Auth;
 use Brian2694\Toastr\Facades\Toastr;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Session;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Storage;
+use SimpleSoftwareIO\QrCode\Facades\QrCode;
+
+use Endroid\QrCode\Builder\Builder;
+use Endroid\QrCode\Writer\SvgWriter;
+use Endroid\QrCode\Writer\PngWriter;
+
+
 class FrontendController extends Controller
 {
     protected $blog;
@@ -158,9 +167,7 @@ class FrontendController extends Controller
         $playListing_data['playcountries'] = $playcountries;
         $playListing_data['playcitys'] = $playcitys;
         $playListing_data['playcategorys'] = $playcategorys;
-        // playListing end
-
-        // return $sleepListing_data ;
+       
         return view('frontend.details', compact('sleepListing_data','workListing_data','playListing_data'));
             
     }
@@ -242,10 +249,10 @@ class FrontendController extends Controller
             $page_data['directory'] = 'play';
         }
 
+
         $page_data['listings']->getCollection()->transform(function ($item) {
             return $item->productFormattedArray();
         });
-        
         $page_data['categories'] = Category::where('type', $type)->get();
         $page_data['type'] = $type;
         $page_data['view'] = $view;
@@ -264,10 +271,7 @@ class FrontendController extends Controller
             $page_data['listing'] = $this->playListing->where('id', $id)->first();
             $page_data['directory'] = 'play';
         }
-        $nearbyLocations = $this->nearbylocation
-        ->where('listing_id', $id)
-        ->where('listing_type', $type)
-        ->get();
+        $nearbyLocations = $this->nearbylocation->where('listing_id', $id)->where('listing_type', $type)->get();
 
         $coordinates = $nearbyLocations->map(function ($location) {
             return [
@@ -290,7 +294,17 @@ class FrontendController extends Controller
         $page_data['offers'] = $this->offer->where('segment_id',$id)->where('segment_type',$type)->whereDate('to_date', '<=', $today)->whereDate('from_date', '>=', $today)->get()->map(function ($item) {
             return $item->offerformatted();
         });
+        $today = date('Y-m-d');
 
+        $page_data['events'] = $this->event->where('segment_id', $id)->where('segment_type', $type)
+            ->where(function ($query) use ($today) {
+                $query->whereDate('to_date', '>=', $today)  
+                    ->orWhereDate('from_date', '>', $today);
+            })
+            ->orderBy('from_date', 'asc') 
+            ->get()->map(function ($item) {
+                return $item->eventformatted();
+            });
         $page_data['type'] = $type;
         $page_data['listing_id'] = $id;
         return view('frontend.'.$type.'.details_'.$type, $page_data);
@@ -492,31 +506,91 @@ class FrontendController extends Controller
         return $response;
     }
 
+    public function customerBookAppointment(Request $request)
+    {
+        try {
+            // Default fields
+            $now = now();
+            $request['date'] = date("Y-m-d", strtotime($request->input('date', $now)));
+            $request['in_time'] = date("H:i:s", strtotime($request->input('in_time', $now)));
+            $request['out_time'] = date("H:i:s", strtotime($request->input('out_time', $now)));
+            $request['customer_id'] = auth()->id() ?? 1;
 
-    public function customerBookAppointment(Request $request){
-        $request['date'] = date("Y-m-d", strtotime($request['date']));
-        $request['in_time'] = date("H:i:s", strtotime($request['in_time']));
-        $request['out_time'] = date("H:i:s", strtotime($request['out_time']));
-        $request['customer_id'] = auth()->user()->id ?? 1;
-       
-        if (is_array($request->room_id)) {
-            $request['room_id'] = json_encode($request->room_id); 
+            // Handle arrays (menu/room)
+            if (is_array($request->room_id ?? null)) {
+                $request['room_id'] = json_encode($request->room_id);
+            }
+            if (is_array($request->menu_id ?? null)) {
+                $request['menu_id'] = json_encode($request->menu_id);
+            }
+            if (is_array($request->menu_qty ?? null)) {
+                $request['menu_qty'] = json_encode($request->menu_qty);
+            }
+            if (is_array($request->menu_summary ?? null)) {
+                $request['menu_summary'] = implode(', ', $request->menu_summary);
+            }
+
+            if ($request->input('listing_type') === 'event') {
+                $request['event_id'] = $request->input('event_id');
+                $request['event_price'] = $request->input('event_price');
+                $request['total_price'] = $request->input('event_price');
+                $request['adults'] = $request->input('adults', 1);
+                $request['title'] = $request->input('title', 'Event Booking');
+            }
+
+            $appointment = $this->appointment->create($request->except('_token'));
+
+            // Generate QR Code
+            $token = Str::uuid()->toString();
+            $qrUrl = route('appointments.scan', $token);
+            $qrPath = 'qrcodes/' . $token . '.svg';
+
+            $result = Builder::create()
+                ->writer(new SvgWriter())
+                ->data($qrUrl)
+                ->size(300)
+                ->margin(10)
+                ->build();
+
+            \Storage::disk('public')->put($qrPath, $result->getString());
+
+            $appointment->update([
+                'qr_code' => $token,
+                'is_arrived' => 0,
+            ]);
+
+            if ($request->ajax()) {
+                return response()->json(['success' => true, 'message' => 'Event booked successfully!']);
+            }
+
+            \Session::flash('success', get_phrase('Appointment placed successfully! QR code generated.'));
+            return redirect()->back();
+
+        } catch (\Throwable $e) {
+            // Catch and return readable error
+            if ($request->ajax()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Error: ' . $e->getMessage(),
+                ], 500);
+            }
+
+            \Log::error('Booking Error: ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => $e->getMessage()]);
         }
-        if (is_array($request->menu_id)) {
-            $request['menu_id'] = json_encode($request->menu_id); 
-        }
-        if (is_array($request->menu_qty)) {
-            $request['menu_qty'] = json_encode($request->menu_qty);
-        }
-        if (is_array($request->menu_summary)) {
-            $request['menu_summary'] = implode(', ', $request->menu_summary); 
-        }
-        
-        $appointment = $this->appointment->create($request->except('_token'));
-        
-        Session::flash('success', get_phrase('Appointment placed successfully!'));
-        return redirect()->back();
     }
+
+
+
+    public function scan($token){
+        $appointment = $this->appointment->where('qr_code', $token)->first();
+        if (!$appointment) {
+            return response()->json(['message' => 'Invalid QR code'], 404);
+        }
+        $appointment->update(['is_arrived' => 1]);
+        return view('appointments.arrived', compact('appointment'));
+    }
+
     
 
     function get_amenity_filtered_ids($min_price, $max_price){
@@ -543,20 +617,24 @@ class FrontendController extends Controller
     {
         $listing_type = $request->input('type', 'sleep');
         $perPage = 25;
-
         $page_data = [];
         $page_data['type'] = $listing_type;
         $page_data['view'] = $request->input('view', '');
         $query = null;
         if ($listing_type === 'sleep') {
             $query = $this->sleepListing
-                ->with(['countryDetail','cityDetail','claimed','reviews'])
-                ->where('visibility', 'visible')
-                ->latest();
+            ->with(['countryDetail', 'cityDetail', 'claimed', 'reviews'])
+            ->where('visibility', 'visible')
+            ->latest();
 
             $page_data['directory'] = 'sleep';
 
-            if ($request->filled('category') && $request->category !== 'all') {
+            if ($request->has('accommodation_type') && $request->accommodation_type !== 'all') {                
+                $type = str_replace('-', '_', sanitize($request->accommodation_type));                 
+                $query->where('accommodation_type', $type);
+                $page_data['accommodation_type'] = $type;
+            }
+            if($request->filled('category') && $request->category !== 'all') {
                 $query->where('category', sanitize($request->category));
                 $page_data['category_type'] = sanitize($request->category);
                 $page_data['activeMenu'] = sanitize($request->category);
@@ -572,6 +650,7 @@ class FrontendController extends Controller
                 $query->where('is_popular', sanitize($request->is_popular));
                 $page_data['status_type'] = sanitize($request->is_popular);
             }
+
 
             if ($request->filled('city') && $request->city !== 'all') {
                 $query->where('city', sanitize($request->city));
@@ -596,6 +675,7 @@ class FrontendController extends Controller
             if ($request->filled('title') && $request->title !== 'all') {
                 $query->where('title', 'like', '%' . sanitize($request->title) . '%');
             }
+
         } elseif ($listing_type === 'work') {
             $query = $this->workListing
                 ->with(['countryDetail','cityDetail','claimed','reviews'])
@@ -714,7 +794,7 @@ class FrontendController extends Controller
 
         // paginate + preserve query string
         $page_data['listings'] = $query->paginate($perPage)->appends($request->all());
-
+        
         // transform each item to productFormattedArray (keeps paginator structure)
         $page_data['listings']->getCollection()->transform(function ($item) {
             return $item->productFormattedArray();

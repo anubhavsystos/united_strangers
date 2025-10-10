@@ -62,7 +62,7 @@
 <section>
     <div class="container">
         <div class="row row-28 mb-80px">
-            <div class="col-xl-8 col-lg-7">
+            <div class="col-xl-7 col-lg-7">
                 <!-- Banners Slider -->
                 <div class="swiper resdetails-banner-slider mb-30px">
                     <div class="swiper-wrapper">
@@ -97,22 +97,11 @@
                         </a>
                        @endif
                 </div>
-
-                {{-- Shop Addon --}}
-                @if (addon_status('shop') == 1)
-                    @php 
-                    $shopItems = App\Models\Inventory::where('type', $listing->type)->where('listing_id', $listing->id)->where('availability', 1)->get();
-                    $shopCategories = App\Models\InventoryCategory::where('type', $listing->type)->where('listing_id', $listing->id)->get();
-                    @endphp
-                    @if($shopItems && $shopItems->count() > 0)
-                        @include('frontend.shop')
-                    @endif
-                @endif
-            {{-- Shop Addon --}}
-
                 <!-- Menu -->
+                 
+                @if(count($menus) != 0)
                 <div class="restdetails-menu-wrap mb-50px">
-                    <h2 class="in-title3-24px mb-20">{{get_phrase('Menu')}}</h2>
+                    <h2 class="in-title3-24px mb-5">{{get_phrase('Menu')}}</h2>
                     <div class="restdetails-menu-items">
                         
                         @foreach (($menus ?? []) as $key => $menu)
@@ -125,7 +114,7 @@
                         @endphp
                         <input class="form-check-input d-none" name="room[]"  type="checkbox"  value="{{ $room['id'] ?? '' }}" id="flckDefault{{ $key }}"
                         @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
-                        <div class="restdetails-menu-item d-flex" onclick="selectRoom('{{ $key }}', '{{ $menu['id'] ?? '' }}', '{{ $menu['title'] ?? 'Untitled Room' }}', '{{ $menu_price ?? 0 }}')" 
+                        <div class="restdetails-menu-item d-flex" onclick="selectMenu('{{ $key }}', '{{ $menu['id'] ?? '' }}', '{{ $menu['title'] ?? 'Untitled Room' }}', '{{ $menu_price ?? 0 }}')" 
                                     for="flckDefault{{ $key }}">
                             <div class="img">
                                 <img src="{{get_all_image('menu/'.$menu->image)}}" alt="">
@@ -146,6 +135,68 @@
                         <!-- Menu Item -->  
                     </div>
                 </div>
+                @endif
+
+                <!-- offer -->
+                @if(count($offers) != 0)
+                <div class="restdetails-menu-wrap mb-50px">
+                    <h2 class="in-title3-24px mb-5">{{get_phrase('offer')}}</h2>
+                    <div class="restdetails-menu-items">                        
+                        @foreach (($offers ?? []) as $key => $offer)                      
+                        <input class="form-check-input d-none" name="room[]"  type="checkbox"  value="{{ $room['id'] ?? '' }}" id="flckDefault{{ $key }}"
+                        @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+                        <div class="restdetails-menu-item d-flex" onclick="selectOffer('{{ $key }}', '{{ $offer['id'] ?? '' }}', '{{ $offer['title'] ?? 'Untitled Room' }}', '{{ $offer['offer_persent'] ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
+                            <div class="img">
+                                <img src="{{ $offer['image'] }}" alt="">
+                            </div>
+                            <div class="restdetails-menu-details">
+                                <h5 class="name">{{$offer['title']}}</h5>
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($offer['offer_persent']))
+                                        <p class="new-price">{{ $offer['offer_persent'] }} %</p>
+                                    @endif
+                                </div> 
+                            </div>
+                        </div>
+                         @endforeach
+                        <!-- offer Item -->  
+                    </div>
+                </div>
+                @endif
+
+                <!-- event -->
+                @if(count($events) != 0)
+                <div class="restdetails-menu-wrap mb-50px">
+                    <h2 class="in-title3-24px mb-5">{{get_phrase('event')}}</h2>
+                    <div class="restdetails-menu-items">                        
+                        @foreach (($events ?? []) as $key => $event)                      
+                        <input class="form-check-input d-none" name="room[]"  type="checkbox"  value="{{ $room['id'] ?? '' }}" id="flckDefault{{ $key }}"
+                        @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+                        <div class="restdetails-menu-item d-flex" onclick="selectEvent('{{ $key }}', '{{ $event['id'] ?? '' }}', '{{ $event['title'] ?? 'Untitled Room' }}', '{{ $event['price'] ?? 0 }}', '{{ $event['to_date'] ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
+                            <div class="img">
+                                <img src="{{ $event['image'] }}" alt="">
+                            </div>
+                            <div class="restdetails-menu-details">
+                                <h5 class="name">{{$event['title']}}</h5>
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($event['price']))
+                                        <p class="new-price">{{ currency($event['price']) }} </p>
+                                    @endif
+                                </div> 
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($event['to_date']))
+                                        <p class="new-price">{{ $event['to_date'] }} </p>
+                                    @endif
+                                </div> 
+                            </div>
+                        </div>
+                         @endforeach
+                        <!-- event Item -->  
+                    </div>
+                </div>
+                @endif
                 <!-- Opening Time -->
                 <div class="restaurent-opening-time mb-50px">
                     <h2 class="in-title3-24px mb-20">{{get_phrase('Opening Time')}}</h2>
@@ -187,21 +238,23 @@
                     </div>
             </div>
             <!-- Right Sidebar -->
-             <div class="col-xl-4 col-lg-5">
+             <div class="col-xl-5 col-lg-5">
                     <div class="sleepdetails-form-area mb-30px">
-                    <h4 class="sub-title ">{{ get_phrase('Booking') }}</h4>
-                    
+                    <h4 class="sub-title ">{{ get_phrase('Booking') }}</h4>                    
                     <form action="{{ route('customerBookAppointment') }}" method="post">
                         @csrf
                         <input type="hidden" name="listing_type" value="play">
                         <input type="hidden" name="listing_id" value="{{ $listing->id }}">
                         <input type="hidden" name="customer_id" value="{{ $listing->id }}">
+                        <input type="hidden" name="title" value="{{ $listing->title }}">
                         <input type="hidden" name="menu_summary" id="menu_summary">
+                        <input type="hidden" id="offers_ids" name="offers_ids" value="">
+                        <input type="hidden" id="offer_percent" name="offer_percent" value="">
                         <div id="selectedRoomsContainer"></div>
                         <div class="sleepdetails-form-inputs mb-16">
                         <div class="mb-3">
                             <label class="form-label">Appointment Date</label>
-                            <input type="date" class="appointmentDate form-control mform-control flat-input-picker3 " name="date">
+                            <input type="date" class="appointmentDate form-control mform-control flat-input-picker3 " name="date" required>
                         </div>
                         <div class="mb-3 row">
                             <div class="col">
@@ -211,6 +264,16 @@
                             <div class="col">
                                 <label class="form-label">   Child</label>
                                 <input type="number" class="form-control" name="child" >
+                            </div>
+                        </div>
+                        <div class="mb-3 row">
+                            <div class="col">
+                                <label class="form-label">Check In Time</label>
+                                <input type="time" class="form-control" name="in_time" required>
+                            </div>
+                            <div class="col">
+                            <label class="form-label"> Check Out Time</label>
+                            <input type="time" class="form-control" name="out_time" required>
                             </div>
                         </div>
                         <div class="mb-3">
@@ -399,62 +462,6 @@ $relatedListing = App\Models\PlayListing::where('is_popular', $listing->is_popul
     }
 
 </script>
-@if (Auth::check())
-<script>
-        "use strict";
-        function updateWishlist(button, listingId) {
-            const bookmarkButton = $(button);
-            const isActive = bookmarkButton.hasClass('active');
-            bookmarkButton.toggleClass('active'); 
-            const newTooltipText = isActive ? 'Add to Wishlist' : 'Remove from Wishlist';
-            bookmarkButton.attr('data-bs-title', newTooltipText);
-
-            const tooltipInstance = bootstrap.Tooltip.getInstance(button);
-            if (tooltipInstance) tooltipInstance.dispose(); 
-            new bootstrap.Tooltip(button); 
-
-            $.ajax({
-                url: '{{ route("wishlist.update") }}', 
-                method: 'POST', 
-                data: {
-                    listing_id: listingId,
-                    type: 'play', 
-                    user_id: {{ auth()->check() ? auth()->id() : 'null' }}, 
-                    _token: '{{ csrf_token() }}',
-                },
-                success: function (response) {
-                    if (response.status === 'success') {
-                        success(response.message);
-                    } 
-                    else if (response.status === 'error') {
-                        bookmarkButton.toggleClass('active');
-                        const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                        bookmarkButton.attr('data-bs-title', revertTooltipText);
-                        const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                        if (revertTooltipInstance) revertTooltipInstance.dispose();
-                        new bootstrap.Tooltip(button);
-                    }
-                },
-                error: function (xhr) {
-                    bookmarkButton.toggleClass('active');
-                    const revertTooltipText = isActive ? 'Remove from Wishlist' : 'Add to Wishlist';
-                    bookmarkButton.attr('data-bs-title', revertTooltipText);
-                    const revertTooltipInstance = bootstrap.Tooltip.getInstance(button);
-                    if (revertTooltipInstance) revertTooltipInstance.dispose();
-                    new bootstrap.Tooltip(button);
-                },
-            });
-        }
-</script>
-@else
-<script>
-    "use strict";
-    function updateWishlist(listing_id) {
-        warning("Please login first!");
-    }
-</script>
-@endif
-
 <script>
     "use strict";
         $(document).ready(function() {
@@ -553,10 +560,14 @@ $relatedListing = App\Models\PlayListing::where('is_popular', $listing->is_popul
     });
 </script>
 <script>
-let selectedMenus = [];
+// Selected items arrays
 
-function selectRoom(key, id, name, price) {
-    // check if already exists
+let selectedMenus = [];
+let selectedOffers = [];
+let selectedEvents = [];
+
+// --- Select Menu Item ---
+function selectMenu(key, id, name, price) {
     let existing = selectedMenus.find(r => r.id == id);
     if (!existing) {
         selectedMenus.push({ id, name, price: parseFloat(price), qty: 1 });
@@ -564,19 +575,36 @@ function selectRoom(key, id, name, price) {
     updateSummary();
 }
 
+// --- Select Offer ---
+function selectOffer(key, id, title, percent) {
+    let existing = selectedOffers.find(r => r.id == id);
+    if (!existing) {
+        selectedOffers.push({ id, title, offer_percent: parseFloat(percent) });
+    } else {
+        // deselect if clicked again
+        selectedOffers = selectedOffers.filter(o => o.id != id);
+    }
+    updateSummary();
+}
+
+
+
+// --- Change quantity of menu item ---
 function changeQty(id, change) {
     let item = selectedMenus.find(r => r.id == id);
     if (item) {
-        item.qty = Math.max(1, item.qty + change); // qty not less than 1
+        item.qty = Math.max(1, item.qty + change);
         updateSummary();
     }
 }
 
-function removeRoom(id) {
+// --- Remove menu item ---
+function removeMenu(id) {
     selectedMenus = selectedMenus.filter(r => r.id != id);
     updateSummary();
 }
 
+// --- Update Summary Table ---
 function updateSummary() {
     let summaryBody = document.getElementById('summaryRooms');
     let subtotalEl = document.getElementById('summarySubtotal');
@@ -585,29 +613,20 @@ function updateSummary() {
     let grandTotalEl = document.getElementById('summaryGrandTotal');
     let total_price = document.getElementById('total_price');
     let menu_summary = document.getElementById('menu_summary');
+    let offers_ids_input = document.getElementById('offers_ids');
+    let offer_percent_input = document.getElementById('offer_percent');
     let summaryDiv = document.getElementById('bookingSummary');
-    let taxPersent = parseFloat(document.getElementById('tax_persent')?.value) || 0;
+    let taxPercent = parseFloat(document.getElementById('tax_persent')?.value) || 0;
 
     summaryBody.innerHTML = '';
-    let subtotal = 0;
+    let menuSubtotal = 0;
     let summary = [];
+    let totalOfferPercent = selectedOffers.reduce((acc, o) => acc + o.offer_percent, 0);
 
-    if (selectedMenus.length === 0) {
-        summaryDiv.classList.add('d-none');
-        subtotalEl.innerText = "₹0";
-        taxPercentEl.innerText = taxPersent;
-        taxEl.innerText = "₹0";
-        grandTotalEl.innerText = "₹0";
-        if (total_price) total_price.value = 0;
-        if (menu_summary) menu_summary.value = "";
-        return;
-    }
-
-    // loop items
+    // --- Menu Items ---
     selectedMenus.forEach((r, index) => {
         let itemSubtotal = r.price * r.qty;
-        subtotal += itemSubtotal;
-
+        menuSubtotal += itemSubtotal;
         summary.push(r.qty + " " + r.name);
 
         summaryBody.innerHTML += `
@@ -624,7 +643,7 @@ function updateSummary() {
                 </td>
                 <td class="text-end">₹${itemSubtotal.toLocaleString()}</td>
                 <td class="text-center">
-                    <button type="button" class="btn btn-sm btn-danger" onclick="removeRoom('${r.id}')">
+                    <button type="button" class="btn btn-sm btn-danger" onclick="removeMenu('${r.id}')">
                         <i class="fas fa-trash"></i>
                     </button>
                 </td>
@@ -632,23 +651,33 @@ function updateSummary() {
         `;
     });
 
-    // calculate tax + grand total
-    let taxAmount = (subtotal * taxPersent) / 100;
-    let grandTotal = subtotal + taxAmount;
+    // --- Offers Discount ---
+    let offerDiscount = (menuSubtotal * totalOfferPercent) / 100;
 
-    // update summary table
-    subtotalEl.innerText = "₹" + subtotal.toLocaleString();
-    taxPercentEl.innerText = taxPersent;
+    // --- Totals ---
+    let subtotalAfterOffer = menuSubtotal - offerDiscount;
+    let taxAmount = (subtotalAfterOffer * taxPercent) / 100;
+    let grandTotal = subtotalAfterOffer + taxAmount;
+
+    // --- Update Table ---
+    subtotalEl.innerText = "₹" + subtotalAfterOffer.toLocaleString();
+    taxPercentEl.innerText = taxPercent;
     taxEl.innerText = "₹" + taxAmount.toLocaleString();
     grandTotalEl.innerText = "₹" + grandTotal.toLocaleString();
 
-    // update hidden inputs
+    // --- Hidden Inputs ---
     if (total_price) total_price.value = grandTotal;
     if (menu_summary) menu_summary.value = summary.join(", ");
-
-    summaryDiv.classList.remove('d-none');
+    if (offers_ids_input) offers_ids_input.value = selectedOffers.map(o => o.id).join(",") || "";
+    if (offer_percent_input) offer_percent_input.value = totalOfferPercent;
+    
+    // --- Show or hide summary ---
+    if (selectedMenus.length === 0) {
+        summaryDiv.classList.add('d-none');
+    } else {
+        summaryDiv.classList.remove('d-none');
+    }
 }
-
 
 </script>
 

@@ -18,7 +18,7 @@ use App\Models\City;
 use App\Models\Country;
 use App\Models\Amenities;
 use Brian2694\Toastr\Facades\Toastr;
-use App\Models\NearByLocation;
+use App\Models\NearbyLocation;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Session;
@@ -78,6 +78,9 @@ class ListingController extends Controller
         $data['description'] = $request->description;
         $data['visibility'] = sanitize($request->visibility);
         $data['tax_persent'] = sanitize($request->tax_persent);
+        $data['wallet_price'] = sanitize($request->wallet_price);
+        $data['coins_price'] = sanitize($request->coins_price);
+        $data['rewards_price'] = sanitize($request->rewards_price);
         $data['type'] = $type;        
         $data['meta_title'] = sanitize($request->meta_title);
         $data['meta_keyword'] = sanitize($request->keyword);
@@ -103,7 +106,6 @@ class ListingController extends Controller
         if ($request->hasFile('listing_image')) {
             foreach ($request->file('listing_image') as $key => $image) {
                 $imageName = $key.'-'.time() . '.' . $image->getClientOriginalExtension();
-                // $image->storeAs('public/listing-images', $imageName);
                 $image->move(public_path('uploads/listing-images'), $imageName);
                 array_push($listing_image, $imageName);
             }
@@ -115,6 +117,7 @@ class ListingController extends Controller
             $data['bed'] = sanitize($request->bed);
             $data['bath'] = sanitize($request->bath);
             $data['size'] = sanitize($request->size);
+            $data['accommodation_type'] = sanitize($request->accommodation_type);
             $data['dimension'] = sanitize($request->dimension);
             $data['is_popular'] = $request->is_popular ?? 0;
             $this->sleepListing->insert($data);
@@ -131,6 +134,7 @@ class ListingController extends Controller
             $data['sub_dimension'] = sanitize($request->sub_dimension);
             $data['status'] = sanitize($request->status);
             $data['near_by']='{"0":"school","1":"hospital","2":"shopping_center"}';
+            return $data;
              $this->workListing->insert($data);
         }elseif($type == 'play'){
             $data['tables'] = sanitizenumber($request->tables);            
@@ -139,8 +143,7 @@ class ListingController extends Controller
         }
         if ($request->hasFile('og_image')) {
             $image = $request->file('og_image');
-            $imageName = time() . '.' . $image->getClientOriginalExtension(); 
-            // $image->storeAs('public\og_image', $imageName);
+            $imageName = time() . '.' . $image->getClientOriginalExtension();
             $image->move(public_path('uploads/og_image'), $imageName);
             $data['og_image'] = $imageName;
         }
@@ -153,7 +156,8 @@ class ListingController extends Controller
 
     }
 
-    public function listing_edit($type, $id, $tab = ""){  
+    public function listing_edit($type, $id, $tab = ""){ 
+         
         if($type == 'work'){
             $page_data['listing'] =  $this->workListing->where('id', $id)->first();
         }elseif($type == 'sleep'){
@@ -182,6 +186,9 @@ class ListingController extends Controller
         
         $data['title'] = sanitize($request->title);
         $data['tax_persent'] = sanitize($request->tax_persent);
+         $data['wallet_price'] = sanitize($request->wallet_price);
+        $data['coins_price'] = sanitize($request->coins_price);
+        $data['rewards_price'] = sanitize($request->rewards_price);
         $data['category'] = sanitize($request->category);
         $data['description'] = sanitize($request->description);
         $data['visibility'] = sanitize($request->visibility);
@@ -671,6 +678,7 @@ class ListingController extends Controller
             }
         }
         $data['image'] = json_encode($room_image);
+        // return $data;
         Room::insert($data);
         Session::flash('success', get_phrase('Sleep room create successful!'));
         if(user('role') == 2) {

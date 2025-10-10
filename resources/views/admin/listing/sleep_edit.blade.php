@@ -153,8 +153,8 @@
                                 <select name="accommodation_type" id="accommodation_type" class="form-control ol-form-control ol-select2" required data-minimum-results-for-search="Infinity">
                                     <option value=""> {{get_phrase('Select Type')}} </option>
                                     <option value="hostels" {{$listing->accommodation_type == 'hostels'?'selected':''}}> {{get_phrase('Hostels')}} </option>
-                                    <option value="co‑living" {{$listing->accommodation_type == 'co‑living'?'selected':''}}> {{get_phrase('Co‑Living')}} </option>
-                                    <option value="full-apartments" {{$listing->accommodation_type == 'full-apartments'?'selected':''}}> {{get_phrase('Full Apartments')}} </option>                                    
+                                    <option value="co_living" {{$listing->accommodation_type == 'co‑living'?'selected':''}}> {{get_phrase('Co‑Living')}} </option>
+                                    <option value="full_apartments" {{$listing->accommodation_type == 'full-apartments'?'selected':''}}> {{get_phrase('Full Apartments')}} </option>                                    
                                 </select>
                             </div>
                         </div>
@@ -180,6 +180,30 @@
                                     {{ get_phrase('Tax in Percent') }} *
                                 </label>
                                 <input type="number" name="tax_persent" id="tax_persent" class="form-control ol-form-control" value="{{$listing->tax_persent}}" placeholder="{{ get_phrase('Enter tax percent') }}" min="1" max="99" step="1"required>
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="wallet_price" class="form-label ol-form-label">
+                                    {{ get_phrase('Wallet') }} 
+                                </label>
+                                <input type="number" name="wallet_price" id="wallet_price" class="form-control ol-form-control"  value="{{$listing->wallet_price}}" placeholder="{{ get_phrase('Enter Wallet Price') }}" >
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="coins_price" class="form-label ol-form-label">
+                                    {{ get_phrase('Coin') }} 
+                                </label>
+                                <input type="number" name="coins_price" id="coins_price" class="form-control ol-form-control" value="{{$listing->coins_price}}" placeholder="{{ get_phrase('Enter coin') }}" >
+                            </div>
+                        </div>
+                        <div class="col-sm-6">
+                            <div class="mb-3">
+                                <label for="rewards_price" class="form-label ol-form-label">
+                                    {{ get_phrase('Rewards') }} 
+                                </label>
+                                <input type="number" name="rewards_price" id="rewards_price" class="form-control ol-form-control" value="{{$listing->rewards_price}}" placeholder="{{ get_phrase('Enter Rewards') }}" >
                             </div>
                         </div>
                         
@@ -238,9 +262,9 @@
                     <div class="row">
                         <div class="col-sm-6"> 
                             <div class="mb-3">
-                                <label for="engine_size" class="form-label ol-form-label"> {{ get_phrase('Country') }} *</label>
+                                <label for="engine_size" class="form-label ol-form-label"> {{ get_phrase('State') }} *</label>
                                 <select name="country" id="country" class="form-control ol-form-control ol-select2">
-                                    <option value=""> {{ get_phrase('Select listing country') }} </option>
+                                    <option value=""> {{ get_phrase('Select Listing State') }} </option>
                                     @foreach ($country as $c)
                                         <option value="{{ $c->id }}" {{ $listing->country == $c->id ? 'selected' : '' }}>
                                             {{ get_phrase($c->name) }}
@@ -861,73 +885,59 @@ document.getElementById('listing-floor-plan').addEventListener('change', functio
     }
 });
 
-    $("#form-action-btn").on('click', function() {
-        event.preventDefault(); 
-       
-        var listing_title = $("#title").val();
-        if(!listing_title){
-            warning('Listing title is required');
-        }
-        var listing_price = $("#price").val();
-        if(!listing_price){
-            warning('Listing price is required');
-        }
-        var listing_bed = $("#bed").val();
-        if(!listing_bed){
-            warning('Listing bed is required');
-        }
-        var listing_bath = $("#bath").val();
-        if(!listing_bath){
-            warning('Listing bath is required');
-        }
-        var listing_size = $("#size").val();
-        if(!listing_size){
-            warning('Listing size is required');
-        }
-        var listing_garage = $("#garage").val();
-        if(!listing_garage){
-            warning('Listing garage is required');
-        }
-        var listing_year = $("#year").val();
-        if(!listing_year){
-            warning('Listing Year is required');
-        }
-        
-        var listing_country = $("#country").val();
-        if(!listing_country){
-            warning('Listing country is required');
-        }
-        var listing_city = $("#city").val();
-        if(!listing_city){
-            warning('Listing city is required');
-        }
-        var listing_address = $("#list_address").val();
-        if(!listing_address){
-            warning('Listing address is required');
-        }
-        var listing_post_code = $("#post_code").val();
-        if(!listing_post_code){
-            warning('Listing post code is required');
-        }
-        var listing_latitude = $("#latitude").val();
-        if(!listing_latitude){
-            warning('Listing latitude is required');
-        }
-        var listing_longitude = $("#longitude").val();
-        if(!listing_longitude){
-            warning('Listing longitude is required');
-        }
-        var listing_visibility = $("#visibility").val();
-        if(!listing_visibility){
-            warning('Listing visibility is required');
-        }
-        var listing_dimension = $("#dimension").val();
-        if(!listing_dimension){
-            warning('Listing dimension is required');
-        }
-       
+   $("#form-action-btn").on('click', function(event) {
+    event.preventDefault(); // prevent default form submission
 
-    })
+    // --- Validation ---
+    var listing_title = $("#title").val();
+    if(!listing_title){ warning('Listing title is required'); return; }
+
+    var listing_price = $("#price").val();
+    if(!listing_price){ warning('Listing price is required'); return; }
+
+    var listing_bed = $("#bed").val();
+    if(!listing_bed){ warning('Listing bed is required'); return; }
+
+    var listing_bath = $("#bath").val();
+    if(!listing_bath){ warning('Listing bath is required'); return; }
+
+    var listing_size = $("#size").val();
+    if(!listing_size){ warning('Listing size is required'); return; }
+
+    var listing_garage = $("#garage").val();
+    if(!listing_garage){ warning('Listing garage is required'); return; }
+
+    var listing_year = $("#year").val();
+    if(!listing_year){ warning('Listing Year is required'); return; }
+
+    var listing_country = $("#country").val();
+    if(!listing_country){ warning('Listing country is required'); return; }
+
+    var listing_city = $("#city").val();
+    if(!listing_city){ warning('Listing city is required'); return; }
+
+    var listing_address = $("#list_address").val();
+    if(!listing_address){ warning('Listing address is required'); return; }
+
+    var listing_post_code = $("#post_code").val();
+    if(!listing_post_code){ warning('Listing post code is required'); return; }
+
+    var listing_latitude = $("#latitude").val();
+    if(!listing_latitude){ warning('Listing latitude is required'); return; }
+
+    var listing_longitude = $("#longitude").val();
+    if(!listing_longitude){ warning('Listing longitude is required'); return; }
+
+    var listing_visibility = $("#visibility").val();
+    if(!listing_visibility){ warning('Listing visibility is required'); return; }
+
+    var listing_dimension = $("#dimension").val();
+    if(!listing_dimension){ warning('Listing dimension is required'); return; }
+
+    // --- If all validations pass, submit the form ---
+    $("#form-action").submit();
+});
+
 </script>
 
 <script>

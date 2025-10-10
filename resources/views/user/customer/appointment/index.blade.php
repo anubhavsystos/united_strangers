@@ -82,6 +82,7 @@
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Details')}}</th>                                                             
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Status')}}</th>                                                                      
                                     <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('Payment')}}</th>                                                                
+                                    <!-- <th scope="col" class="ca-title-14px ca-text-dark">{{get_phrase('QR Code')}}</th>                                                                 -->
                                 </tr>
                             </thead>
                             <tbody class="ca-tbody">
@@ -169,7 +170,7 @@
                                                 @endif
                                             </div>                                                                        
                                         </td>  
-                                         <td>
+                                        <td>
                                             @if ($appointment['status'] == 1)
                                                 <p class="badge-success-light">{{get_phrase('Successfully Ended')}}</p>
                                             @elseif($appointment['status'] == 3)
@@ -179,7 +180,7 @@
                                             @endif
                                         </td>
                                                                                                         
-                                       <td class="min-w-140px">
+                                        <td class="min-w-140px">
                                             @if($appointment['status'] == 1)
                                                 <button type="button" class="btn btn-success button_font" disabled>
                                                     {{ get_phrase('Payment Complete') }}
@@ -212,7 +213,26 @@
                                                 </button>
                                             @endif
                                         </td>
-
+                                        <!-- <td>
+                                            <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#qrModal{{ $appointment['id'] }}">
+                                               {{get_phrase('Scanner')}} 
+                                            </button>
+                                            <div class="modal fade" id="qrModal{{ $appointment['id'] }}" tabindex="-1" aria-hidden="true">
+                                                <div class="modal-dialog modal-dialog-centered">
+                                                    <div class="modal-content text-center p-3">
+                                                        <h5>{{ $appointment['customer_name'] }}</h5>
+                                                        @if(!empty($appointment['qr_code']))
+                                                        @php
+                                                            $qrUrl = str_replace('united_strangers/public', 'united_strangers', asset('storage/app/public/qrcodes/'.$appointment['qr_code'].'.svg'));
+                                                        @endphp
+                                                            <img src="{{ $qrUrl }}" width="200" alt="QR Code">
+                                                        @else
+                                                            <p>No QR generated</p>
+                                                        @endif
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td> -->
                                     </tr>
                                 @endforeach
                             </tbody>

@@ -40,8 +40,8 @@
     color: white;
 }
 .otp-icon-wrapper {
-    background: white;
-    color: #34A853;
+    /* background: white; */
+    color: #fff;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -83,7 +83,7 @@
                     </form>
 
                     <div class="login-buttons mt-4">
-                        <div class="d-flex gap-2">
+                        <div class="d-flex gap-2" style="justify-content: center;">
                             <!-- <a href="{{ route('login.google') }}" class="google-btn flex-fill">
                                 <div class="google-icon-wrapper">
                                     <img class="google-icon" src="https://developers.google.com/identity/images/g-logo.png" alt="Google Logo">
@@ -92,7 +92,7 @@
                             </a> -->
                             <div class="col-xl-5 col-lg-6">
                                 <button type="button" class="otp-btn flex-fill" data-bs-toggle="modal" data-bs-target="#otpModal">
-                                    <div class="otp-icon-wrapper"><i class="fas fa-mobile-alt"></i></div>
+                                    <div class="otp-icon-wrapper"><i class="ml-1 fas fa-mobile-alt"></i></div>
                                     <span class="btn-text"><b>Login with OTP</b></span>
                                 </button>
                             </div>

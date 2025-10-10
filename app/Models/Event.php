@@ -67,6 +67,7 @@ class Event extends Model
             'id' => $this->id ?? '',
             'image' => isset($this->image) ? get_all_image('event-images/' . $image) : '',            
             'title' => $this->title ?? '',
+            'price' => $this->price ?? '',
             'to_date' => !empty($this->to_date) ? date('M d, Y', strtotime($this->to_date)) : '',
             'from_date' => !empty($this->from_date) ? date('M d, Y', strtotime($this->from_date)) : '',
             'visibility' => $this->visibility ?? '',

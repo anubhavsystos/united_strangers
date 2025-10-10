@@ -2,7 +2,7 @@
 
 @php 
 $cities = App\Models\PlayListing::select('city')->groupBy('city')->get();
-$countries = App\Models\PlayListing::select('country')->groupBy('country')->get();
+$countries = App\Models\PlayListing::where('visibility', 'visible')->select('country')->groupBy('country')->get();
 @endphp
 
 <form  class="sidebar-accordion-area" id="filter-form" action="{{ route('ListingsFilter') }}" method="get">

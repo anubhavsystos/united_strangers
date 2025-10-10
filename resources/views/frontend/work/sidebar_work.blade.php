@@ -3,7 +3,7 @@
 $min_price =  App\Models\WorkListing::min('price') ?? 0;
 $max_price =  App\Models\WorkListing::max('price') ?? 0;
 $cities = App\Models\WorkListing::select('city')->groupBy('city')->get();
-$countries = App\Models\WorkListing::select('country')->groupBy('country')->get();
+$countries = App\Models\WorkListing::where('visibility', 'visible')->select('country')->groupBy('country')->get();
 isset($searched_bedroom) ? '' : ($searched_bedroom = []);
 isset($searched_bathroom) ? '' : ($searched_bathroom = []);
 isset($searched_garage) ? '' : ($searched_garage = []);

@@ -131,13 +131,13 @@
                             </div>
                         </div>
                         <div class="row row-28">
-                            <div class="col-xl-5 col-lg-12 col-md-5">
+                            <!-- <div class="col-xl-5 col-lg-12 col-md-5">
                                 <div class="realestate-property-title">
                                     <h5 class="title">{{get_phrase('Property')}}</h5>
                                     <p class="info">{{get_phrase('ID :')}} {{$listing->property_id}}</p>
                                 </div>
-                            </div>
-                            <div class="col-xl-7 col-lg-12 col-md-7">
+                            </div> -->
+                            <div class="col-xl-12 col-lg-12 col-md-7">
                                 <ul class="realestate-property-list d-flex align-items-center">
                                     <li>
                                         <img src="{{asset('assets/frontend/images/icons/bed-gray-30.svg')}}" alt="">
@@ -175,17 +175,65 @@
                         </a>
                        @endif
                     </div>
-                    {{-- Shop Addon --}}
-                         @if (addon_status('shop') == 1)
-                            @php 
-                            $shopItems = App\Models\Inventory::where('type', $listing->type)->where('listing_id', $listing->id)->where('availability', 1)->get();
-                            $shopCategories = App\Models\InventoryCategory::where('type', $listing->type)->where('listing_id', $listing->id)->get();
-                            @endphp
-                        @if($shopItems && $shopItems->count() > 0)
-                            @include('frontend.shop')
-                        @endif
-                     @endif
-                  {{-- Shop Addon --}}
+                     @if(count($offers) != 0)
+                <div class="restdetails-menu-wrap mb-50px">
+                    <h2 class="in-title3-24px mb-5">{{get_phrase('offer')}}</h2>
+                    <div class="restdetails-menu-items">                        
+                        @foreach (($offers ?? []) as $key => $offer)                      
+                        <input class="form-check-input d-none" name="room[]"  type="checkbox"  value="{{ $room['id'] ?? '' }}" id="flckDefault{{ $key }}"
+                        @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+                        <div class="restdetails-menu-item d-flex" onclick="selectOffer('{{ $key }}', '{{ $offer['id'] ?? '' }}', '{{ $offer['title'] ?? 'Untitled Room' }}', '{{ $offer['offer_persent'] ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
+                            <div class="img">
+                                <img src="{{ $offer['image'] }}" alt="">
+                            </div>
+                            <div class="restdetails-menu-details">
+                                <h5 class="name">{{$offer['title']}}</h5>
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($offer['offer_persent']))
+                                        <p class="new-price">{{ $offer['offer_persent'] }} %</p>
+                                    @endif
+                                </div> 
+                            </div>
+                        </div>
+                         @endforeach
+                        <!-- offer Item -->  
+                    </div>
+                </div>
+                @endif
+
+                <!-- event -->
+                @if(count($events) != 0)
+                <div class="restdetails-menu-wrap mb-50px">
+                    <h2 class="in-title3-24px mb-5">{{get_phrase('event')}}</h2>
+                    <div class="restdetails-menu-items">                        
+                        @foreach (($events ?? []) as $key => $event)                      
+                        <input class="form-check-input d-none" name="room[]"  type="checkbox"  value="{{ $room['id'] ?? '' }}" id="flckDefault{{ $key }}"
+                        @if(!empty($listing->room) && $listing->room !== 'null' && in_array($room['id'] ?? 0, json_decode($listing->room, true) ?? [])) checked @endif>
+                        <div class="restdetails-menu-item d-flex" onclick="selectEvent('{{ $key }}', '{{ $event['id'] ?? '' }}', '{{ $event['title'] ?? 'Untitled Room' }}', '{{ $event['price'] ?? 0 }}', '{{ $event['to_date'] ?? 0 }}')" 
+                                    for="flckDefault{{ $key }}">
+                            <div class="img">
+                                <img src="{{ $event['image'] }}" alt="">
+                            </div>
+                            <div class="restdetails-menu-details">
+                                <h5 class="name">{{$event['title']}}</h5>
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($event['price']))
+                                        <p class="new-price">{{ currency($event['price']) }} </p>
+                                    @endif
+                                </div> 
+                                <div class="prices d-flex align-items-end">
+                                    @if(!empty($event['to_date']))
+                                        <p class="new-price">{{ $event['to_date'] }} </p>
+                                    @endif
+                                </div> 
+                            </div>
+                        </div>
+                         @endforeach
+                        <!-- event Item -->  
+                    </div>
+                </div>
+                @endif    
                     <!-- Details Address -->
                       @php $plus = 1 @endphp
                     <div class="row row-28 filter_rooms_row">
@@ -368,6 +416,9 @@
                         <input type="hidden" name="listing_type" value="work">
                         <input type="hidden" name="listing_id" value="{{ $listing->id }}">
                         <input type="hidden" name="customer_id" value="{{ $listing->id }}">
+                        <input type="hidden" name="title" value="{{ $listing->title }}">
+                        <input type="hidden" id="offers_ids" name="offers_ids" value="">
+                        <input type="hidden" id="offer_percent" name="offer_percent" value="">
                         <div id="selectedRoomsContainer"></div>
                         <div class="sleepdetails-form-inputs mb-16">
                         <div class="mb-3">
@@ -414,7 +465,7 @@
                             </div>
                         </div>
                         <input type="hidden" id="tax_persent" value="{{ isset($listing->tax_persent) ? $listing->tax_persent : 0 }}">
-                        <input type="hidden" id="total_price" name="total_price" value="0">
+                        <!-- <input type="hidden" id="total_price" name="total_price" value="0"> -->
                         <button type="submit" class="submit-fluid-btn">
                         {{ get_phrase('Proceed Booking') }}
                         </button>

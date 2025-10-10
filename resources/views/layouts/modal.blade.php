@@ -127,6 +127,61 @@
   </div>
 </div>
 
+<!-- Event Booking Modal -->
+<div class="modal fade" id="eventModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-sm">
+    <div class="modal-content">
+      <form id="eventBookingForm" method="POST" action="{{ route('customerBookAppointment') }}">
+        @csrf
+        <div class="modal-header py-2">
+          <h5 class="modal-title">Book Event</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body py-2 px-3">
+          <input type="hidden" id="modal_event_id" name="event_id">
+          <input type="hidden" id="modal_event_price" name="event_price">
+          <input type="hidden" id="listing_type" name="listing_type" value="event">
+
+          <!-- Event Title (Full Row) -->
+          <div class="mb-2">
+            <label class="form-label mb-1">Event Title</label>
+            <input type="text" id="modal_event_title" name="title"  class="form-control form-control-sm" readonly>
+          </div>
+
+          <!-- Two-column Row: Date + Price -->
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label mb-1">Event Date</label>
+              <input type="text" id="modal_event_date" name="date" class="form-control form-control-sm" readonly>
+            </div>
+            <div class="col-6">
+              <label class="form-label mb-1">Price per Person</label>
+              <input type="text" id="modal_event_base_price" class="form-control form-control-sm" readonly>
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label mb-1">Person Count</label>
+              <input type="number" id="modal_event_persons" name="adults" class="form-control form-control-sm" min="1" value="1">
+            </div>
+            <div class="col-6">
+              <label class="form-label mb-1 fw-bold">Total Price</label>
+              <input type="text" id="modal_event_total" class="form-control form-control-sm fw-bold" readonly>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary btn-sm">Submit Booking</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
 <script>
     "use script"
     function modal(size, url, title){
@@ -175,5 +230,68 @@
         $('#confirm-modal').modal('show');
         $("#confirm-btn").attr("href",url);
     }
+</script>    
+<script>    
+
+let userLoggedIn = false; 
+
+// Event click handler
+function selectEvent(key, id, title, price, date) {
+    @if(auth()->check())
+
+    // Fill modal fields
+    document.getElementById('modal_event_id').value = id;
+    document.getElementById('modal_event_title').value = title;
+    document.getElementById('modal_event_date').value = date;
+    document.getElementById('modal_event_base_price').value = "₹" + parseFloat(price).toLocaleString();
+    document.getElementById('modal_event_price').value = price;
+    document.getElementById('modal_event_persons').value = 1;
+    document.getElementById('modal_event_total').value = "₹" + parseFloat(price).toLocaleString();
+
+    // Show modal
+    let modal = new bootstrap.Modal(document.getElementById('eventModal'));
+    modal.show();
+    @else
+        window.location.href = "{{ route('login') }}?redirect=" + encodeURIComponent(window.location.href);
+    @endif
+}
+
+// Auto-calculate total when person count changes
+document.getElementById('modal_event_persons').addEventListener('input', function () {
+    let basePrice = parseFloat(document.getElementById('modal_event_price').value) || 0;
+    let persons = parseInt(this.value) || 1;
+    let total = basePrice * persons;
+
+    document.getElementById('modal_event_total').value = "₹" + total.toLocaleString();
+    document.getElementById('modal_event_price').value = total; // update hidden total for submission
+});
+
+// Handle form submission (optional AJAX)
+document.getElementById('eventBookingForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    let form = this;
+    let formData = new FormData(form);
+
+    fetch(form.action, {
+        method: 'POST',
+        body: formData,
+        headers: { 'X-Requested-With': 'XMLHttpRequest' }
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.success) {
+            alert('Event booked successfully!');
+            let modalEl = document.getElementById('eventModal');
+            let modal = bootstrap.Modal.getInstance(modalEl);
+            modal.hide();
+        } else {
+            alert(data.message || 'Something went wrong.');
+        }
+    })
+    .catch(() => alert('Server error, please try again.'));
+});
+
+
 </script>    
 {{-- @endpush --}}
